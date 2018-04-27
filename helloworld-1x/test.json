@@ -1,0 +1,7 @@
+{
+  "name": "helloworld-1x",
+  "version": "1.x",
+  "versionSpecific": true,
+  "type": "bash",
+  "cleanup": true
+}
