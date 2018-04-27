@@ -24,6 +24,7 @@ pushd $PROJNAME
 dotnet run | grep 'Hello World from F#!'
 if [ $? -eq 1 ]; then
   echo "F# Hello World FAIL"
+  rm -rf $PROJNAME
   exit 1
 fi
 popd
@@ -40,6 +41,7 @@ pushd $PROJNAME
 dotnet run | grep 'Hello World!'
 if [ $? -eq 1 ]; then
   echo "VB Hello World FAIL"
+  rm -rf $PROJNAME
   exit 1
 fi
 popd
