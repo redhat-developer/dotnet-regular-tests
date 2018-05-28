@@ -1,0 +1,7 @@
+{
+  "name": "no-source-files-in-nuget",
+  "version": "1.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true
+}
