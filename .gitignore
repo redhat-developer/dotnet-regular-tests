@@ -5,6 +5,10 @@ run-tests.py
 common.sh
 get-completions.sh
 
+# .sln is not wanted
+*.sln
+
+# Built stuffs and IDE stuff
 *.userprefs
 .idea/
 bin/
