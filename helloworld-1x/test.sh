@@ -5,6 +5,7 @@ function cleanup {
 }
 
 # Test new C# project
+cleanup cs
 dotnet new -t console -l C#
 dotnet restore
 dotnet build
@@ -20,7 +21,7 @@ echo "C# Hello World PASS"
 echo -e "===================\n"
 
 # Test new F# project
-
+cleanup fs
 dotnet new -t console -l F#
 dotnet restore
 dotnet build
