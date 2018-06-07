@@ -69,24 +69,17 @@ namespace linq
                 var bottom = startingDeck.Skip(26);
     
                 var shuffle2 = top.InterleaveSequenceWith(bottom);
-                foreach (var c in shuffle2)
-                {
-                    Console.WriteLine(c);
-                }
     
     
                 var times = 0;
                 var shuffle = startingDeck;
                 do
                 {
-                    shuffle = shuffle.Skip(26).InterleaveSequenceWith(shuffle.Take(26)).ToArray();
-                    /*
-    
-                    foreach (var c in shuffle)
-                        Console.WriteLine(c);
-    
-                    Console.WriteLine();
-                    */
+                    var result = shuffle.Skip(26).InterleaveSequenceWith(shuffle.Take(26)).ToArray();
+                    if( times % 2 == 0 )
+                        Assert.Equal( shuffle[times/2 + result.Length/2], result[times] );
+                    else Assert.Equal( shuffle[times/2], result[times] );
+                    shuffle = result;
                     times++;
                 } while (!startingDeck.SequenceEquals(shuffle));
 
@@ -117,12 +110,7 @@ namespace linq
                 yield return Rank.King;
                 yield return Rank.Ace;
             }
-
-    }
-
-        
-        
-    
+        }
     }
     
     
