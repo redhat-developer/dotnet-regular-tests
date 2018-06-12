@@ -26,7 +26,7 @@ namespace rest_client
             var stringTask = client.GetStringAsync("https://api.github.com/orgs/dotnet/repos");
 
             var msg = await stringTask;
-            Assert.NotNull(msg);
+            Assert.NotEmpty(msg);
         }
     }
 }
