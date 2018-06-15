@@ -1,6 +1,6 @@
 {
   "name": "tool-dev-certs",
-  "version": "2.1.300",
+  "version": "2.1",
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true

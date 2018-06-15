@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-dotnet tool install dotnet-dev-certs
+dotnet tool install --global dotnet-dev-certs
 dotnet dev-certs
 
 if [ $? -eq 1 ]; then
