@@ -1,0 +1,7 @@
+{
+  "name": "man-pages",
+  "version": "2.1",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true
+}
