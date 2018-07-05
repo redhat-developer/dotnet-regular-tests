@@ -1,14 +1,14 @@
 #!/bin/bash
 
-folder="cstest"
+folder="fstest"
 mkdir $folder && pushd $folder
 
 function cleanup {
   popd && rm -rf $folder
 }
 
-# Test new C# project
-dotnet new -t console -l C#
+# Test new F# project
+dotnet new -t console -l F#
 dotnet restore
 dotnet build
 dotnet run | grep 'Hello World!'
@@ -19,7 +19,7 @@ fi
 
 cleanup
 echo -e "\n==================="
-echo "C# Hello World PASS"
+echo "F# Hello World PASS"
 echo -e "===================\n"
 
 exit 0
