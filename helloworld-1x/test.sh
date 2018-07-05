@@ -1,37 +1,40 @@
 #!/bin/bash
 
+folder="cstest"
+mkdir $folder && pushd $folder
+
 function cleanup {
-  rm -rf Program.$1 project.json project.lock.json bin obj
+  popd && rm -rf $folder
 }
 
 # Test new C# project
-cleanup cs
 dotnet new -t console -l C#
 dotnet restore
 dotnet build
 dotnet run | grep 'Hello World!'
 if [ $? -eq 1 ]; then
-  cleanup cs
+  cleanup
   exit 1
 fi
 
-cleanup cs
+cleanup
 echo -e "\n==================="
 echo "C# Hello World PASS"
 echo -e "===================\n"
 
+folder="fstest"
+mkdir $folder && pushd $folder
 # Test new F# project
-cleanup fs
 dotnet new -t console -l F#
 dotnet restore
 dotnet build
 dotnet run | grep 'Hello World!'
 if [ $? -eq 1 ]; then
-  cleanup fs
+  cleanup
   exit 1
 fi
 
-cleanup fs
+cleanup
 echo -e "\n==================="
 echo "F# Hello World PASS"
 echo -e "===================\n"
