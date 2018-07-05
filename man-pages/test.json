@@ -1,5 +1,6 @@
 {
   "name": "man-pages",
+  "enabled": true,
   "version": "2.1",
   "versionSpecific": false,
   "type": "bash",

@@ -1,5 +1,6 @@
 {
   "name": "system-libunwind",
+  "enabled": true,
   "version": "2.0",
   "versionSpecific": false,
   "type": "bash",

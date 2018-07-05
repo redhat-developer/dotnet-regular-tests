@@ -1,5 +1,6 @@
 {
   "name": "libuv-kestrel-sample-app",
+  "enabled": true,
   "version": "1.0",
   "versionSpecific": false,
   "type": "bash",

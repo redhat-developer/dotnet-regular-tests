@@ -1,5 +1,6 @@
 {
   "name": "helloworld-10",
+  "enabled": true,
   "version": "1.0",
   "versionSpecific": true,
   "type": "bash",
