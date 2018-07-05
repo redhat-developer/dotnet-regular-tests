@@ -4,6 +4,7 @@ source ../../common.sh
 
 initialize
 
+step dotnet restore
 step dotnet build
 background-step dotnet run
 step sleep 15
