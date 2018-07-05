@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+set -x
 
 latest_aspnet_package=2.1.1
 sdks=$(dotnet --list-sdks | awk '{print $1}')
