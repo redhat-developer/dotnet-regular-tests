@@ -58,7 +58,7 @@ for sdk in "$sdks"; do
 
     # publish application
     cd $test_folder
-    dotnet publish -o out >/dev/null
+    dotnet publish -o out
 
     # read the package version
     package_version=$(cat out/*.deps.json | jq -r '.targets[".NETCoreApp,Version=v2.1"]["testapp/1.0.0"].dependencies["'$package'"]')
@@ -91,9 +91,9 @@ for sdk in "$sdks"; do
     cd $test_folder
     restore_return=0
     if [ "$package" == "Microsoft.AspNetCore.App" ]; then
-      LatestPatchVersionForAspNetCoreApp2_1=9.9.9 dotnet restore >/dev/null || restore_return=$? && true
+      LatestPatchVersionForAspNetCoreApp2_1=9.9.9 dotnet restore || restore_return=$? && true
     else # Microsoft.AspNetCore.All
-      LatestPatchVersionForAspNetCoreAll2_1=9.9.9 dotnet restore >/dev/null || restore_return=$? && true
+      LatestPatchVersionForAspNetCoreAll2_1=9.9.9 dotnet restore || restore_return=$? && true
     fi
 
     # cleanup folder
