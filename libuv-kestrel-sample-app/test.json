@@ -4,5 +4,7 @@
   "version": "2.0",
   "versionSpecific": false,
   "type": "bash",
-  "cleanup": true
+  "cleanup": true,
+  "platform-blacklist":[
+  ]
 }
