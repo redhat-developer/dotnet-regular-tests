@@ -3,8 +3,8 @@
 set -e
 set -x
 
-latest_aspnet_package=2.1.1
-sdks=$(dotnet --list-sdks | awk '{print $1}')
+latest_aspnet_package=2.1.3
+sdks=$(dotnet --list-sdks | awk '{print $1}' | sort -ur | head -1)
 test_folder=testapp
 
 function create_project_for_sdk_and_package()
