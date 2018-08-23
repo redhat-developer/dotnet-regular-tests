@@ -3,8 +3,34 @@
 set -e
 set -x
 
-latest_aspnet_package=2.1.3
-sdks=$(dotnet --list-sdks | awk '{print $1}' | sort -ur | head -1)
+# Ensure we have an up-to-date value for latest_aspnet_package.
+dotnet_version=$(dotnet --version)
+dotnet_version_patch=${dotnet_version##*.}
+latest_known_patch=401
+if [[ "$dotnet_version_patch" -le "$latest_known_patch" ]]; then
+  latest_aspnet_package=2.1.3
+else
+  echo "Unknown dotnet version ($dotnet_version), please update latest_known_patch and latest_aspnet_package."
+  exit 1
+fi
+
+# On RHEL, older sdks are aware of the latest ASP.NET Core version
+# by setting LatestPatchVersionForAspNetCore{App,All}2_1 in the scl.
+# On other OSes, only the latest sdk is aware of the latest ASP.NET Core version.
+sdks=$(dotnet --list-sdks | awk '{print $1}' | sort -ur)
+if [[ `grep "Red Hat Enterprise Linux" /etc/redhat-release` ]]; then
+  if [ "$LatestPatchVersionForAspNetCoreApp2_1" != "$latest_aspnet_package" ]; then
+    echo "LatestPatchVersionForAspNetCoreApp2_1 is not set to the latest ASP.NET Core version."
+    exit 1
+  fi
+  if [ "$LatestPatchVersionForAspNetCoreAll2_1" != "$latest_aspnet_package" ]; then
+    echo "LatestPatchVersionForAspNetCoreAll2_1 is not set to the latest ASP.NET Core version."
+    exit 1
+  fi
+else
+  sdks=(${sdks[0]})
+fi
+
 test_folder=testapp
 
 function create_project_for_sdk_and_package()
