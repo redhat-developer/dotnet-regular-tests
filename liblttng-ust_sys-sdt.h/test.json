@@ -5,6 +5,6 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
-  "platform-blacklist":[
+  "platformBlacklist":[
   ]
 }
