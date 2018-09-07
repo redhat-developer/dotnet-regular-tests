@@ -6,9 +6,9 @@ set -x
 # Ensure we have an up-to-date value for latest_aspnet_package.
 dotnet_version=$(dotnet --version)
 dotnet_version_patch=${dotnet_version##*.}
-latest_known_patch=401
+latest_known_patch=402
 if [[ "$dotnet_version_patch" -le "$latest_known_patch" ]]; then
-  latest_aspnet_package=2.1.3
+  latest_aspnet_package=2.1.4
 else
   echo "Unknown dotnet version ($dotnet_version), please update latest_known_patch and latest_aspnet_package."
   exit 1
