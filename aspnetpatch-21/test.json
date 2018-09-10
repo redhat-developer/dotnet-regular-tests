@@ -1,6 +1,6 @@
 {
   "name": "aspnetpatch-21",
-  "enabled": true,
+  "enabled": false,
   "version": "2.1",
   "versionSpecific": true,
   "type": "bash",
