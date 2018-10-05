@@ -1,5 +1,8 @@
 #!/bin/bash
 
+if [ -f /etc/profile ]; then
+  source /etc/profile
+fi
 
 dotnet tool install --global dotnet-dev-certs
 dotnet dev-certs
