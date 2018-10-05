@@ -1,6 +1,12 @@
 #!/bin/bash
 
 packageName=$(rpm -qa | grep 'dotnet.*lttng-ust')
+# If a dotnet-specific lttng package doesn't exist, we must be using
+# the normal system-wide lttng package.
+if [ -z "$packageName" ]; then
+  packageName=$(rpm -qa | grep 'lttng-ust')
+fi
+
 filePath=$(rpm -ql $packageName | grep 'liblttng-ust.so.0$')
 readelf -n $filePath | grep 'NT_STAPSDT (SystemTap probe descriptors)'
 
