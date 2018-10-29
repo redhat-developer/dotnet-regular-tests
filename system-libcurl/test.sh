@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -euo pipefail
 
 echo "Looking for libssl..."
 ldd $(dirname $(readlink -f $(which dotnet)))/shared/Microsoft.NETCore.App/*/System.Net.Http.Native.so | grep 'libssl.so'

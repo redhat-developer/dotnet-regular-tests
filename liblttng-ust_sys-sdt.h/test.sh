@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 packageName=$(rpm -qa | grep 'dotnet.*lttng-ust')
 # If a dotnet-specific lttng package doesn't exist, we must be using
 # the normal system-wide lttng package.

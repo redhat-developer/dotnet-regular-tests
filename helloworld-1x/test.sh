@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 folder="cstest"
 mkdir $folder && pushd $folder
 

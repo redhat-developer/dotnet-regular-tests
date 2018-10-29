@@ -4,6 +4,10 @@ if [ -f /etc/profile ]; then
   source /etc/profile
 fi
 
+# Enable "unofficial strict mode" only after loading /etc/profile
+# because that usually contains lots of "errors".
+set -euo pipefail
+
 dotnet tool install --global dotnet-dev-certs
 dotnet dev-certs
 

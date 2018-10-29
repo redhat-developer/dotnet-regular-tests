@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 set -x
 
 # Ensure we have an up-to-date value for latest_aspnet_package.

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-dotnet new console
+set -euo pipefail
+
+dotnet new console --force
 dotnet restore
 dotnet build
 

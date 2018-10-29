@@ -3,15 +3,8 @@
 # this file tests templates created by
 # dotnet new <template>
 
-# override function from common.sh ( so we can have more tests in one file :) )
-function get-test-name {
-	printf "%s" "${origTestName} ( ${currentTestName} )"
-}
-
-set -e
-#set -eux
-origTestName="$( get-test-name )"
-currentTestName=""
+set -euo pipefail
+#set -x
 
 # tested templates
 # format: <template> <action>
@@ -85,7 +78,6 @@ function testTemplates {
 		if [ -n "${line:-}" ] ; then
 			templateName="${line%% *}"
 			action="${line##* }"
-			currentTestName="${templateName}"
 
 			[ -d "${tmpDir}" ]
 			mkdir -p "${tmpDir}/${templateName}-template"
