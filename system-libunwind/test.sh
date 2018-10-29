@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 ldd $(dirname $(readlink -f $(which dotnet)))/shared/Microsoft.NETCore.App/*/libcoreclr.so | grep 'libunwind.so'
 if [ $? -eq 1 ]; then
   echo "libunwind not found"

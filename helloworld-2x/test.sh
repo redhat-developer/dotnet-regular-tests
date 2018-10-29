@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 PROJNAME=helloworld
 
 # Test new C# project

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
 
 ../../get-completions.sh dotnet n | grep new
 if [ $? -eq 1 ]; then
