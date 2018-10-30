@@ -8,7 +8,9 @@ fi
 # because that usually contains lots of "errors".
 set -euo pipefail
 
-dotnet tool install --global dotnet-dev-certs
+# it's okay if the tool is already installed
+# if the tool fails to install, it will fail in the next line
+dotnet tool install --global dotnet-dev-certs || true
 dotnet dev-certs
 
 if [ $? -eq 1 ]; then
