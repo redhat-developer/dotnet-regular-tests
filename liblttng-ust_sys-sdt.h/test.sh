@@ -1,8 +1,11 @@
 #!/bin/bash
 
 set -euo pipefail
+set -x
 
+set +e  # disable abort-on-error so we can have the pipeline below fail
 packageName=$(rpm -qa | grep 'dotnet.*lttng-ust')
+set -e
 # If a dotnet-specific lttng package doesn't exist, we must be using
 # the normal system-wide lttng package.
 if [ -z "$packageName" ]; then
