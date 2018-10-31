@@ -13,6 +13,8 @@ set -x
 
 no_server=("/nodeReuse:false" "/p:UseSharedCompilation=false" "/p:UseRazorBuildServer=false")
 
+rm -rf HelloWeb
+
 mkdir HelloWeb
 pushd HelloWeb
 strace -e %network -fo ../new.log dotnet new web
@@ -27,3 +29,5 @@ if grep AF_INET build.log ; then
 else
     echo "OK"
 fi
+
+rm new.log restore.log build.log
