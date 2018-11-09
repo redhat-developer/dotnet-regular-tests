@@ -17,9 +17,9 @@ rm -rf HelloWeb
 
 mkdir HelloWeb
 pushd HelloWeb
-strace -e %network -fo ../new.log dotnet new web
-strace -e %network -fo ../restore.log dotnet restore "${no_server[@]}"
-strace -e %network -fo ../build.log dotnet build -c Release  "${no_server[@]}"
+strace -e network -fo ../new.log dotnet new web
+strace -e network -fo ../restore.log dotnet restore "${no_server[@]}"
+strace -e network -fo ../build.log dotnet build -c Release  "${no_server[@]}"
 popd
 rm -rf HelloWeb
 
