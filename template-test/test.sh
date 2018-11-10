@@ -95,4 +95,9 @@ function testTemplates {
 trap cleanupFunc EXIT
 tmpDir="$( mktemp -d )"
 
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+if [[ -f "${script_dir}/nuget.config" ]]; then
+    cp "${script_dir}/nuget.config" "${tmpDir}/"
+fi
+
 testTemplates
