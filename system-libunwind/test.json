@@ -6,6 +6,6 @@
   "type": "bash",
   "cleanup": true,
   "platformBlacklist":[
-  rhel8
+    "rhel8"
   ]
 }
