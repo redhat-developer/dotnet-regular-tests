@@ -8,6 +8,9 @@ set -euo pipefail
 runtime_version=$(dotnet --info  | grep '  Microsoft.NETCore.App' | awk '{ print $2 }' | sort -rh | head -1)
 echo "Latest runtime version: $runtime_version"
 
+runtime_version_major_minor=$(echo "$runtime_version" | cut -d'.' -f-2)
+echo "Latest runtime major/mior version: $runtime_version_major_minor"
+
 test_folder=testapp
 
 function create_project_for_package()
@@ -22,7 +25,7 @@ function create_project_for_package()
   cat >$test_folder/testapp.csproj <<EOF
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp${runtime_version_major_minor}</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="$package" />
@@ -52,7 +55,7 @@ for package in Microsoft.AspNetCore.App Microsoft.AspNetCore.All; do
   dotnet publish -o out
 
   # read the package version
-  package_version=$(cat out/*.deps.json | jq -r '.targets[".NETCoreApp,Version=v2.1"]["testapp/1.0.0"].dependencies["'$package'"]')
+  package_version=$(cat out/*.deps.json | jq -r '.targets[".NETCoreApp,Version=v'$runtime_version_major_minor'"]["testapp/1.0.0"].dependencies["'$package'"]')
 
   # cleanup folder
   popd
