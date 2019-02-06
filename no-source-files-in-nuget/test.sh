@@ -1,8 +1,17 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+set -x
 
-dotnet new console --force
+rm -rf project.json
+
+IFS='.' read -ra VERSION <<< "$1"
+NEW_CMD="new console --force"
+if [[ "${VERSION[0]}" = "1" ]]; then
+  NEW_CMD="new -t console"
+fi
+
+dotnet $NEW_CMD
 dotnet restore
 dotnet build
 
