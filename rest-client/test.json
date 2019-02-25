@@ -1,6 +1,6 @@
 {
   "name": "rest-client",
-  "enabled": true,
+  "enabled": false,
   "version": "1.0",
   "versionSpecific": false,
   "type": "xunit",
