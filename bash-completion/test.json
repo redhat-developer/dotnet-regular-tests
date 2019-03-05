@@ -1,8 +1,8 @@
 {
   "name": "bash-completion",
   "enabled": true,
-  "version": "2.0",
-  "versionSpecific": false,
+  "version": "2.1",
+  "versionSpecific": true,
   "type": "bash",
   "cleanup": true,
   "platformBlacklist":[

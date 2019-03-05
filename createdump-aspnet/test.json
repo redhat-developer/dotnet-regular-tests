@@ -2,7 +2,7 @@
   "name": "createdump-aspnet",
   "enabled": true,
   "version": "2.2",
-  "versionSpecific": true,
+  "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
   "platformBlacklist":[
