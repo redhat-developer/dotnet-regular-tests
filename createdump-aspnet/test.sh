@@ -5,7 +5,9 @@ set -euo pipefail
 
 set -x
 
-version="$1"
+IFS='.' read -ra VERSION_SPLIT <<< "$1"
+
+version=${VERSION_SPLIT[0]}.${VERSION_SPLIT[1]}
 
 dotnet new web --force
 # The tool install command can fail because the tool is already installed
