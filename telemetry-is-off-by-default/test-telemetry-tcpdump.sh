@@ -5,15 +5,12 @@
 set -euo pipefail
 set -x
 
-# make sure all sudo invocations later on will work
-sudo echo
-
 # found via experimentation
 telemetry_host=dc.services.visualstudio.com
 
 echo "testing telemetry data"
 host ${telemetry_host}
-sudo tcpdump host "${telemetry_host}" -vv >tcp.out 2>tcp.err &
+sudo --non-interactive tcpdump host "${telemetry_host}" -vv >tcp.out 2>tcp.err &
 sleep 2
 rm -rf WebTest
 mkdir -p WebTest
@@ -22,7 +19,7 @@ dotnet new web >/dev/null 2>&1 || true
 dotnet publish
 popd
 sleep 2
-sudo pkill tcpdump
+sudo --non-interactive pkill tcpdump
 sleep 2
 
 cat tcp.out
@@ -36,12 +33,12 @@ fi
 
 echo "testing telemetry data is still sent to the same host"
 host ${telemetry_host}
-sudo tcpdump host "${telemetry_host}" -vv >tcp.out 2>tcp.err &
+sudo --non-interactive tcpdump host "${telemetry_host}" -vv >tcp.out 2>tcp.err &
 sleep 2
 export DOTNET_CLI_TELEMETRY_OPTOUT=0
 dotnet new globaljson >/dev/null 2>&1 || true
 sleep 2
-sudo pkill tcpdump
+sudo --non-interactive pkill tcpdump
 sleep 2
 
 cat tcp.out
