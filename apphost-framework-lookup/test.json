@@ -1,7 +1,7 @@
 {
   "name": "apphost-framework-lookup",
   "enabled": true,
-  "version": "3.0",
+  "version": "2.2",
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
