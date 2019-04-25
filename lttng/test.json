@@ -6,5 +6,6 @@
   "type": "bash",
   "cleanup": true,
   "platformBlacklist":[
+    "rhel"
   ]
 }
