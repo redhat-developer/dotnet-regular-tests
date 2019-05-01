@@ -2,7 +2,7 @@
   "name": "bash-completion",
   "enabled": true,
   "version": "2.1",
-  "versionSpecific": true,
+  "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
   "platformBlacklist":[
