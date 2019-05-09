@@ -13,7 +13,7 @@ test_publish()
   popd
 }
 
-test_publish "self-contained" true
 test_publish "framework-dependent" false
+test_publish "self-contained" true
 
 echo "PASS"
