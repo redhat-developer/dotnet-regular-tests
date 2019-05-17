@@ -1,13 +1,26 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
-source ../../common.sh
+set -euo pipefail
 
-initialize
+set -x
 
-step dotnet restore
-step dotnet build
-background-step dotnet run
-step sleep 15
-step curl "http://localhost:5000"
+dotnet restore
+dotnet build
+dotnet run &
+sleep 5
+root_pid=$!
 
-finish
+mapfile -t pids < <(pgrep -P "${root_pid}")
+pids+=("${root_pid}")
+
+curl "http://localhost:5000"
+
+for pid in "${pids[@]}"; do
+    kill -s SIGTERM "${pid}"
+done
+sleep 1
+for pid in "${pids[@]}"; do
+    if ps -p "${pid}"; then
+        kill "${pid}"
+    fi
+done
