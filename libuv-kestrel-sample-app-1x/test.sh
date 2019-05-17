@@ -1,6 +1,8 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
-source ../../common.sh
+set -euo pipefail
+
+set -x
 
 rm -f project.json
 if [ "x$1" = "x1.0" ]; then
@@ -9,12 +11,23 @@ elif [ "x$1" = "x1.1" ]; then
   cp project11.json project.json
 fi
 
-initialize
+dotnet restore
+dotnet build
+dotnet run &
+sleep 5
+root_pid=$!
 
-step dotnet restore
-step dotnet build
-background-step dotnet run
-step sleep 15
-step curl "http://localhost:5000"
+mapfile -t pids < <(pgrep -P "${root_pid}")
+pids+=("${root_pid}")
 
-finish
+curl "http://localhost:5000"
+
+for pid in "${pids[@]}"; do
+    kill -s SIGTERM "${pid}"
+done
+sleep 1
+for pid in "${pids[@]}"; do
+    if ps -p "${pid}"; then
+        kill "${pid}"
+    fi
+done
