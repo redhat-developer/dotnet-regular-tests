@@ -1,0 +1,12 @@
+{
+  "name": "bundled-libunwind",
+  "enabled": true,
+  "version": "2.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "platformBlacklist":[
+    "rhel7",
+    "fedora"
+  ]
+}
