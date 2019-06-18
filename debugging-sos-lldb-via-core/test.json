@@ -1,0 +1,11 @@
+{
+  "name": "debugging-sos-lldb-via-core",
+  "enabled": true,
+  "version": "2.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "platformBlacklist":[
+  ]
+}
+
