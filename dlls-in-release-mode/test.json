@@ -1,0 +1,11 @@
+{
+  "name": "dlls-in-release-mode",
+  "enabled": true,
+  "version": "2.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "platformBlacklist":[
+  ]
+}
+
