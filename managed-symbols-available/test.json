@@ -1,0 +1,11 @@
+{
+  "name": "managed-symbols-available",
+  "enabled": true,
+  "version": "3.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "platformBlacklist":[
+  ]
+}
+
