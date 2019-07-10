@@ -128,7 +128,7 @@ cat lldb.out
 echo "[ip2md]"
 lldb-core 'clrthreads' > lldb.out
 cat lldb.out
-thread_id=$(grep -A5 'ID OSID ThreadOBJ' lldb.out | tail -4 | grep -v 'Finalizer' | head -1 | awk '{print $1}')
+thread_id=$(grep -A5 'ID OSID ThreadOBJ' lldb.out | tail -4 | grep -vE 'Finalizer|Threadpool' | head -1 | awk '{print $1}')
 lldb-core "thread select ${thread_id}" 'clrstack' > lldb.out
 cat lldb.out
 ip=$(grep 'OS Thread Id:' lldb.out -A5 | tail -n3 | grep -v -F '[Prestub' | head -1 | cut -d' ' -f2)
