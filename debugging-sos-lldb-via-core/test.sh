@@ -38,11 +38,15 @@ cd TestDir
 
 dotnet new web
 sed -i -e 's|.UseStartup|.UseUrls("http://localhost:5000").UseStartup|' Program.cs
-dotnet run &
+dotnet build
+dotnet run --no-restore --no-build &
 run_pid=$!
 
-sleep 5
-exec_pid=$(pgrep --list-full --full 'dotnet exec' | cut -d' ' -f1)
+exec_pid=$(pgrep --list-full --full 'dotnet exec' | cut -d' ' -f1) || true
+while [ -z "${exec_pid}" ]; do
+    sleep 1
+    exec_pid=$(pgrep --list-full --full 'dotnet exec' | cut -d' ' -f1) || true
+done
 
 sleep 5
 
