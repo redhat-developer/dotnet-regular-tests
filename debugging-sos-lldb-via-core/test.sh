@@ -21,7 +21,7 @@ lldb-core () {
          "${commands[@]}"
 }
 
-version=$1
+sdk_version=$1
 
 set -x
 
@@ -51,9 +51,11 @@ done
 sleep 5
 
 # TODO: assert that this is only one directory
-framework_dir="$(ls -d "$(dirname "$(readlink -f "$(command -v dotnet)")")/shared/Microsoft.NETCore.App/${version}"*)"
-
+declare -a versions
+readarray -d '.' -t versions <<< ${sdk_version}
+framework_dir="$(ls -d "$(dirname "$(readlink -f "$(command -v dotnet)")")/shared/Microsoft.NETCore.App/${versions[0]}.${versions[1]}"*)"
 echo "${framework_dir}"
+test -d "${framework_dir}"
 
 "${framework_dir}"/createdump --name 'coredump.%d' "${exec_pid}" | tee exec.pid
 
