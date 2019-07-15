@@ -7,6 +7,10 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+# https://stackoverflow.com/questions/3173131/redirect-copy-of-stdout-to-log-file-from-within-bash-script-itself
+exec > >(tee -i sos-lldb-core.log)
+exec 2>&1
+
 lldb-core () {
     commands=()
     while [[ "$#" -ne 0 ]]; do
@@ -24,6 +28,14 @@ lldb-core () {
 sdk_version=$1
 
 set -x
+
+# TODO: assert that this is only one directory
+declare -a versions
+IFS='.' read -ra versions <<< "${sdk_version}"
+framework_dir="$(ls -d "$(dirname "$(readlink -f "$(command -v dotnet)")")/shared/Microsoft.NETCore.App/${versions[0]}.${versions[1]}"*)"
+echo "${framework_dir}"
+test -d "${framework_dir}"
+test -f "${framework_dir}/createdump"
 
 if ! command -v lldb ; then
     echo "lldb is not installed"
@@ -49,13 +61,6 @@ while [ -z "${exec_pid}" ]; do
 done
 
 sleep 5
-
-# TODO: assert that this is only one directory
-declare -a versions
-readarray -d '.' -t versions <<< ${sdk_version}
-framework_dir="$(ls -d "$(dirname "$(readlink -f "$(command -v dotnet)")")/shared/Microsoft.NETCore.App/${versions[0]}.${versions[1]}"*)"
-echo "${framework_dir}"
-test -d "${framework_dir}"
 
 "${framework_dir}"/createdump --name 'coredump.%d' "${exec_pid}" | tee exec.pid
 
