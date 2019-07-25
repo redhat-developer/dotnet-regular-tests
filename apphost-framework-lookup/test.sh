@@ -3,6 +3,8 @@
 set -euo pipefail
 set -x
 
+env
+
 test_publish()
 {
   name=$1
