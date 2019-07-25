@@ -12,10 +12,8 @@ IFS='.' read -ra VERSION_SPLIT <<< "$1"
 version=${VERSION_SPLIT[0]}.${VERSION_SPLIT[1]}
 
 dotnet new web --force
-# The tool install command can fail because the tool is already installed
-# so ignore that. We will fail later on if the tool can't be executed.
-dotnet tool install -g dotnet-dev-certs || true
-dotnet dev-certs https
+
+sed -i -e 's|.UseStartup|.UseUrls("http://localhost:5000").UseStartup|' Program.cs
 
 # Do not kick off compiler servers that hang around after a build
 dotnet build -p:UseRazorBuildServer=false -p:UseSharedCompilation=false /m:1
