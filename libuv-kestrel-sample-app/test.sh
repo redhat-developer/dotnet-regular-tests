@@ -6,21 +6,15 @@ set -x
 
 dotnet restore
 dotnet build
-dotnet run &
-sleep 5
+dotnet bin/Debug/netcoreapp*/libuv-kestrel-sample-app.dll &
 root_pid=$!
 
-mapfile -t pids < <(pgrep -P "${root_pid}")
-pids+=("${root_pid}")
+sleep 5
 
 curl "http://localhost:5000"
 
-for pid in "${pids[@]}"; do
-    kill -s SIGTERM "${pid}"
-done
+kill -s SIGTERM "${root_pid}"
 sleep 1
-for pid in "${pids[@]}"; do
-    if ps -p "${pid}"; then
-        kill "${pid}"
-    fi
-done
+if ps -p "${root_pid}"; then
+    kill "${root_pid}"
+fi

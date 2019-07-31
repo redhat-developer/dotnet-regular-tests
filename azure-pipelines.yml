@@ -1,0 +1,52 @@
+
+resources:
+  containers:
+  - container: fedora-30
+    image: fedora:30
+    options: --cap-add all --security-opt seccomp=unconfined --privileged
+
+  - container: fedora-rawhide
+    image: fedora:rawhide
+    options: --cap-add all --security-opt seccomp=unconfined --privileged
+
+jobs:
+  - job: Test
+    timeoutInMinutes: 30
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    strategy:
+      matrix:
+        2.1-fedora-30:
+          containerResource: fedora-30
+          DOTNET_VERSION: 2.1
+          options: --cap-add all --security-opt seccomp=unconfined --privileged
+        2.1-fedora-rawhide:
+          containerResource: fedora-rawhide
+          DOTNET_VERSION: 2.1
+          options: --cap-add all --security-opt seccomp=unconfined --privileged
+        2.2-fedora-30:
+          containerResource: fedora-30
+          DOTNET_VERSION: 2.2
+        2.2-fedora-rawhide:
+          containerResource: fedora-rawhide
+          DOTNET_VERSION: 2.2
+          options: --cap-add all --security-opt seccomp=unconfined --privileged
+
+    container: $[ variables['containerResource'] ]
+
+    steps:
+    - bash: |
+        set -euo pipefail
+        set -x
+        cat /etc/os-release
+        sudo dnf install 'dnf-command(copr)' -y
+        sudo dnf copr enable @dotnet-sig/dotnet -y
+        sudo dnf install git python3 dotnet-sdk-${DOTNET_VERSION} -y
+        mkdir dotnet-regular-tests
+        mv $(ls * -d | grep -v dotnet-regular-tests) dotnet-regular-tests
+        git clone https://github.com/redhat-developer/dotnet-bunny
+        cd dotnet-bunny
+        mv ../dotnet-regular-tests .
+        sudo dnf install $(grep "^Dependencies: " dotnet-regular-tests/README.md | sed "s/Dependencies: //") -y
+        ./run-tests.py ${DOTNET_VERSION} -v
+        cat logfile.log

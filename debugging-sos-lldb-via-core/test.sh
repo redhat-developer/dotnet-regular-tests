@@ -42,6 +42,8 @@ if ! command -v lldb ; then
     exit 1
 fi
 
+no_server=("/nodeReuse:false" "/p:UseSharedCompilation=false" "/p:UseRazorBuildServer=false")
+
 # Create a dump
 
 rm -rf TestDir
@@ -50,24 +52,23 @@ cd TestDir
 
 dotnet new web
 sed -i -e 's|.UseStartup|.UseUrls("http://localhost:5000").UseStartup|' Program.cs
-dotnet build
-dotnet run --no-restore --no-build &
-run_pid=$!
+dotnet build "${no_server[@]}"
 
-exec_pid=$(pgrep --list-full --full 'dotnet exec' | cut -d' ' -f1) || true
-while [ -z "${exec_pid}" ]; do
-    sleep 1
-    exec_pid=$(pgrep --list-full --full 'dotnet exec' | cut -d' ' -f1) || true
-done
+dotnet bin/Debug/netcoreapp*/TestDir.dll &
+run_pid=$!
 
 sleep 5
 
-"${framework_dir}"/createdump --name 'coredump.%d' "${exec_pid}" | tee exec.pid
+if ! "${framework_dir}"/createdump --name 'coredump.%d' "${run_pid}"; then
+    kill "${run_pid}" || true
+    exit 1
+fi
 
-kill "${exec_pid}"
+"${framework_dir}"/createdump --name 'coredump.%d' "${run_pid}" | tee run.pid
+
 kill "${run_pid}" || true
 
-coredump="coredump.${exec_pid}"
+coredump="coredump.${run_pid}"
 test -f "${coredump}"
 
 # Make sure dotnet-sos is not active
