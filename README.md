@@ -12,5 +12,5 @@ git clone git@github.com:redhat-developer/dotnet-bunny.git && cd dotnet-bunny &&
 
 ### Dependencies
 
-Dependencies: jq bash-completion /usr/bin/readelf npm strace /usr/bin/free /usr/bin/lldb findutils which
+Dependencies: babeltrace bash-completion findutils jq lttng-tools npm strace /usr/bin/free /usr/bin/lldb /usr/bin/readelf which
 

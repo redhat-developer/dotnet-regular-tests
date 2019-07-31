@@ -22,9 +22,6 @@ xunit test
 web build
 mvc build
 razor build
-angular build-nodejs
-reactredux build-nodejs
-react build-nodejs
 webapi build
 webconfig new
 globaljson new
@@ -56,8 +53,7 @@ function testTemplate {
 	elif [ "${action}" = "build" ] ; then
 		dotnet build
 	elif [ "${action}" = "build-nodejs" ] ; then
-		npm install
-		dotnet build
+		exit 1
 	elif [ "${action}" = "run" ] ; then
 		dotnet run
 	elif [ "${action}" = "test" ] ; then
