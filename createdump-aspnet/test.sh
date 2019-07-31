@@ -5,8 +5,6 @@ set -euo pipefail
 
 set -x
 
-env
-
 IFS='.' read -ra VERSION_SPLIT <<< "$1"
 
 version=${VERSION_SPLIT[0]}.${VERSION_SPLIT[1]}
