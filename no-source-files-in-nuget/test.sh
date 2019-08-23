@@ -11,6 +11,8 @@ if [[ "${VERSION[0]}" = "1" ]]; then
   NEW_CMD="new -t console"
 fi
 
+rm -rf ~/.nuget
+
 dotnet $NEW_CMD
 dotnet restore
 dotnet build
