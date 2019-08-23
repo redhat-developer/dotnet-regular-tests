@@ -1,8 +1,8 @@
 {
-  "name": "libuv-kestrel-sample-app",
+  "name": "libuv-kestrel-sample-app-2x",
   "enabled": true,
-  "version": "2.0",
-  "versionSpecific": false,
+  "version": "2.x",
+  "versionSpecific": true,
   "type": "bash",
   "cleanup": true,
   "platformBlacklist":[
