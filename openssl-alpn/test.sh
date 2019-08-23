@@ -11,6 +11,14 @@ dotnet_dir="$(dirname $(readlink -f $(which dotnet)))"
 find "${dotnet_dir}" \
      -name System.Security.Cryptography.Native.OpenSsl.so
 
+if ! find "${dotnet_dir}" \
+     -name System.Security.Cryptography.Native.OpenSsl.so \
+     -exec nm -D {} \; \
+     | grep SSL ; then
+    echo "Not linked directly against OpenSSL. Skipping test"
+    exit 0
+fi
+
 find "${dotnet_dir}" \
      -name System.Security.Cryptography.Native.OpenSsl.so \
      -exec nm -D {} \; \
