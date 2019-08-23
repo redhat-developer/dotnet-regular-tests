@@ -1,0 +1,10 @@
+{
+  "name": "aspnet-same-runtime-version-2x",
+  "enabled": true,
+  "version": "3.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "platformBlacklist":[
+  ]
+}
