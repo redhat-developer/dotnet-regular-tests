@@ -28,9 +28,9 @@ if [ $? -eq 1 ]; then
 fi
 
 echo "Step 3"
-"$DIR"/get-completions.sh dotnet mig | grep migrate
+"$DIR"/get-completions.sh dotnet cle | grep clean
 if [ $? -eq 1 ]; then
-  echo 'Bash completion "dotnet mig" FAIL'
+  echo 'Bash completion "dotnet cle" FAIL'
   exit 1
 fi
 
