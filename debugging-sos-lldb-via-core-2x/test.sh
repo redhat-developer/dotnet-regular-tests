@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Check whether coredumps produced by .NET Core can be used by sos
-# successfully. This test uses the `dotnet sos` global tool.
+# successfully. This test uses the built-in CoreCLR sos support, not
+# the new `dotnet sos` global tool.
 
 set -euo pipefail
 IFS=$'\n\t'
@@ -18,18 +19,15 @@ lldb-core () {
         shift
     done
     lldb --batch \
+         --no-lldbinit \
          -c "${coredump}" \
+         --one-line "plugin load ${framework_dir}/libsosplugin.so" \
          "${commands[@]}"
 }
 
 sdk_version=$1
 
 set -x
-
-dotnet tool install -g dotnet-sos  --version 3.0.0-preview8 || true
-dotnet tool install -g dotnet-dump  --version 3.0.0-preview8 || true
-
-dotnet sos install
 
 # TODO: assert that this is only one directory
 declare -a versions
@@ -61,12 +59,24 @@ run_pid=$!
 
 sleep 5
 
-dotnet dump collect --output "coredump.${run_pid}" --process-id "${run_pid}" | tee run.pid
+if ! "${framework_dir}"/createdump --name 'coredump.%d' "${run_pid}"; then
+    kill "${run_pid}" || true
+    exit 1
+fi
+
+"${framework_dir}"/createdump --name 'coredump.%d' "${run_pid}" | tee run.pid
 
 kill "${run_pid}" || true
 
 coredump="coredump.${run_pid}"
 test -f "${coredump}"
+
+# Make sure dotnet-sos is not active
+lldb --batch \
+     -c "${coredump}" \
+     --one-line "soshelp" >lldb.out 2>&1
+cat lldb.out
+grep -F "error: 'soshelp' is not a valid command." lldb.out
 
 # Object Inspection
 
@@ -173,8 +183,8 @@ echo "[bpmd] breakpoints make no sense for core files"
 echo "[eeheap]"
 lldb-core 'eeheap' > lldb.out
 cat lldb.out
-grep 'Heap Size:       Size: 0x' lldb.out
-grep 'GC Heap Size:    Size: 0x' lldb.out
+grep 'Heap Size:               Size: 0x' lldb.out
+grep 'GC Heap Size:            Size: 0x' lldb.out
 # TODO: enable this
 # if grep 'Error getting' lldb.out; then
 #     echo 'fail: Error getting some parts of eeheap'
@@ -196,6 +206,7 @@ cat lldb.out
 grep 'TestDir.dll' lldb.out
 grep 'System.Runtime.dll' lldb.out
 grep 'Microsoft.AspNetCore.dll' lldb.out
+grep 'System.Security.Cryptography.Primitives' lldb.out
 to_string_method_descriptor=$(grep 'MethodDesc:' lldb.out | head -1 | awk '{print $2}')
 
 echo "[dumpmt]"
@@ -223,12 +234,11 @@ grep -F "Name:       ${framework_dir}" lldb.out
 grep 'Attributes: PEFile' lldb.out
 grep 'MetaData start address:  0' lldb.out
 
-# TODO bug https://github.com/dotnet/diagnostics/issues/448
-# echo "[dumpil]"
-# lldb-core "dumpil ${to_string_method_descriptor}" > lldb.out
-# cat lldb.out
-# grep 'IL_0000: ldarg.0' lldb.out
-# grep 'IL_0001: ret ' lldb.out
+echo "[dumpil]"
+lldb-core "dumpil ${to_string_method_descriptor}" > lldb.out
+cat lldb.out
+grep 'IL_0000: ldarg.0' lldb.out
+grep 'IL_0001: ret ' lldb.out
 
 echo "[dumplog]"
 

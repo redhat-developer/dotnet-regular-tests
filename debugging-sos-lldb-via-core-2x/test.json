@@ -1,8 +1,8 @@
 {
   "name": "debugging-sos-lldb-via-core-2x",
   "enabled": true,
-  "version": "3.0",
-  "versionSpecific": false,
+  "version": "2.x",
+  "versionSpecific": true,
   "type": "bash",
   "cleanup": true,
   "platformBlacklist":[
