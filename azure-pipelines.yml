@@ -1,6 +1,13 @@
 
 resources:
   containers:
+  - container: rhel-8
+    image: registry.access.redhat.com/ubi8
+    options: --cap-add all --security-opt seccomp=unconfined --privileged
+
+  - container: dotnet-rhel-8
+    image: registry.access.redhat.com/ubi8/dotnet
+
   - container: fedora-30
     image: fedora:30
     options: --cap-add all --security-opt seccomp=unconfined --privileged
@@ -9,6 +16,7 @@ resources:
     image: fedora:rawhide
     options: --cap-add all --security-opt seccomp=unconfined --privileged
 
+
 jobs:
   - job: Test
     timeoutInMinutes: 30
@@ -16,21 +24,31 @@ jobs:
       vmImage: 'Ubuntu-16.04'
     strategy:
       matrix:
+        # RHEL 8 containers don't work too well on azure because sudo
+        # is not installed and
+        2.1-rhel-8:
+          containerResource: rhel-8
+          DOTNET_VERSION: 2.1
         2.1-fedora-30:
           containerResource: fedora-30
           DOTNET_VERSION: 2.1
-          options: --cap-add all --security-opt seccomp=unconfined --privileged
         2.1-fedora-rawhide:
           containerResource: fedora-rawhide
           DOTNET_VERSION: 2.1
-          options: --cap-add all --security-opt seccomp=unconfined --privileged
         2.2-fedora-30:
           containerResource: fedora-30
           DOTNET_VERSION: 2.2
         2.2-fedora-rawhide:
           containerResource: fedora-rawhide
           DOTNET_VERSION: 2.2
-          options: --cap-add all --security-opt seccomp=unconfined --privileged
+        3.0-fedora-30:
+          containerResource: fedora-30
+          DOTNET_VERSION: 3.0
+          ENABLE_PREVIEW: true
+        3.0-fedora-rawhide:
+          containerResource: fedora-rawhide
+          DOTNET_VERSION: 3.0
+          ENABLE_PREVIEW: true
 
     container: $[ variables['containerResource'] ]
 
@@ -38,9 +56,17 @@ jobs:
     - bash: |
         set -euo pipefail
         set -x
+        whoami
+        id
         cat /etc/os-release
-        sudo dnf install 'dnf-command(copr)' -y
-        sudo dnf copr enable @dotnet-sig/dotnet -y
+        source /etc/os-release
+        if [[ ${ID} == "fedora" ]]; then
+           sudo dnf install 'dnf-command(copr)' -y
+           sudo dnf copr enable @dotnet-sig/dotnet -y
+           if [[ ${ENABLE_PREVIEW} == true ]]; then
+               sudo dnf copr enable @dotnet-sig/dotnet-preview -y
+           fi
+        fi
         sudo dnf install git python3 dotnet-sdk-${DOTNET_VERSION} -y
         mkdir dotnet-regular-tests
         mv $(ls * -d | grep -v dotnet-regular-tests) dotnet-regular-tests
