@@ -46,7 +46,10 @@ EOF
 }
 
 # Verify a matching version of ASP.NET Core App/All is used
-for package in Microsoft.AspNetCore.App Microsoft.AspNetCore.All; do
+
+#for package in Microsoft.AspNetCore.App Microsoft.AspNetCore.All; do
+#We don't have .All leading to releases so this always fails.
+for package in Microsoft.AspNetCore.App; do
   # create project folder
   create_project_for_package $package
 
