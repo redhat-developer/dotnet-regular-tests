@@ -1,0 +1,11 @@
+{
+  "name": "japanese-eras",
+  "enabled": true,
+  "version": "2.1",
+  "versionSpecific": false,
+  "type": "xunit",
+  "cleanup": true,
+  "platformBlacklist":[
+  ]
+}
+
