@@ -1,6 +1,6 @@
 {
   "name": "japanese-eras",
-  "enabled": true,
+  "enabled": false,
   "version": "2.1",
   "versionSpecific": false,
   "type": "xunit",
