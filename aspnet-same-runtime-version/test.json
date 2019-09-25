@@ -1,5 +1,5 @@
 {
-  "name": "aspnet-same-runtime-version-2x",
+  "name": "aspnet-same-runtime-version",
   "enabled": true,
   "version": "3.0",
   "versionSpecific": false,

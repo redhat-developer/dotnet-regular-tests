@@ -1,5 +1,5 @@
 {
-  "name": "debugging-sos-lldb-via-core-2x",
+  "name": "debugging-sos-lldb-via-core",
   "enabled": true,
   "version": "3.0",
   "versionSpecific": false,
