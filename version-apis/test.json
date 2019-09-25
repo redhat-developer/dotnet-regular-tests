@@ -1,0 +1,11 @@
+{
+  "name": "version-apis",
+  "enabled": true,
+  "version": "3.0",
+  "versionSpecific": false,
+  "type": "xunit",
+  "cleanup": true,
+  "platformBlacklist":[
+  ]
+}
+
