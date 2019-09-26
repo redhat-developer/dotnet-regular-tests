@@ -5,31 +5,20 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-version=$1
+sdk_version=$1
+IFS='.' read -ra VERSION_SPLIT <<< "$sdk_version"
+runtime_version=${VERSION_SPLIT[0]}.${VERSION_SPLIT[1]}
 
 ignore_cases=(
-    Microsoft.Win32.Registry.dll
-    SOS.NETCore.dll
-    System.IO.FileSystem.AccessControl.dll
-    System.IO.Pipes.AccessControl.dll
-    System.Private.CoreLib.dll
-    System.Private.DataContractSerialization.dll
-    System.Private.Uri.dll
-    System.Private.Xml.dll
-    System.Private.Xml.Linq.dll
-    System.Runtime.WindowsRuntime.dll
-    System.Runtime.WindowsRuntime.UI.Xaml.dll
-    System.Security.AccessControl.dll
-    System.Security.Cryptography.Cng.dll
-    System.Security.Cryptography.OpenSsl.dll
-    System.Security.Principal.Windows.dll
+    System.Runtime.CompilerServices.Unsafe.dll
 )
 
 dotnet_dir=$(dirname "$(readlink -f "$(which dotnet)")")
 
-framework_dir=${dotnet_dir}/shared/Microsoft.NETCore.App/${version}/
+framework_dirs=("${dotnet_dir}/shared/Microsoft.NETCore.App/${runtime_version}"*)
+framework_dir="${framework_dirs[0]}"
 
-find ${framework_dir} -name '*.dll' -type f | sort -u | while read dll_name; do
+find "${framework_dir}" -name '*.dll' -type f | sort -u | while read dll_name; do
     base_dll_name=$(basename "${dll_name}")
     is_special=0
     for ignore_case in "${ignore_cases[@]}"; do
