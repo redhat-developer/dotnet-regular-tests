@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# This is a script called by multiple tests to find the runtime id of
+# the current platform.
+
+set -euo pipefail
+
+function usage() {
+    echo "usage: $0 [--portable]"
+    echo ""
+    echo "Shows the runtime id of the current OS distribution, or general OS (with the --portable flag)"
+}
+
+source /etc/os-release
+
+declare -A archmap
+archmap=(
+    ["aarch64"]="arm64"
+    ["amd64"]="x64"
+    ["armv8l"]="arm"
+    ["i686"]="x86"
+    ["i386"]="x86"
+    ["x86_64"]="x64"
+)
+
+arch=${archmap["$(uname -m)"]}
+
+portable_rid=0
+
+while [[ $# -gt 0 ]]; do
+    arg=$1
+    shift
+    case "$arg" in
+        --portable) portable_rid=1 ;;
+        *) usage; exit 1 ;;
+    esac
+done
+
+if [[ ${portable_rid} == 1 ]]; then
+    echo "linux-${arch}"
+else
+    case "${ID}" in
+        # Remove the RHEL minor version
+        rhel) rid_version=${VERSION_ID%.*} ;;
+
+        *) rid_version=${VERSION_ID} ;;
+    esac
+
+    echo "${ID}.${rid_version}-${arch}"
+fi
