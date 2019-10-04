@@ -7,7 +7,7 @@ Please see the repository for more details: https://github.com/redhat-developer/
 If you forked it, replace `redhat-developer` with your username.
 
 ```
-git clone git@github.com:redhat-developer/dotnet-bunny.git && cd dotnet-bunny && git clone git@github.com:redhat-developer/dotnet-regular-tests.git
+$ git clone https://github.com/redhat-developer/dotnet-bunny && cd dotnet-bunny && git clone https://github.com/redhat-developer/dotnet-regular-tests
 ```
 
 ### Dependencies
