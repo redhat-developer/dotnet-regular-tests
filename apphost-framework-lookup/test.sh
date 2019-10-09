@@ -10,13 +10,15 @@ fi
 set -euo pipefail
 set -x
 
+runtime_id="$(../runtime-id --portable)"
+
 test_publish()
 {
   name=$1
   mkdir $name && pushd $name
   dotnet new console
-  dotnet publish -r linux-x64 --self-contained $2
-  ./bin/Debug/netcoreapp*/linux-x64/publish/$name
+  dotnet publish -r "$runtime_id" --self-contained $2
+  ./bin/Debug/netcoreapp*/"$runtime_id"/publish/$name
   popd
 }
 
