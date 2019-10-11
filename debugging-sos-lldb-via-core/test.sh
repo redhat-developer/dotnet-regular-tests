@@ -3,6 +3,12 @@
 # Check whether coredumps produced by .NET Core can be used by sos
 # successfully. This test uses the `dotnet sos` global tool.
 
+if [ -f /etc/profile ]; then
+  source /etc/profile
+fi
+
+# Enable "unofficial strict mode" only after loading /etc/profile
+# because that usually contains lots of "errors".
 set -euo pipefail
 IFS=$'\n\t'
 
