@@ -32,8 +32,10 @@ sdk_version=$1
 
 set -x
 
-dotnet tool install -g dotnet-sos  --version 3.0.0-preview8 || true
-dotnet tool install -g dotnet-dump  --version 3.0.0-preview8 || true
+dotnet tool uninstall -g dotnet-sos || true
+dotnet tool uninstall -g dotnet-dump || true
+dotnet tool install -g dotnet-sos  --version 3.0.0
+dotnet tool install -g dotnet-dump --version 3.0.0
 
 dotnet sos install
 
@@ -69,7 +71,7 @@ sleep 5
 
 dotnet dump collect --output "coredump.${run_pid}" --process-id "${run_pid}" | tee run.pid
 
-kill "${run_pid}" || true
+kill -9 "${run_pid}" || true
 
 coredump="coredump.${run_pid}"
 test -f "${coredump}"
@@ -179,7 +181,6 @@ echo "[bpmd] breakpoints make no sense for core files"
 echo "[eeheap]"
 lldb-core 'eeheap' > lldb.out
 cat lldb.out
-grep 'Heap Size:       Size: 0x' lldb.out
 grep 'GC Heap Size:    Size: 0x' lldb.out
 # TODO: enable this
 # if grep 'Error getting' lldb.out; then
@@ -220,7 +221,7 @@ lldb-core "dumpmd ${to_string_method_descriptor}" > lldb.out
 cat lldb.out
 grep -F 'Method Name:          System.String.ToString()' lldb.out
 grep 'IsJitted:             yes' lldb.out
-grep 'Code Version History:' lldb.out
+grep 'Version History:' lldb.out
 
 echo "[dumpmodule]"
 lldb-core "dumpmodule ${string_module}" > lldb.out
