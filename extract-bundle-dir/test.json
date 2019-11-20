@@ -1,0 +1,10 @@
+{
+  "name": "extract-bundle-dir",
+  "enabled": true,
+  "version": "3.1",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "platformBlacklist":[
+  ]
+}
