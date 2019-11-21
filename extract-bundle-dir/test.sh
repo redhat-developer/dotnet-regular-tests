@@ -7,8 +7,8 @@
 set -euo pipefail
 
 # Verify DOTNET_BUNDLE_EXTRACT_BASE_DIR is set.
-if [[ "$DOTNET_BUNDLE_EXTRACT_BASE_DIR" != "$HOME/.dotnet/bundle_extract_dir" ]]; then
-    echo "error: DOTNET_BUNDLE_EXTRACT_BASE_DIR $DOTNET_BUNDLE_EXTRACT_BASE_DIR is not expected $HOME/.dotnet/bundle_extract_dir"
+if [[ "$DOTNET_BUNDLE_EXTRACT_BASE_DIR" != "$HOME/.cache/dotnet_bundle_extract" ]]; then
+    echo "error: DOTNET_BUNDLE_EXTRACT_BASE_DIR $DOTNET_BUNDLE_EXTRACT_BASE_DIR is not expected $HOME/.cache/dotnet_bundle_extract"
     exit 1
 else
     echo "info: DOTNET_BUNDLE_EXTRACT_BASE_DIR is $DOTNET_BUNDLE_EXTRACT_BASE_DIR."
