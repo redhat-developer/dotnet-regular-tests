@@ -2,13 +2,19 @@
 
 # The profile file sets DOTNET_BUNDLE_EXTRACT_BASE_DIR to avoid multi-user issues.
 # see: https://bugzilla.redhat.com/show_bug.cgi?id=1752350.
-. /etc/profile.d/dotnet.sh
+if [ -f /etc/profile ]; then
+  source /etc/profile
+fi
 
 set -euo pipefail
 
 # Verify DOTNET_BUNDLE_EXTRACT_BASE_DIR is set.
-if [[ "$DOTNET_BUNDLE_EXTRACT_BASE_DIR" != "$HOME/.cache/dotnet_bundle_extract" ]]; then
-    echo "error: DOTNET_BUNDLE_EXTRACT_BASE_DIR $DOTNET_BUNDLE_EXTRACT_BASE_DIR is not expected $HOME/.cache/dotnet_bundle_extract"
+if [[ "${DOTNET_BUNDLE_EXTRACT_BASE_DIR:-}" != "$HOME/.cache/dotnet_bundle_extract" ]]; then
+    echo "error: DOTNET_BUNDLE_EXTRACT_BASE_DIR is '${DOTNET_BUNDLE_EXTRACT_BASE_DIR:-}', expected '${HOME:-}/.cache/dotnet_bundle_extract'"
+    echo "\$HOME: ${HOME:-}"
+    echo "\$PWD: ${PWD:-}"
+    echo "\$XDG_CACHE_HOME: ${XDG_CACHE_HOME:-}"
+    echo "\$DOTNET_BUNDLE_EXTRACT_BASE_DIR: ${DOTNET_BUNDLE_EXTRACT_BASE_DIR:-}"
     exit 1
 else
     echo "info: DOTNET_BUNDLE_EXTRACT_BASE_DIR is $DOTNET_BUNDLE_EXTRACT_BASE_DIR."
