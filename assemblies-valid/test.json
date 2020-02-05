@@ -1,9 +1,9 @@
 {
-  "name": "dlls-in-release-mode",
+  "name": "assemblies-valid",
   "enabled": true,
   "version": "2.0",
   "versionSpecific": false,
-  "type": "bash",
+  "type": "xunit",
   "cleanup": true,
   "platformBlacklist":[
   ]
