@@ -1,0 +1,375 @@
+#!/usr/bin/python3
+
+# This is an automated script to check package compliance against
+# https://docs.microsoft.com/en-us/dotnet/core/build/distribution-packaging
+
+import argparse
+from collections import namedtuple
+import pathlib
+import subprocess
+import sys
+from typing import Dict, List, Optional, Tuple
+
+description: str = '''
+Verify that .NET Core packages comply with the official packaging
+suggestions by scanning the local packages, or, optionally, in the
+local directory.
+'''
+
+PackageRequirement = namedtuple('PackageRequirement', ['name', 'version', 'dependencies', 'contains'])
+
+# This is a machine-readable version of the guidelines at
+# https://docs.microsoft.com/en-us/dotnet/core/build/distribution-packaging
+#
+# Values enclosed in paren {like_so} are replaced at runtime with the
+# real values, based on user input.
+#
+# The following names are currently defined/replaced at runtime:
+#
+# rid: runtime id
+# major: the major .NET Core version
+# minor: the minor .NET Core version
+# runtime_version: the full runtime version
+# aspnetcore_runtime_version: the full ASP.NET Core version
+# sdk_version: the full SDK version
+# netstandard_version: the full .NET Standard version
+# netstandard_major: the major .NET Standard version
+# netstandard_minor: the minor .NET Standard version
+
+PACKAGE_REQUIREMENTS = [
+    PackageRequirement(
+        name='dotnet-sdk-{major}.{minor}',
+        version='{sdk_version}',
+        dependencies=[
+            'dotnet-runtime-{major}.{minor}',
+            'aspnetcore-runtime-{major}.{minor}',
+            'aspnetcore-targeting-pack-{major}.{minor}',
+            'dotnet-apphost-pack-{major}.{minor}',
+            'dotnet-targeting-pack-{major}.{minor}',
+            'dotnet-templates-{major}.{minor}',
+            'netstandard-targeting-pack-{netstandard_major}.{netstandard_minor}',
+        ],
+        contains=['/sdk/', '/sdk/{major}.{minor}'],
+    ),
+    PackageRequirement(
+        name='aspnetcore-runtime-{major}.{minor}',
+        version='{aspnetcore_runtime_version}',
+        dependencies=[
+            'dotnet-runtime-{major}.{minor}',
+        ],
+        contains=['/shared/', '/shared/Microsoft.AspNetCore.App/{major}.{minor}'],
+    ),
+    PackageRequirement(
+        name='dotnet-runtime-{major}.{minor}',
+        version='{runtime_version}',
+        dependencies=[
+            'dotnet-hostfxr-{major}.{minor}',
+        ],
+        contains=['/shared/', '/shared/Microsoft.NETCore.App/{major}.{minor}'],
+    ),
+    PackageRequirement(
+        name='dotnet-hostfxr-{major}.{minor}',
+        version='{runtime_version}',
+        dependencies=[
+            'dotnet-host',
+        ],
+        contains=['/host/fxr/{major}.{minor}'],
+    ),
+    PackageRequirement(
+        name='dotnet-host',
+        version='{runtime_version}',
+        dependencies=[],
+        contains=[
+            '/usr/lib64/dotnet/dotnet',
+            '/dotnet/LICENSE.txt',
+            '/dotnet/ThirdPartyNotices.txt',
+            '/usr/bin/dotnet',
+            '/usr/share/man/man1/dotnet.1.gz',
+            '/etc/dotnet/install_location'
+        ],
+    ),
+    PackageRequirement(
+        name='dotnet-apphost-pack-{major}.{minor}',
+        version='{runtime_version}',
+        dependencies=[],
+        contains=['/packs/Microsoft.NETCore.App.Host.{rid}/{major}.{minor}'],
+    ),
+    PackageRequirement(
+        name='dotnet-targeting-pack-{major}.{minor}',
+        version='{runtime_version}',
+        dependencies=[],
+        contains=['/packs/Microsoft.NETCore.App.Ref/{major}.{minor}'],
+    ),
+    PackageRequirement(
+        name='aspnetcore-targeting-pack-{major}.{minor}',
+        version='{aspnetcore_runtime_version}',
+        dependencies=[],
+        contains=['/packs/Microsoft.AspNetCore.App.Ref/{major}.{minor}'],
+    ),
+    PackageRequirement(
+        name='netstandard-targeting-pack-{netstandard_major}.{netstandard_minor}',
+        version='{sdk_version}',
+        dependencies=[],
+        contains=['/packs/NETStandard.Library.Ref/{netstandard_major}.{netstandard_minor}'],
+    ),
+    PackageRequirement(
+        name='dotnet-templates-{major}.{minor}',
+        version='{sdk_version}',
+        dependencies=[],
+        contains=['/templates/{major}.{minor}'],
+    ),
+]
+
+
+class PackageSource:
+
+    def __init__(self):
+        raise NotImplementedError()
+
+    def find_package(self, name: str):
+        raise NotImplementedError()
+
+    def rpm_get_reqiures(self, package_name: str):
+        raise NotImplementedError()
+
+    def rpm_query(self, package_name: str, query_args: List[str]) -> str:
+        raise NotImplementedError()
+
+    def _rpm_requires_to_dependencies(self, output_lines: List[str]):
+        actual_dependencies: List[Tuple[str, Optional[str], Optional[str]]] = []
+        for dep in output_lines:
+            dependency = dep.split(' ')
+            name = dependency[0]
+            if '(' in name:
+                name = name.split('(')[0]
+            try:
+                op: Optional[str] = dependency[1]
+                version: Optional[str] = dependency[2].split('-')[0]
+            except IndexError:
+                op = None
+                version = None
+            if name:
+                actual_dependencies.append((name, op, version))
+        return actual_dependencies
+
+
+class InstalledPackages(PackageSource):
+
+    def __init__(self):
+        pass
+
+    def find_package(self, name: str):
+        try:
+            return self._rpm_query(name, [])
+        except subprocess.CalledProcessError:
+            return None
+
+    def rpm_get_reqiures(self, package_name: str):
+        package_requires = self._rpm_query(package_name, ['--requires']).split('\n')
+        return self._rpm_requires_to_dependencies(package_requires)
+
+    def rpm_query(self, package_name: str, query_args: List[str]) -> str:
+        return self._rpm_query(package_name, query_args)
+
+    def _rpm_query(self, package_name: str, query_args: List[str]) -> str:
+        # print(f'running rpm -qp {query_args} {str(f)}')
+        completed = subprocess.run(['rpm', '-q', *query_args, package_name],
+                                check=True, text=True, capture_output=True)
+        # print(completed.stdout)
+        return completed.stdout
+
+
+class DirectoryOfPackages(PackageSource):
+
+    def __init__(self, directory: str):
+        self.__package_cache: Dict[str, pathlib.Path] = self.__build_package_cache(directory)
+
+    def __build_package_cache(self, directory: str):
+        cache: Dict[str, pathlib.Path] = {}
+        for f in pathlib.Path(directory).iterdir():
+            # print(f)
+            if f.name.endswith('rpm'):
+                name = self._rpm_query_file(f, ['--queryformat', '%{name}'])
+                cache[name] = f
+        return cache
+
+    def find_package(self, name: str) -> Optional[pathlib.Path]:
+        return self.__package_cache.get(name)
+
+    def rpm_get_reqiures(self, package_name: str):
+        package_file = self.__package_cache.get(package_name)
+        if package_file is None:
+            raise AssertionError()
+
+        package_requires = self._rpm_query_file(package_file, ['--requires']).split('\n')
+        return self._rpm_requires_to_dependencies(package_requires)
+
+    def rpm_query(self, package_name, query_args: List[str]):
+        package_file = self.__package_cache.get(package_name)
+        if package_file is None:
+            raise AssertionError()
+        return self._rpm_query_file(package_file, query_args)
+
+    def _rpm_query_file(self, package_path: pathlib.Path, query_args: List[str]) -> str:
+        # print(f'running rpm -qp {query_args} {str(f)}')
+        completed = subprocess.run(['rpm', '-qp', *query_args, str(package_path)],
+                                check=True, text=True, capture_output=True)
+        # print(completed.stdout)
+        return completed.stdout
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('runtime_id', help='Runtime Id')
+    parser.add_argument('runtime_version', help='Runtime version')
+    parser.add_argument('aspnetcore_runtime_version', help='ASP.NET Core Runtime version')
+    parser.add_argument('sdk_version', help='Sdk version')
+    parser.add_argument('netstandard_version', help='netstandard version')
+    parser.add_argument('--directory', default='', help='directory to search packages in')
+    parser.add_argument('--package-prefix', default='', help='prefix for packages')
+
+    args = parser.parse_args()
+
+    runtime_id = args.runtime_id
+    directory = args.directory
+    package_prefix = args.package_prefix
+    runtime_version = args.runtime_version
+    aspnetcore_runtime_version = args.aspnetcore_runtime_version
+    sdk_version = args.sdk_version
+    netstandard_version = args.netstandard_version
+
+    if package_prefix and not package_prefix.endswith('-'):
+        package_prefix = package_prefix + '-'
+
+    package_source: PackageSource
+    if args.directory:
+        package_source = DirectoryOfPackages(args.directory)
+    else:
+        package_source = InstalledPackages()
+
+    okay = check_packages(package_source, package_prefix, runtime_id,
+                          runtime_version, aspnetcore_runtime_version, sdk_version, netstandard_version)
+
+    if okay:
+        return 0
+    else:
+        return 1
+
+
+def check_packages(package_source: PackageSource, package_prefix: str, runtime_id: str,
+                   runtime_version: str, aspnetcore_runtime_version: str,
+                   sdk_version: str, netstandard_version: str) -> bool:
+    okay = True
+
+    format_dict = {
+        'rid': runtime_id,
+        'major': runtime_version.split('.')[0],
+        'minor': runtime_version.split('.')[1],
+        'runtime_version': runtime_version,
+        'aspnetcore_runtime_version': aspnetcore_runtime_version,
+        'sdk_version': sdk_version,
+        'netstandard_version': netstandard_version,
+        'netstandard_major': netstandard_version.split('.')[0],
+        'netstandard_minor': netstandard_version.split('.')[1],
+    }
+
+    known_packages: Dict[str, str] = {}
+    for requirement in PACKAGE_REQUIREMENTS:
+        package_name = package_prefix + requirement.name.format(**format_dict)
+        package_version = requirement.version.format(**format_dict)
+        known_packages[package_name] = package_version
+
+    for requirement in PACKAGE_REQUIREMENTS:
+        package_name = package_prefix + requirement.name.format(**format_dict)
+        package = package_source.find_package(package_name)
+
+        if package is None:
+            print(f'✗ {package_name}')
+            print(f'  error: package {package_name} not found')
+            okay = False
+            continue
+
+        verbose(f'Found {package_name} at {package}')
+
+        issues: List[str] = []
+
+        expected_version = requirement.version.format(**format_dict)
+        issues += check_package_version(package_source, package_name, expected_version)
+
+        resolved_deps = [package_prefix + dep.format(**format_dict) for dep in requirement.dependencies]
+        issues += check_package_dependencies(package_source, package_name, runtime_id, known_packages, resolved_deps)
+
+        contains = [path.format(**format_dict) for path in requirement.contains]
+        issues += check_package_contents(package_source, package_name, runtime_id, contains)
+
+        if not issues:
+            print(f'✓ {package_name} ')
+        else:
+            print(f'✗ {package_name} FAIL')
+            for issue in issues:
+                print(f'  error: {issue}')
+
+        okay = okay and (len(issues) == 0)
+
+    return okay
+
+
+def check_package_version(package_source: PackageSource, package_name: str, expected_version: str) -> List[str]:
+    package_version = package_source.rpm_query(package_name, ['--queryformat', '%{version}'])
+    if expected_version != package_version:
+        return [f'package {package_name} has incorrect version. Expected {expected_version}, got {package_version}']
+
+    return []
+
+
+def check_package_dependencies(package_source: PackageSource, package_name: str, runtime_id: str,
+                               known_packages: Dict[str, str],
+                               expected_dependencies: List[str]) -> List[str]:
+    issues: List[str] = []
+
+    actual_dependencies = package_source.rpm_get_reqiures(package_name)
+    # print(str(actual_dependencies))
+
+    # print(f'Looking in {package_name}')
+    for dep in expected_dependencies:
+        if dep not in known_packages.keys():
+            issues += [f'The dependency {dep} is unknown']
+            continue
+
+        expected_version = known_packages[dep]
+        # print(f'Expected version of {dep} is {expected_version}')
+
+        if dep not in [name for name, _, _ in actual_dependencies]:
+            issues += [f'package {package_name} is missing the dependency {dep}']
+        else:
+            actual_version = [version for name, _, version, in actual_dependencies if name == dep][0]
+            if actual_version != expected_version:
+                issues += [f'package {package_name} expected dependency of ({dep}, {expected_version})'
+                           f' but has the actual dependency ({dep}, {actual_version})']
+
+    return issues
+
+
+def check_package_contents(package_source: PackageSource, package_name: str, runtime_id: str,
+                           expected_contents: List[str]) -> List[str]:
+    package_files = package_source.rpm_query(package_name, ['-l']).split('\n')
+    issues: List[str] = []
+    for expected in expected_contents:
+        found = False
+        for actual in package_files:
+            if expected in actual:
+                found = True
+                break
+        if not found:
+            issues += [f'package {package_name} is missing the file {expected}']
+
+    return issues
+
+
+def verbose(message: str) -> None:
+    # print(message)
+    pass
+
+
+if __name__ == '__main__':
+    sys.exit(main())

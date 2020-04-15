@@ -1,0 +1,11 @@
+{
+  "name": "distribution-packages",
+  "enabled": true,
+  "version": "3.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "platformBlacklist":[
+    "rhel7"
+  ]
+}
