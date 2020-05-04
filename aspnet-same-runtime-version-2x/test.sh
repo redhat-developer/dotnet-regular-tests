@@ -5,6 +5,9 @@ set -euo pipefail
 # There's always a version of Microsoft.AspNetCore.App for each
 # version of Microsoft.NetCore.App. Make sure this is true for us too.
 
+wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+chmod +x jq-linux64
+
 runtime_version=$(dotnet --info  | grep '  Microsoft.NETCore.App' | awk '{ print $2 }' | sort -rh | head -1)
 echo "Latest runtime version: $runtime_version"
 
@@ -58,7 +61,7 @@ for package in Microsoft.AspNetCore.App; do
   dotnet publish -o out
 
   # read the package version
-  package_version=$(cat out/*.deps.json | jq -r '.targets[".NETCoreApp,Version=v'$runtime_version_major_minor'"]["testapp/1.0.0"].dependencies["'$package'"]')
+  package_version=$(cat out/*.deps.json | ../jq-linux64 -r '.targets[".NETCoreApp,Version=v'$runtime_version_major_minor'"]["testapp/1.0.0"].dependencies["'$package'"]')
 
   # cleanup folder
   popd
