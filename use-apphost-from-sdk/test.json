@@ -1,6 +1,7 @@
 {
   "name": "use-apphost-from-sdk",
   "enabled": true,
+  "requiresSdk": true,
   "version": "3.0",
   "versionSpecific": false,
   "type": "bash",

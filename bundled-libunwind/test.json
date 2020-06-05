@@ -1,6 +1,7 @@
 {
   "name": "bundled-libunwind",
   "enabled": true,
+  "requiresSdk": false,
   "version": "2.0",
   "versionSpecific": false,
   "type": "bash",

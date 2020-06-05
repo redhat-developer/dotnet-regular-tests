@@ -1,6 +1,7 @@
 {
   "name": "debugging-sos-lldb-via-core",
   "enabled": true,
+  "requiresSdk": true,
   "version": "3.0",
   "versionSpecific": false,
   "type": "bash",

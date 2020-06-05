@@ -1,6 +1,7 @@
 {
   "name": "equality-and-sort",
   "enabled": true,
+  "requiresSdk": true,
   "version": "1.0",
   "versionSpecific": false,
   "type": "xunit",

@@ -1,6 +1,7 @@
 {
   "name": "version-apis",
   "enabled": true,
+  "requiresSdk": true,
   "version": "3.0",
   "versionSpecific": false,
   "type": "xunit",
