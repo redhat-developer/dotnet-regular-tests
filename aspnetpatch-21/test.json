@@ -1,6 +1,7 @@
 {
   "name": "aspnetpatch-21",
   "enabled": false,
+  "requiresSdk": true,
   "version": "2.1",
   "versionSpecific": true,
   "type": "bash",

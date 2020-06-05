@@ -1,6 +1,7 @@
 {
   "name": "extract-bundle-dir",
   "enabled": true,
+  "requiresSdk": true,
   "version": "3.1",
   "versionSpecific": false,
   "type": "bash",

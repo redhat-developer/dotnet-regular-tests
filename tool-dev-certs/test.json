@@ -1,6 +1,7 @@
 {
   "name": "tool-dev-certs",
   "enabled": true,
+  "requiresSdk": true,
   "version": "2.1",
   "versionSpecific": false,
   "type": "bash",

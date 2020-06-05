@@ -1,6 +1,7 @@
 {
   "name": "managed-symbols-available",
   "enabled": true,
+  "requiresSdk": true,
   "version": "3.0",
   "versionSpecific": false,
   "type": "bash",

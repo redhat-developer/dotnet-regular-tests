@@ -1,6 +1,7 @@
 {
   "name": "helloworld-10",
   "enabled": true,
+  "requiresSdk": true,
   "version": "1.0",
   "versionSpecific": true,
   "type": "bash",

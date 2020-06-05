@@ -1,6 +1,7 @@
 {
   "name": "rest-client",
   "enabled": false,
+  "requiresSdk": true,
   "version": "1.0",
   "versionSpecific": false,
   "type": "xunit",

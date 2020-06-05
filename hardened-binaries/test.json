@@ -1,6 +1,7 @@
 {
   "name": "hardened-binaries",
   "enabled": true,
+  "requiresSdk": false,
   "version": "3.0",
   "versionSpecific": false,
   "type": "bash",
