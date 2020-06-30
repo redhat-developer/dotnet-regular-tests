@@ -174,7 +174,8 @@ class InstalledPackages(PackageSource):
     def _rpm_query(self, package_name: str, query_args: List[str]) -> str:
         # print(f'running rpm -qp {query_args} {str(f)}')
         completed = subprocess.run(['rpm', '-q', *query_args, package_name],
-                                check=True, universal_newlines=True, capture_output=True)
+                                check=True, universal_newlines=True,
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # print(completed.stdout)
         return completed.stdout
 
@@ -213,7 +214,8 @@ class DirectoryOfPackages(PackageSource):
     def _rpm_query_file(self, package_path: pathlib.Path, query_args: List[str]) -> str:
         # print(f'running rpm -qp {query_args} {str(f)}')
         completed = subprocess.run(['rpm', '-qp', *query_args, str(package_path)],
-                                check=True, universal_newlines=True, capture_output=True)
+                                check=True, universal_newlines=True,
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # print(completed.stdout)
         return completed.stdout
 
