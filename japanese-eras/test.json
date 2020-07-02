@@ -6,7 +6,7 @@
   "versionSpecific": false,
   "type": "xunit",
   "cleanup": true,
-  "platformBlacklist":[
+  "ignoredRIDs":[
   ]
 }
 
