@@ -6,6 +6,6 @@
   "versionSpecific": true,
   "type": "bash",
   "cleanup": true,
-  "platformBlacklist":[
+  "ignoredRIDs":[
   ]
 }

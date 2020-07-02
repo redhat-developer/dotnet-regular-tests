@@ -24,7 +24,7 @@ namespace AssembliesValid
         // https://github.com/dotnet/runtime/blob/master/src/coreclr/src/inc/readytorun.h
         public static readonly int READYTORUN_SIGNATURE = 0x00525452; // 'RTR'
 
-        public static string[] FileNameBlacklist =
+        public static string[] IgnoredFileNames =
         {
             "mscorlib.dll",
             "msdia140.dll",
@@ -32,7 +32,7 @@ namespace AssembliesValid
             "System.Runtime.WindowsRuntime.dll",
         };
 
-        public static Regex[] PathBlacklist =
+        public static Regex[] IgnoredPaths =
         {
             new Regex(".*\\.resources\\.dll$"),
             new Regex("/sdk/"),
@@ -71,9 +71,9 @@ namespace AssembliesValid
             bool allOkay = true;
             foreach (var assembly in assemblies)
             {
-                bool inBlacklist = FileNameBlacklist.Any(basename => new FileInfo(assembly).Name == basename);
+                bool ignored = IgnoredFileNames.Any(basename => new FileInfo(assembly).Name == basename);
 
-                if (!inBlacklist) {
+                if (!ignored) {
                     using (var file = File.Open(assembly, FileMode.Open, FileAccess.Read))
                     {
                         var reader = new PEReader(file);
@@ -148,7 +148,7 @@ namespace AssembliesValid
 
                 foreach (var fileInfo in dir.EnumerateFiles("*.dll"))
                 {
-                    if (!PathBlacklist.Any(pattern => pattern.IsMatch(fileInfo.FullName)))
+                    if (!IgnoredPaths.Any(pattern => pattern.IsMatch(fileInfo.FullName)))
                     {
                         assemblies.Add(fileInfo.FullName);
                     }

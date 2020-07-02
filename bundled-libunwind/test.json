@@ -6,7 +6,7 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
-  "platformBlacklist":[
+  "ignoredRIDs":[
     "rhel7",
     "fedora"
   ]
