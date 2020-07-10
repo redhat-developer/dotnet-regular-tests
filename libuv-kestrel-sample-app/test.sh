@@ -6,7 +6,7 @@ set -x
 
 dotnet restore
 dotnet build
-dotnet bin/Debug/netcoreapp*/libuv-kestrel-sample-app.dll &
+dotnet bin/Debug/net*/libuv-kestrel-sample-app.dll &
 root_pid=$!
 
 sleep 5

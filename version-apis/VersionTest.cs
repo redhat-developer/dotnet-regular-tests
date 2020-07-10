@@ -13,7 +13,7 @@ namespace DotNetCoreVersionApis
         {
             var version = Environment.Version;
             Console.WriteLine($"Environment.Version: {version}");
-            Assert.Equal(3, version.Major);
+            Assert.InRange(version.Major, 3, 5);
         }
 
         [Fact]
@@ -21,7 +21,7 @@ namespace DotNetCoreVersionApis
         {
             var description = RuntimeInformation.FrameworkDescription;
             Console.WriteLine($"RuntimeInformation.FrameworkDescription: {description}");
-            Assert.StartsWith(".NET Core 3.", description);
+            Assert.StartsWith(".NET", description);
         }
 
         [Theory]
@@ -45,7 +45,7 @@ namespace DotNetCoreVersionApis
 
             bool okay = Version.TryParse(plainVersion, out Version parsedVersion);
             Assert.True(okay);
-            Assert.Equal(3, parsedVersion.Major);
+            Assert.InRange(parsedVersion.Major, 3, 5);
 
             var commitId = versionParts[1];
             Regex commitRegex = new Regex("[0-9a-fA-F]{40}");
