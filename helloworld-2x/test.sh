@@ -23,7 +23,7 @@ echo -e "===================\n"
 
 dotnet new console --language F# --name $PROJNAME
 pushd $PROJNAME
-dotnet run | grep 'Hello World from F#!'
+dotnet run | grep -i 'Hello World from F#'
 if [ $? -eq 1 ]; then
   echo "F# Hello World FAIL"
   rm -rf $PROJNAME

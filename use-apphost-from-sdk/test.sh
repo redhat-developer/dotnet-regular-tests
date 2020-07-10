@@ -21,7 +21,7 @@ EOF
 
 dotnet new console
 dotnet build --no-restore
-netcoreapp=( bin/Debug/netcoreapp* )
+netcoreapp=( bin/Debug/net* )
 "${netcoreapp[0]}"/console
 
 popd
