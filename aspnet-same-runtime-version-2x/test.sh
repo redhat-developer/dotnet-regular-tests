@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+set -x
+
 # There's always a version of Microsoft.AspNetCore.App for each
 # version of Microsoft.NetCore.App. Make sure this is true for us too.
 
