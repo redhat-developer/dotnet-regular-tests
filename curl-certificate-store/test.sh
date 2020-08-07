@@ -5,6 +5,11 @@ set -euo pipefail
 framework_dir=$(../dotnet-directory --framework "$1")
 system_net_native="${framework_dir}/System.Net.Http.Native.so"
 
+if [ ! -f "${system_net_native}" ]; then
+    echo "${system_net_native} not found. Nothing to test."
+    exit 0
+fi
+
 ldd_line=$(ldd "$system_net_native" | grep -E 'libcurl.so')
 echo "$ldd_line"
 libcurl=$(echo "$ldd_line" | awk '{ print $3 }')
