@@ -29,12 +29,7 @@ sdk_version=$1
 
 set -x
 
-# TODO: assert that this is only one directory
-declare -a versions
-IFS='.' read -ra versions <<< "${sdk_version}"
-framework_dir="$(ls -d "$(dirname "$(readlink -f "$(command -v dotnet)")")/shared/Microsoft.NETCore.App/${versions[0]}.${versions[1]}"*)"
-echo "${framework_dir}"
-test -d "${framework_dir}"
+framework_dir=$(../dotnet-directory --framework "${sdk_version}")
 test -f "${framework_dir}/createdump"
 
 if ! command -v lldb ; then

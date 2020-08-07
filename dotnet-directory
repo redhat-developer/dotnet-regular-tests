@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# This is a script called by multiple tests to find the runtime
+# directory of the current platform.
+
+set -euo pipefail
+
+function usage() {
+    echo "usage: $0 [--home | --framework] <version>"
+    echo ""
+    echo "Shows a .NET directory."
+}
+
+print_home=0
+print_framework=0
+
+positional_args=()
+while [[ $# -gt 0 ]]; do
+    arg=$1
+    shift
+    case "$arg" in
+        --home) print_home=1 ;;
+        --framework) print_framework=1 ;;
+        --*) usage; exit 1 ;;
+        *)
+            positional_args+=("$arg")
+            ;;
+    esac
+done
+
+version=${positional_args[0]:-}
+if [[ -z ${version} ]]; then
+    echo "error: missing argument."
+    usage
+    exit 1
+fi
+
+declare -a versions
+IFS='.' read -ra versions <<< "${version}"
+dotnet_dir=$(dirname "$(readlink -f "$(command -v dotnet)")")
+framework_dirs=( "${dotnet_dir}/shared/Microsoft.NETCore.App/${versions[0]}.${versions[1]}"* )
+framework_dir="${framework_dirs[0]}"
+
+if [[ ${print_home} == 1 ]]; then
+    echo "${dotnet_dir}"
+elif [[ ${print_framework} == 1 ]]; then
+    echo "${framework_dir}"
+else
+    echo "error"
+    exit 1
+fi
