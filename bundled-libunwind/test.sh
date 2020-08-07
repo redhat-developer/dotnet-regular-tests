@@ -4,8 +4,10 @@ set -euo pipefail
 
 set -x
 
+framework_dir=$(../dotnet-directory --framework "$1")
+
 set +e
-ldd $(dirname $(readlink -f $(which dotnet)))/shared/Microsoft.NETCore.App/*/libcoreclr.so | grep 'libunwind.so'
+ldd "${framework_dir}/libcoreclr.so" | grep 'libunwind.so'
 retval=$?
 set -e
 if [ $retval -eq 1 ]; then
@@ -16,7 +18,7 @@ else
 fi
 
 set +e
-ldd $(dirname $(readlink -f $(which dotnet)))/shared/Microsoft.NETCore.App/*/libcoreclr.so | grep 'libunwind-x86_64.so'
+ldd "${framework_dir}/libcoreclr.so" | grep 'libunwind-x86_64.so'
 retval=$?
 set -e
 if [ $retval -eq 1 ]; then

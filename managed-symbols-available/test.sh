@@ -5,18 +5,11 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-sdk_version=$1
-IFS='.' read -ra VERSION_SPLIT <<< "$sdk_version"
-runtime_version=${VERSION_SPLIT[0]}.${VERSION_SPLIT[1]}
-
 ignore_cases=(
     System.Runtime.CompilerServices.Unsafe.dll
 )
 
-dotnet_dir=$(dirname "$(readlink -f "$(which dotnet)")")
-
-framework_dirs=("${dotnet_dir}/shared/Microsoft.NETCore.App/${runtime_version}"*)
-framework_dir="${framework_dirs[0]}"
+framework_dir=$(../dotnet-directory --framework "$1")
 
 find "${framework_dir}" -name '*.dll' -type f | sort -u | while read dll_name; do
     base_dll_name=$(basename "${dll_name}")

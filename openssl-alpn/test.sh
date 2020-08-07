@@ -5,7 +5,7 @@
 set -euo pipefail
 set -x
 
-dotnet_dir="$(dirname $(readlink -f $(which dotnet)))"
+dotnet_dir="$(../dotnet-directory --home "$1")"
 
 # print for  debugging
 find "${dotnet_dir}" \

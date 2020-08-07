@@ -2,13 +2,15 @@
 
 set -euo pipefail
 
-ldd $(dirname $(readlink -f $(which dotnet)))/shared/Microsoft.NETCore.App/*/libcoreclr.so | grep 'libunwind.so'
+framework_dir=$(../dotnet-directory --framework "$1")
+
+ldd "${framework_dir}/libcoreclr.so" | grep 'libunwind.so'
 if [ $? -eq 1 ]; then
   echo "libunwind not found"
   exit 1
 fi
 
-ldd $(dirname $(readlink -f $(which dotnet)))/shared/Microsoft.NETCore.App/*/libcoreclr.so | grep 'libunwind-x86_64.so'
+ldd "${framework_dir}/libcoreclr.so" | grep 'libunwind-x86_64.so'
 if [ $? -eq 1 ]; then
   echo "libunwind-x86_64 not found"
   exit 1
