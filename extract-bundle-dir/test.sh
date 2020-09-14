@@ -28,6 +28,7 @@ rm -rf $APP_EXTRACT_DIR
 
 # Create a single file executable.
 dotnet new console -o $APP_NAME
+sed -E -i '/Console.WriteLine/ a     Console.WriteLine(AppContext.BaseDirectory);' $APP_NAME/Program.cs
 dotnet publish -r $(../runtime-id --portable) /p:PublishSingleFile=true $APP_NAME -o published
 
 # Execute the single file, which will cause it to extract.
