@@ -1,0 +1,11 @@
+{
+  "name": "system-openssl",
+  "enabled": true,
+  "requiresSdk": false,
+  "version": "2.1",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "ignoredRIDs":[
+  ]
+}

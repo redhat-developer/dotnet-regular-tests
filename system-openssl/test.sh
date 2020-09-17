@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Make sure .NET Core has linked to SSL_*_alpn_* functions from OpenSSL
+# Make sure .NET has ldd-visible links to OpenSSL. We prefer that over
+# using OpenSSL via dlopen (which is more likely to fail at runtime).
 
 set -euo pipefail
 set -x
@@ -15,12 +16,10 @@ find "${dotnet_dir}" \
 
 find "${dotnet_dir}" \
      "${find_ssl_args[@]}" \
-     -exec nm -D {} \; \
-     | grep SSL
+     -exec ldd {} \; \
+    | grep -E '(libcrypto|libssl)'
 
-# This is the real check. Make sure SSL_*_alpn_* are available as dynamic symbols
 find "${dotnet_dir}" \
      "${find_ssl_args[@]}" \
      -exec nm -D {} \; \
-    | grep SSL \
-    | grep _alpn_
+     | grep SSL
