@@ -16,7 +16,7 @@ suggestions by scanning the local packages, or, optionally, in the
 local directory.
 '''
 
-PackageRequirement = namedtuple('PackageRequirement', ['name', 'version', 'dependencies', 'contains'])
+PackageRequirement = namedtuple('PackageRequirement', ['name', 'version', 'another_version', 'dependencies', 'contains'])
 
 # This is a machine-readable version of the guidelines at
 # https://docs.microsoft.com/en-us/dotnet/core/build/distribution-packaging
@@ -40,6 +40,7 @@ PACKAGE_REQUIREMENTS = [
     PackageRequirement(
         name='dotnet-sdk-{major}.{minor}',
         version='{sdk_version}',
+        another_version=False,
         dependencies=[
             'dotnet-runtime-{major}.{minor}',
             'aspnetcore-runtime-{major}.{minor}',
@@ -54,6 +55,7 @@ PACKAGE_REQUIREMENTS = [
     PackageRequirement(
         name='aspnetcore-runtime-{major}.{minor}',
         version='{aspnetcore_runtime_version}',
+        another_version=False,
         dependencies=[
             'dotnet-runtime-{major}.{minor}',
         ],
@@ -62,6 +64,7 @@ PACKAGE_REQUIREMENTS = [
     PackageRequirement(
         name='dotnet-runtime-{major}.{minor}',
         version='{runtime_version}',
+        another_version=False,
         dependencies=[
             'dotnet-hostfxr-{major}.{minor}',
         ],
@@ -70,6 +73,7 @@ PACKAGE_REQUIREMENTS = [
     PackageRequirement(
         name='dotnet-hostfxr-{major}.{minor}',
         version='{runtime_version}',
+        another_version=False,
         dependencies=[
             'dotnet-host',
         ],
@@ -78,6 +82,7 @@ PACKAGE_REQUIREMENTS = [
     PackageRequirement(
         name='dotnet-host',
         version='{runtime_version}',
+        another_version=True,
         dependencies=[],
         contains=[
             '/usr/lib64/dotnet/dotnet',
@@ -91,30 +96,35 @@ PACKAGE_REQUIREMENTS = [
     PackageRequirement(
         name='dotnet-apphost-pack-{major}.{minor}',
         version='{runtime_version}',
+        another_version=False,
         dependencies=[],
         contains=['/packs/Microsoft.NETCore.App.Host.{rid}/{major}.{minor}'],
     ),
     PackageRequirement(
         name='dotnet-targeting-pack-{major}.{minor}',
         version='{runtime_version}',
+        another_version=False,
         dependencies=[],
         contains=['/packs/Microsoft.NETCore.App.Ref/{major}.{minor}'],
     ),
     PackageRequirement(
         name='aspnetcore-targeting-pack-{major}.{minor}',
         version='{aspnetcore_runtime_version}',
+        another_version=False,
         dependencies=[],
         contains=['/packs/Microsoft.AspNetCore.App.Ref/{major}.{minor}'],
     ),
     PackageRequirement(
         name='netstandard-targeting-pack-{netstandard_major}.{netstandard_minor}',
         version='{sdk_version}',
+        another_version=True,
         dependencies=[],
         contains=['/packs/NETStandard.Library.Ref/{netstandard_major}.{netstandard_minor}'],
     ),
     PackageRequirement(
         name='dotnet-templates-{major}.{minor}',
         version='{sdk_version}',
+        another_version=False,
         dependencies=[],
         contains=['/templates/{major}.{minor}'],
     ),
@@ -296,7 +306,8 @@ def check_packages(package_source: PackageSource, package_prefix: str, runtime_i
         issues: List[str] = []
 
         expected_version = requirement.version.format(**format_dict)
-        issues += check_package_version(package_source, package_name, expected_version)
+        another_version = requirement.another_version;
+        issues += check_package_version(package_source, package_name, expected_version, another_version)
 
         resolved_deps = [package_prefix + dep.format(**format_dict) for dep in requirement.dependencies]
         issues += check_package_dependencies(package_source, package_name, runtime_id, known_packages, resolved_deps)
@@ -316,12 +327,21 @@ def check_packages(package_source: PackageSource, package_prefix: str, runtime_i
     return okay
 
 
-def check_package_version(package_source: PackageSource, package_name: str, expected_version: str) -> List[str]:
+def check_package_version(package_source: PackageSource, package_name: str, expected_version: str, another_version: bool) -> List[str]:
     package_version = package_source.rpm_query(package_name, ['--queryformat', '%{version}'])
-    if expected_version != package_version:
+    if expected_version == package_version:
+        return []
+
+    if not another_version:
         return [f'package {package_name} has incorrect version. Expected {expected_version}, got {package_version}']
 
-    return []
+    package_version_major_minor = '.'.join(package_version.split('.')[:2])
+    expected_version_major_minor = '.'.join(expected_version.split('.')[:2])
+
+    if expected_version_major_minor != package_version_major_minor:
+        return []
+
+    return [f'package {package_name} has incorrect version. Expected {expected_version} or a different major+minor version, got {package_version}']
 
 
 def check_package_dependencies(package_source: PackageSource, package_name: str, runtime_id: str,
