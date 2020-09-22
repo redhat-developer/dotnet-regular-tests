@@ -34,8 +34,8 @@ set -x
 
 dotnet tool uninstall -g dotnet-sos || true
 dotnet tool uninstall -g dotnet-dump || true
-dotnet tool install -g dotnet-sos  --version 3.0.0
-dotnet tool install -g dotnet-dump --version 3.0.0
+dotnet tool install -g dotnet-sos
+dotnet tool install -g dotnet-dump
 
 dotnet sos install
 
@@ -59,7 +59,7 @@ dotnet new web
 sed -i -e 's|.UseStartup|.UseUrls("http://localhost:5000").UseStartup|' Program.cs
 dotnet build "${no_server[@]}"
 
-dotnet bin/Debug/netcoreapp*/TestDir.dll &
+dotnet bin/Debug/net*/TestDir.dll &
 run_pid=$!
 
 sleep 5
@@ -133,7 +133,7 @@ cat lldb.out
 echo "[ip2md]"
 lldb-core 'clrthreads' > lldb.out
 cat lldb.out
-thread_id=$(grep -A5 'ID OSID ThreadOBJ' lldb.out | tail -4 | grep -vE 'Finalizer|Threadpool' | head -1 | awk '{print $1}')
+thread_id=$(grep -A5 'ID *OSID *ThreadOBJ' lldb.out | tail -4 | grep -vE 'Finalizer|Threadpool' | head -1 | awk '{print $1}')
 lldb-core "thread select ${thread_id}" 'clrstack' > lldb.out
 cat lldb.out
 ip=$(grep 'OS Thread Id:' lldb.out -A5 | tail -n3 | grep -v -F '[Prestub' | head -1 | cut -d' ' -f2)
@@ -221,9 +221,9 @@ grep 'Version History:' lldb.out
 echo "[dumpmodule]"
 lldb-core "dumpmodule ${string_module}" > lldb.out
 cat lldb.out
-grep -F "Name:       ${framework_dir}" lldb.out
-grep 'Attributes: PEFile' lldb.out
-grep 'MetaData start address:  0' lldb.out
+grep "Name: *${framework_dir}" lldb.out
+grep 'Attributes: *PEFile' lldb.out
+grep 'MetaData start address: *0' lldb.out
 
 # TODO bug https://github.com/dotnet/diagnostics/issues/448
 # echo "[dumpil]"
