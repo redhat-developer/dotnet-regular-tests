@@ -1,4 +1,0 @@
-This is src/Servers/Kestrel/samples/SampleAppsamples/SampleApp from aspnet/AspNetCore repo
-commit 5c05b9288a1250261a53f0d39559639ec77b5764
-
-With some slight modifications to build as well as always using Libuv.
