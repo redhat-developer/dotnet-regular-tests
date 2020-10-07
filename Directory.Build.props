@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <XunitVersion>2.4.0</XunitVersion>
+    <XunitRunnerVisualStudioVersion>$(XunitVersion)</XunitRunnerVisualStudioVersion>
+    <MicrosoftNetTestSdkVersion>16.3.0</MicrosoftNetTestSdkVersion>
+  </PropertyGroup>
+</Project>
