@@ -1,10 +1,12 @@
 #!/bin/bash
 
+set -euo pipefail
+
 for TEST_RESULT in pass fail ;
 do
   export TEST_RESULT
-  OUTPUT=$(dotnet test 2>&1)
-  EXIT_CODE=$?
+  EXIT_CODE=0
+  OUTPUT=$(dotnet test 2>&1) || EXIT_CODE=$?
   if [[ ( "$TEST_RESULT" == "pass" && "$EXIT_CODE" != "0" ) \
      || ( "$TEST_RESULT" == "fail" && "$EXIT_CODE" == "0" ) ]] ; then
     echo "$OUTPUT"
