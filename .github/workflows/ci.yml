@@ -1,0 +1,68 @@
+name: Confirm tests run successfully
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Verify tests pass
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 30
+
+    strategy:
+      matrix:
+        container_image:
+          - fedora:33
+          - fedora:32
+          - fedora:rawhide
+          - registry.access.redhat.com/ubi8
+        dotnet_version:
+          - "3.1"
+
+    container:
+      image: ${{ matrix.container_image }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install .NET ${{ matrix.dotnet_version }}
+        timeout-minutes: 5
+        run: |
+          set -euo pipefail
+          if [[ ${{ matrix.container_image }} == fedora* ]] ; then
+              dnf install -y 'dnf-command(copr)'
+              dnf copr enable @dotnet-sig/dotnet -y
+          fi
+
+          dnf install -y dotnet-sdk-${{ matrix.dotnet_version }}
+
+      - name: Install Test dependencies
+        timeout-minutes: 2
+        run: |
+          dnf install -y python3 wget $(grep '^Dependencies: ' README.md | cut -d: -f2-) --skip-broken
+
+      - name: Download test runner
+        run: |
+          set -euo pipefail
+          wget --no-verbose https://github.com/redhat-developer/dotnet-bunny/releases/latest/download/turkey-$(uname -m) -O turkey
+          chmod +x ./turkey
+
+      - name: Run tests
+        run: |
+          set -euo pipefail
+          ### HACK: Filter tests that can't pass in Containers
+          rm -rf debugging-sos-lldb* createdump-aspnet
+
+          ### HACK: UBI 8 is missing strace and bash-completion packages for tests
+          if [[ ${{ matrix.container_image }} == *ubi8* ]] ; then
+              rm -rf telemetry-is-off-by-default bash-completion
+          fi
+
+          ./turkey -v
+
+      - name: Show Logs
+        if: ${{ always() }}
+        run: |
+          set -euo pipefail
+          find -iname '*.log' -exec echo {} \; -exec cat {} \;
