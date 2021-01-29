@@ -18,30 +18,35 @@ pushd omnisharp
 tar xf "../omnisharp-${runtime_id}.tar.gz"
 popd
 
-mkdir hello
-pushd hello
-dotnet new console
-popd
+for project in blazorserver blazorwasm classlib console mstest mvc nunit web webapp webapi worker xunit ; do
 
-./omnisharp/run -s "$(readlink -f hello)" > omnisharp.log &
-omnisharp_pid=$!
+    mkdir hello-$project
+    pushd hello-$project
+    dotnet new $project
+    popd
 
-sleep 5
+    ./omnisharp/run -s "$(readlink -f hello-$project)" > omnisharp.log &
 
-pkill -P $$
+    sleep 5
 
-# Omnisharp spawns off a number of processes. They all include the
-# current directory as a process argument, so use that to identify and
-# kill them.
-kill $(ps aux | grep "$(pwd)" | grep -v 'grep' | awk '{ print $2 }')
+    pkill -P $$
 
-cat omnisharp.log
+    # Omnisharp spawns off a number of processes. They all include the
+    # current directory as a process argument, so use that to identify and
+    # kill them.
+    pgrep -f "$(pwd)"
 
-if grep ERROR omnisharp.log; then
-    echo "test failed"
-    exit 1
-else
-    echo "OK"
-fi
+    kill "$(pgrep -f "$(pwd)")"
+
+    cat omnisharp.log
+
+    if grep ERROR omnisharp.log; then
+        echo "test failed"
+        exit 1
+    else
+        echo "OK"
+    fi
+
+done
 
 popd
