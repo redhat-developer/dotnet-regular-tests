@@ -1,0 +1,11 @@
+{
+  "name": "cgroup-limit",
+  "enabled": true,
+  "requiresSdk": true,
+  "version": "2.1",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "ignoredRIDs":[
+  ]
+}
