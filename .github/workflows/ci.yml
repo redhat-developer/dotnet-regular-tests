@@ -52,7 +52,7 @@ jobs:
         run: |
           set -euo pipefail
           ### HACK: Filter tests that can't pass in Containers
-          rm -rf debugging-sos-lldb* createdump-aspnet
+          rm -rf debugging-sos-lldb* createdump-aspnet cgroup-limit
 
           ### HACK: UBI 8 is missing strace and bash-completion packages for tests
           if [[ ${{ matrix.container_image }} == *ubi8* ]] ; then
