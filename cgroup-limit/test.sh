@@ -6,7 +6,18 @@ set -x
 
 dotnet publish
 
-mapfile -t DOTNET_LIMITS < <(systemd-run -q --scope --user -p CPUQuota=100% -p MemoryLimit=100M bin/Debug/net*/cgroup-limit)
+SYSTEMD_RUN="systemd-run"
+if [ "$UID" != "0" ]; then
+  if ! grep -q "cpu" "/sys/fs/cgroup/user.slice/user-$UID.slice/user@$UID.service/cgroup.controllers" ; then
+    # user can't set cpu limits, use sudo.
+    SYSTEMD_RUN="sudo -n $SYSTEMD_RUN"
+  else
+    # run on behalf of user.
+    SYSTEMD_RUN="$SYSTEMD_RUN --user"
+  fi
+fi
+
+mapfile -t DOTNET_LIMITS < <($SYSTEMD_RUN  -q --scope -p CPUQuota=100% -p MemoryLimit=100M bin/Debug/net*/cgroup-limit)
 
 if [ "${DOTNET_LIMITS[0]}" == "Limits:" ] &&      # Application ran.
    [ "${DOTNET_LIMITS[1]}" == "1" ] &&            # Available processors is 1.
