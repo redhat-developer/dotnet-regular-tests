@@ -1,0 +1,13 @@
+{
+	"name": "fdd-publish-5.0",
+	"enabled": true,
+	"requiresSdk": true,
+	"version": "5.0",
+	"versionSpecific": true,
+	"type": "bash",
+	"cleanup": true,
+	"ignoredRIDs":[
+  
+	]
+  }
+  
