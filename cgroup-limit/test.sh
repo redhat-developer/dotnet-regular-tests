@@ -4,6 +4,10 @@ set -euo pipefail
 
 set -x
 
+cat /proc/self/mountinfo
+
+cat /proc/self/cgroup
+
 dotnet publish
 
 SYSTEMD_RUN="systemd-run"
