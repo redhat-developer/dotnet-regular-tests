@@ -8,6 +8,11 @@ cat /proc/self/mountinfo
 
 cat /proc/self/cgroup
 
+if [[ "$(stat -f -c "%T" /sys/fs/cgroup)" == "cgroup2fs" ]] && [[ $(dotnet --version) == "3."* ]]; then
+    echo "cgroup v2 is not fully supported on .NET Core 3.x. Skipping."
+    exit 0
+fi
+
 dotnet publish
 
 SYSTEMD_RUN="systemd-run"
