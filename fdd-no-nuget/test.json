@@ -1,9 +1,9 @@
 {
-	"name": "fdd-publish-5.0",
+	"name": "fdd-no-nuget",
 	"enabled": true,
 	"requiresSdk": true,
-	"version": "5.0",
-	"versionSpecific": true,
+	"version": "2.1",
+	"versionSpecific": false,
 	"type": "bash",
 	"cleanup": true,
 	"ignoredRIDs":[
