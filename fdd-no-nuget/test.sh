@@ -15,8 +15,8 @@ EOF
 dotnet publish
 
 if [ $? -eq 1 ]; then
-  echo "FAIL"
+  echo "FAIL: unable to publish FFD without nuget.org access"
   exit 1
 fi
 
-echo "PASS"
+echo "PASS: successfully published FDD without nuget.org access"
