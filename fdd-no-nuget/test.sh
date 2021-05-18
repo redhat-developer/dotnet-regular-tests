@@ -16,9 +16,9 @@ dotnet publish
 
 if [ $? -eq 1 ]; then
   echo "FAIL: unable to publish FFD without nuget.org access"
-  rm nuget.config
+  rm -rf ~/.nuget
   exit 1
 fi
 
-rm nuget.config
+rm -rf ~/.nuget
 echo "PASS: successfully published FDD without nuget.org access"
