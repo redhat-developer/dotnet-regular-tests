@@ -14,9 +14,9 @@ jobs:
       fail-fast: false
       matrix:
         container_image:
-          - fedora:34
-          - fedora:33
-          - fedora:rawhide
+          - registry.fedoraproject.org/fedora:33
+          - registry.fedoraproject.org/fedora:34
+          - registry.fedoraproject.org/fedora:35
           - registry.access.redhat.com/ubi8
         dotnet_version:
           - "3.1"
@@ -24,6 +24,8 @@ jobs:
 
     container:
       image: ${{ matrix.container_image }}
+      options: --security-opt seccomp=unconfined
+
 
     steps:
       - uses: actions/checkout@v2
