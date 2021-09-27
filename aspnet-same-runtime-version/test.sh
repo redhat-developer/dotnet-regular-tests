@@ -14,9 +14,9 @@ aspnetcore_runtime_version=$(dotnet --info  | grep '  Microsoft.AspNetCore.App' 
 echo "Latest ASP.NET Core runtime version: $aspnetcore_runtime_version"
 
 # If these are pre-release versions, they need normalization
-if [[ $runtime_version == *preview* ]]; then
-    runtime_version=$(echo $runtime_version | sed -e 's|\(preview[0-9]*\).*|\1|')
-    aspnetcore_runtime_version=$(echo $aspnetcore_runtime_version | sed -e 's|\(preview[0-9]*\).*|\1|')
+if [[ $runtime_version == *preview* ]] || [[ $runtime_version == *rc* ]] ; then
+    runtime_version=$(echo $runtime_version | sed -E 's#(preview[0-9]*|rc[0-9]*).*#\1#')
+    aspnetcore_runtime_version=$(echo $aspnetcore_runtime_version | sed -E 's#(preview[0-9]*|rc[0-9]*).*#\1#')
 fi
 
 if [[ $runtime_version == $aspnetcore_runtime_version ]]; then
