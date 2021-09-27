@@ -7,9 +7,12 @@ PROJNAME=helloworld
 # Test new C# project
 dotnet new console --language C# --name $PROJNAME
 pushd $PROJNAME
-dotnet run | grep 'Hello,\? World!'
-if [ $? -eq 1 ]; then
+if dotnet run | grep 'Hello,\? World!'; then
+  true
+else
   echo "C# Hello World FAIL"
+  dotnet run
+  rm -rf $PROJNAME
   exit 1
 fi
 popd
@@ -23,9 +26,11 @@ echo -e "===================\n"
 
 dotnet new console --language F# --name $PROJNAME
 pushd $PROJNAME
-dotnet run | grep -i 'Hello,\? World!\? from F#'
-if [ $? -eq 1 ]; then
+if dotnet run | grep -E 'Hello,? [Ww]orld!? from F#|Hello from F#'; then
+  true
+else
   echo "F# Hello World FAIL"
+  dotnet run
   rm -rf $PROJNAME
   exit 1
 fi
@@ -40,9 +45,11 @@ echo -e "===================\n"
 
 dotnet new console --language VB --name $PROJNAME
 pushd $PROJNAME
-dotnet run | grep 'Hello,\? World!'
-if [ $? -eq 1 ]; then
+if dotnet run | grep 'Hello,\? World!'; then
+  true
+else
   echo "VB Hello World FAIL"
+  dotnet run
   rm -rf $PROJNAME
   exit 1
 fi
