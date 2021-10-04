@@ -1,0 +1,9 @@
+{
+  "name": "workload",
+  "enabled": true,
+  "version": "6.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "ignoredRIDs":[ ]
+}
