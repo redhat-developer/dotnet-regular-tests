@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Runtime;
 using System.Runtime.InteropServices;
@@ -79,14 +80,15 @@ namespace AssembliesValid
                         var reader = new PEReader(file);
                         bool hasAot = AssemblyHasAot(assembly, reader, machine);
                         bool inReleaseMode = AssemblyIfNgenIsInReleaseMode(assembly, reader);
+                        bool hasMethods = AssemblyHasMethods(reader);
 
-                        if (hasAot && inReleaseMode)
+                        if ((!hasMethods || hasAot) && inReleaseMode)
                         {
                             Console.WriteLine($"{assembly}: OK");
                         }
                         else
                         {
-                            Console.WriteLine($"error: {assembly} hasAot: {hasAot}, inReleaseMode: {inReleaseMode}");
+                            Console.WriteLine($"error: {assembly} hasMethods: {hasMethods}, hasAot: {hasAot}, inReleaseMode: {inReleaseMode}");
                             allOkay = false;
                         }
                     }
@@ -184,6 +186,12 @@ namespace AssembliesValid
             }
 
             return false;
+        }
+
+        static bool AssemblyHasMethods(PEReader reader)
+        {
+            var metadataReader = reader.GetMetadataReader();
+            return metadataReader.MethodDefinitions.Count > 0;
         }
 
         static bool AssemblyIfNgenIsInReleaseMode(string assemblyPath, PEReader reader)
