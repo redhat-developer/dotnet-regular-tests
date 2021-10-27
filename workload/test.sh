@@ -4,7 +4,7 @@ set -euo pipefail
 
 set -x
 
-WORKLOAD="wasm-tools"
+WORKLOAD="macos"
 
 dotnet workload install "$WORKLOAD"
 echo "PASS: workload install."
