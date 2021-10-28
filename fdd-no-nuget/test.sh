@@ -2,6 +2,8 @@
 
 set +x
 
+rm -rf ~/.nuget
+
   # Create the nuget.config with <clear /> to block NuGet
 cat <<EOF >nuget.config
 <?xml version="1.0" encoding="utf-8"?>
@@ -16,9 +18,7 @@ dotnet publish
 
 if [ $? -eq 1 ]; then
   echo "FAIL: unable to publish FFD without nuget.org access"
-  rm -rf ~/.nuget
   exit 1
 fi
 
-rm -rf ~/.nuget
 echo "PASS: successfully published FDD without nuget.org access"
