@@ -2,7 +2,7 @@
 	"name": "fdd-no-nuget",
 	"enabled": true,
 	"requiresSdk": true,
-	"version": "2.1",
+	"version": "3.1",
 	"versionSpecific": false,
 	"type": "bash",
 	"cleanup": true,
