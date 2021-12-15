@@ -4,6 +4,14 @@ set -euo pipefail
 
 set -x
 
+# This test *must* be run as non-root for it to have any meaning. So, force it
+# to re-run itself under a non-root user if it's accidentally run as root.
+if [[ $(id -u) == "0" ]]; then
+    id testrunner || useradd testrunner
+    su - testrunner -c "$(readlink -f $0)" "$@"
+    exit
+fi
+
 WORKLOAD="macos"
 
 dotnet workload install "$WORKLOAD"
