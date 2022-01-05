@@ -8,9 +8,16 @@ set -x
 # to re-run itself under a non-root user if it's accidentally run as root.
 if [[ $(id -u) == "0" ]]; then
     id testrunner || useradd testrunner
-    su - testrunner -c "$(readlink -f $0)" "$@"
+    su - testrunner -c "$(readlink -f "$0")" "$@"
     exit
 fi
+
+# In some environments, such as Github Actions, /tmp/ is strange and
+# basically reserved for root only. So lets use another directory as
+# /tmp/ for this test for the temporary data. Main workload
+# installation is still to the user's home.
+mkdir -p "$(pwd)/workload-temp/"
+export TMPDIR="$(pwd)/workload-temp/"
 
 WORKLOAD="macos"
 
