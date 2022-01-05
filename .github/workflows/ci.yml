@@ -1,6 +1,10 @@
 name: Confirm tests run successfully
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   build:
@@ -14,13 +18,17 @@ jobs:
       fail-fast: false
       matrix:
         container_image:
-          - registry.fedoraproject.org/fedora:33
           - registry.fedoraproject.org/fedora:34
           - registry.fedoraproject.org/fedora:35
+          - registry.fedoraproject.org/fedora:rawhide
           - registry.access.redhat.com/ubi8
         dotnet_version:
           - "3.1"
           - "5.0"
+          - "6.0"
+        exclude:
+          - container_image: registry.fedoraproject.org/fedora:rawhide
+            dotnet_version: "5.0"
 
     container:
       image: ${{ matrix.container_image }}
