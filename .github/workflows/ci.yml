@@ -71,7 +71,7 @@ jobs:
               rm -rf telemetry-is-off-by-default bash-completion
           fi
 
-          ./turkey -v
+          ./turkey -v --timeout 600
 
       - name: Show Logs
         if: ${{ always() }}
