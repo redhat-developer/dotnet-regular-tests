@@ -1,0 +1,12 @@
+{
+  "name": "targeting-packs-bad-files",
+  "enabled": true,
+  "requiresSdk": true,
+  "version": "3.1",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "ignoredRIDs":[
+
+  ]
+}
