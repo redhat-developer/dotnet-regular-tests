@@ -81,6 +81,7 @@ dotnet5Templates=(
 dotnet3Templates=(
     angular
     blazorserver
+    blazorwasm
     classlib
     console
     gitignore
