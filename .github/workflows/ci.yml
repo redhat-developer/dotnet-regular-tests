@@ -54,6 +54,12 @@ jobs:
         run: |
           dnf install -y python3 wget $(grep '^Dependencies: ' README.md | cut -d: -f2-) --skip-broken
 
+      - name: Install test runner dependencies (Fedora Rawhide)
+        timeout-minutes: 2
+        run: |
+          dnf install -y openssl1.1
+        if: matrix.container_image == 'registry.fedoraproject.org/fedora:rawhide'
+
       - name: Download test runner
         run: |
           set -euo pipefail
