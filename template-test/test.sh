@@ -31,7 +31,6 @@ dotnet6Templates=(
     razorclasslib
     razorcomponent
     react
-    reactredux
     sln
     tool-manifest
     viewimports
