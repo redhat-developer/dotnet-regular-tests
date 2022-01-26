@@ -20,9 +20,9 @@ rm -rf HelloWeb
 
 mkdir HelloWeb
 pushd HelloWeb
-strace --string-limit 512 -e network -fo ../new.log dotnet new web
-strace --string-limit 512 -e network -fo ../restore.log dotnet restore "${no_server[@]}"
-strace --string-limit 512 -e network -fo ../build.log dotnet build -c Release  "${no_server[@]}"
+strace -s 512 -e network -fo ../new.log dotnet new web
+strace -s 512 -e network -fo ../restore.log dotnet restore "${no_server[@]}"
+strace -s 512 -e network -fo ../build.log dotnet build -c Release  "${no_server[@]}"
 popd
 rm -rf HelloWeb
 
