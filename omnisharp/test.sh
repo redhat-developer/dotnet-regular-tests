@@ -18,6 +18,25 @@ pushd omnisharp
 tar xf "../omnisharp-${runtime_id}.tar.gz"
 popd
 
+if [[ "$(ldd omnisharp/bin/mono 2>&1 >/dev/null | wc -l )" -gt 0 ]]; then
+    echo "This version of mono is incompatible. Falling back."
+    rm -r "omnisharp-${runtime_id}.tar.gz"
+    rm -r omnisharp
+
+    wget --no-verbose "https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.37.17/omnisharp-${runtime_id}.tar.gz"
+
+    mkdir omnisharp
+    pushd omnisharp
+    tar xf "../omnisharp-${runtime_id}.tar.gz"
+    popd
+
+    if [[ "$(ldd omnisharp/bin/mono 2>&1 >/dev/null | wc -l )" -gt 0 ]]; then
+        echo "error: Can't find a compatible version of mono. Please update the test."
+        exit 100
+    fi
+fi
+
+
 for project in blazorserver blazorwasm classlib console mstest mvc nunit web webapp webapi worker xunit ; do
 
     mkdir hello-$project
