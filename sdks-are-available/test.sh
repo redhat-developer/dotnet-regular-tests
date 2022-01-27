@@ -28,7 +28,7 @@ for expected in "${expected_sdks[@]}"; do
     found=false
 
     for sdk in "${sdks[@]}"; do
-        if [[ "$(basename "$sdk")" == "$expected" ]]; then
+        if [[ "$(basename "$sdk")" == "$expected" ]] && [[ -f "${sdk}/Sdk/Sdk.props" ]] ; then
             found=true
         fi
     done
