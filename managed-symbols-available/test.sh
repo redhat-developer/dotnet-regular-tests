@@ -12,7 +12,9 @@ IFS='.' read -ra VERSION <<< "$1"
 if [[ ${VERSION[0]} -ge 6 ]]; then
     echo "We are not supposed to be shipping symbol files starting with .NET 6"
 
-    if find "${framework_dir}" -name '*.pdb'; then
+    find "${framework_dir}" -name '*.pdb' || true
+
+    if [[ "$(find "${framework_dir}" -name '*.pdb' -printf '.' | wc -c)" -gt 0 ]] ; then
         echo "error: Found some pdb file."
         exit 1
     fi
