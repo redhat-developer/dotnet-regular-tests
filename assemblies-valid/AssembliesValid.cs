@@ -65,7 +65,8 @@ namespace AssembliesValid
 
             Console.WriteLine($"Searching for dotnet binaries in {searchRoot}");
 
-            var machine = GetCurrentMachine();
+            var architecture = RuntimeInformation.OSArchitecture;
+            var machine = GetCurrentMachine(architecture);
 
             ICollection<string> assemblies = FindAssemblyFiles(searchRootDirectory);
 
@@ -82,7 +83,21 @@ namespace AssembliesValid
                         bool inReleaseMode = AssemblyIfNgenIsInReleaseMode(assembly, reader);
                         bool hasMethods = AssemblyHasMethods(reader);
 
-                        if ((!hasMethods || hasAot) && inReleaseMode)
+                        bool valid = true;
+                        if (!inReleaseMode)
+                        {
+                            valid = false;
+                        }
+                        if (hasMethods && !hasAot)
+                        {
+                            // s390x doesn't have aot support, and that's okay for now
+                            if (architecture != Architecture.S390x)
+                            {
+                                valid = false;
+                            }
+                        }
+
+                        if (valid)
                         {
                             Console.WriteLine($"{assembly}: OK");
                         }
@@ -116,15 +131,16 @@ namespace AssembliesValid
             }
         }
 
-        static Machine GetCurrentMachine()
+        static Machine GetCurrentMachine(Architecture arch)
         {
-            var arch = RuntimeInformation.OSArchitecture;
             switch (arch)
             {
                 case Architecture.Arm:
                     return Machine.Arm;
                 case Architecture.Arm64:
                     return Machine.Arm64;
+                case Architecture.S390x:
+                    return Machine.Unknown;
                 case Architecture.X64:
                     return Machine.Amd64;
                 case Architecture.X86:

@@ -258,7 +258,16 @@ function testTemplate {
 
     if [ "${action}" = "new" ] ; then
         true # no additional action
+    elif [[ ( $(uname -m) == "s390x" ) && ( "${templateName}" == "angular" ) ]]; then
+        # angular needs the node module fsevents, which is not supported on s390x
+        true
     elif [ "${action}" = "build" ] || [ "${action}" = "run" ] || [ "${action}" = "test" ] ; then
+        if [[ ( $(uname -m) == "s390x" ) && ( "${templateName}" == "xunit" || "${templateName}" == "nunit" || "${templateName}" == "mstest" ) ]]; then
+            # xunit/nunit/mstest need a package version fix for s390x;
+            # the default templates are known to be broken out of the
+            # box
+            sed -i -E 's|(PackageReference Include="Microsoft.NET.Test.Sdk" Version=")16.11.0"|\117.0.0"|' ./*.csproj
+        fi
         if ! dotnet "${action}"; then
             failedTests=$((failedTests+1))
             echo "FAILED: ${templateName} failed"
