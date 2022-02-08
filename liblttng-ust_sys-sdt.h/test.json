@@ -7,6 +7,6 @@
   "type": "bash",
   "cleanup": true,
   "ignoredRIDs":[
-    "fedora31"
+    "linux-s390x"
   ]
 }
