@@ -54,17 +54,11 @@ jobs:
         run: |
           dnf install -y python3 wget $(grep '^Dependencies: ' README.md | cut -d: -f2-) --skip-broken
 
-      - name: Install test runner dependencies (Fedora Rawhide)
-        timeout-minutes: 2
-        run: |
-          dnf install -y openssl1.1
-        if: matrix.container_image == 'registry.fedoraproject.org/fedora:rawhide'
-
       - name: Download test runner
         run: |
           set -euo pipefail
-          wget --no-verbose https://github.com/redhat-developer/dotnet-bunny/releases/latest/download/turkey-$(uname -m) -O turkey
-          chmod +x ./turkey
+          wget --no-verbose https://github.com/redhat-developer/dotnet-bunny/releases/latest/download/turkey.tar.gz
+          tar xf turkey.tar.gz
 
       - name: Run tests
         run: |
@@ -77,7 +71,7 @@ jobs:
               rm -rf telemetry-is-off-by-default bash-completion
           fi
 
-          ./turkey -v --timeout 600
+          dotnet turkey/Turkey.dll -v --timeout 600
 
       - name: Show Logs
         if: ${{ always() }}
