@@ -90,11 +90,15 @@ namespace AssembliesValid
                         }
                         if (hasMethods && !hasAot)
                         {
+#if NET6_0_OR_GREATER
                             // s390x doesn't have aot support, and that's okay for now
                             if (architecture != Architecture.S390x)
                             {
+#endif
                                 valid = false;
+#if NET6_0_OR_GREATER
                             }
+#endif
                         }
 
                         if (valid)
@@ -139,8 +143,10 @@ namespace AssembliesValid
                     return Machine.Arm;
                 case Architecture.Arm64:
                     return Machine.Arm64;
+#if NET6_0_OR_GREATER
                 case Architecture.S390x:
                     return Machine.Unknown;
+#endif
                 case Architecture.X64:
                     return Machine.Amd64;
                 case Architecture.X86:
