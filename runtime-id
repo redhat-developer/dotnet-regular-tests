@@ -38,11 +38,14 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ ${portable_rid} == 1 ]]; then
-    echo "linux-${arch}"
+    case "${ID}" in
+        alpine)echo "linux-musl-${arch}" ;;
+        *) echo "linux-${arch}" ;;
+    esac
 else
     case "${ID}" in
         # Remove the RHEL minor version
-        rhel) rid_version=${VERSION_ID%.*} ;;
+        rhel|alpine|rocky) rid_version=${VERSION_ID%.*} ;;
 
         *) rid_version=${VERSION_ID} ;;
     esac

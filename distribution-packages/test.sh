@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 
@@ -7,6 +7,9 @@ runtime_version="$(dotnet --list-runtimes | head -1 | awk '{ print $2 }')"
 runtime_id=$(../runtime-id)
 # This might be the final/only netstandard version from now on
 netstandard_version=2.1
+
+# disabled for alpine
+[ -z "${runtime_id##alpine*}" ] && { echo Disabled for Alpine; exit 0; }
 
 ./test-standard-packages \
     "${runtime_id}" \

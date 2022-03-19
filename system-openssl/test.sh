@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Make sure .NET has ldd-visible links to OpenSSL. We prefer that over
 # using OpenSSL via dlopen (which is more likely to fail at runtime).

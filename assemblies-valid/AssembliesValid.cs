@@ -44,7 +44,7 @@ namespace AssembliesValid
         public void ValidateAssemblies()
         {
             string dotnetPath = null;
-            int exitCode = RunProcessAndGetOutput(new string[] { "command", "-v", "dotnet" }, out dotnetPath);
+            int exitCode = RunProcessAndGetOutput(new string[] { "bash", "-c", "\"command", "-v", "dotnet\"" }, out dotnetPath);
             if (exitCode != 0)
             {
                 Console.Error.WriteLine("'dotnet' command not found");
@@ -91,8 +91,8 @@ namespace AssembliesValid
                         if (hasMethods && !hasAot)
                         {
 #if NET6_0_OR_GREATER
-                            // s390x doesn't have aot support, and that's okay for now
-                            if (architecture != Architecture.S390x)
+                            // s390x (and arm) doesn't have aot support, and that's okay for now
+                            if (architecture != Architecture.S390x && architecture != Architecture.Arm)
                             {
 #endif
                                 valid = false;
