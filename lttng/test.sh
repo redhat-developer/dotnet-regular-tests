@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 
@@ -49,8 +49,11 @@ wait $DOTNET_PID
 echo "== Ending lttng session"
 end_session
 
+CMD="$(command -v babeltrace || true)"
+[ -z "${CMD}" ] && CMD="$(command -v babeltrace2)"
+
 # Retrieve trace
-LTTNG_TRACE=$(babeltrace "$TRACE_FOLDER/ust/uid/$(id -u)/64-bit" | grep "vpid = $DOTNET_PID")
+LTTNG_TRACE=$($CMD "$TRACE_FOLDER/ust/uid/$(id -u)/64-bit" | grep "vpid = $DOTNET_PID")
 
 # Clean up
 remove_test_folder

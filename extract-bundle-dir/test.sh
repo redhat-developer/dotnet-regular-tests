@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # The profile file sets DOTNET_BUNDLE_EXTRACT_BASE_DIR to avoid multi-user issues.
 # see: https://bugzilla.redhat.com/show_bug.cgi?id=1752350.

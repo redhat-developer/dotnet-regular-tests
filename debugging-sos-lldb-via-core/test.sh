@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Check whether coredumps produced by .NET Core can be used by sos
 # successfully. This test uses the `dotnet sos` global tool.

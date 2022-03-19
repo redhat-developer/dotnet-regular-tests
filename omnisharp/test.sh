@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 IFS=$'\n\t'
@@ -10,6 +10,9 @@ mkdir workdir
 pushd workdir
 
 runtime_id="$(../../runtime-id --portable)"
+
+# disabled for alpine
+[ -z "${runtime_id##*musl*}" ] && { echo No musl release of omnisharp, disabled; exit 0; }
 
 wget --no-verbose "https://github.com/OmniSharp/omnisharp-roslyn/releases/latest/download/omnisharp-${runtime_id}.tar.gz"
 

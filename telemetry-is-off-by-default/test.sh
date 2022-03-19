@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This test ensures telemetry is not being sent for (some) commands by
 # checking that no network connections are being made when not

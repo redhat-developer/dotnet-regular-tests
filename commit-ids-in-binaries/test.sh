@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # .NET Core native binaries (coreclr.so, System.Native.so) contain a
 # commit id as text somewhere in the binary. For example

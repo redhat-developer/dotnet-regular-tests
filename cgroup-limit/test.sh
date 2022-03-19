@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 
@@ -10,6 +10,12 @@ cat /proc/self/cgroup
 
 if [[ "$(stat -f -c "%T" /sys/fs/cgroup)" == "cgroup2fs" ]] && [[ $(dotnet --version) == "3."* ]]; then
     echo "cgroup v2 is not fully supported on .NET Core 3.x. Skipping."
+    exit 0
+fi
+
+
+if [ -z "$(command -v systemctl)" ]; then
+    echo "Environment does not use systemd"
     exit 0
 fi
 

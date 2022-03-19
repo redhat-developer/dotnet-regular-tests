@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Make sure .NET Core has linked to SSL_*_alpn_* functions from OpenSSL
 

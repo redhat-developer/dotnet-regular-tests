@@ -1,9 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 
 helpPages=$(dotnet --help | grep -A 999 'SDK commands' | grep -E -B 999 'Common options|Additional commands' | awk 'NR>1 {print $1}' | head -n-2)
-manPages=$(rpm -qd $(rpm -qa | grep 'dotnet') | grep 'man1/dotnet-')
+
+RUNTIME_ID=$(../runtime-id)
+case $RUNTIME_ID in
+	alpine*)manPages=$(apk info -L dotnet-doc);;
+	*)manPages=$(rpm -qd $(rpm -qa | grep 'dotnet') | grep 'man1/dotnet-');;
+esac
 
 failed=0
 for page in $helpPages; do
