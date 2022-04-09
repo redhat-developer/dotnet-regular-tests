@@ -19,6 +19,8 @@ fi
 mkdir -p "$(pwd)/workload-temp/"
 export TMPDIR="$(pwd)/workload-temp/"
 
+dotnet workload search
+
 WORKLOAD="macos"
 
 dotnet workload install "$WORKLOAD"
