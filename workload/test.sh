@@ -21,7 +21,7 @@ export TMPDIR="$(pwd)/workload-temp/"
 
 dotnet workload search
 
-WORKLOAD="macos"
+WORKLOAD="wasm-tools"
 
 dotnet workload install "$WORKLOAD"
 echo "PASS: workload install."

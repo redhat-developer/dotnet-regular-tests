@@ -5,5 +5,8 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
-  "ignoredRIDs":[ ]
+  "ignoredRIDs": [
+    "linux-arm64",
+    "linux-s390x"
+  ]
 }
