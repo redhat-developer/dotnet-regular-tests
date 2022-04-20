@@ -8,7 +8,8 @@
   "cleanup": true,
   "ignoredRIDs":[
     "fedora-arm64",
-    "rhel8",
-    "rhel9"
+    "fedora-s390x",
+    "rhel.8",
+    "rhel.9"
   ]
 }
