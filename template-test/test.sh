@@ -165,7 +165,7 @@ dotnet help > /dev/null 2>/dev/null
 
 readarray -t allAutoTemplates < <(
     dotnet new --list |
-        sed '0,/^------/d' |
+        sed '0,/^--*/d' |
         awk -F '  +' ' { print $2 }' |
         sed 's/,/\n/' |
         sed -e '/^ *$/d' |

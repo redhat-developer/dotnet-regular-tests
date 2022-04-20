@@ -6,6 +6,7 @@
   "type": "bash",
   "cleanup": true,
   "ignoredRIDs":[
+    "linux-musl",
     "linux-s390x"
   ]
 }

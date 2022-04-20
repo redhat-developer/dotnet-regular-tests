@@ -6,6 +6,7 @@
   "type": "bash",
   "cleanup": true,
   "ignoredRIDs":[
-    "rhel7"
+    "rhel7",
+    "linux-musl"
   ]
 }

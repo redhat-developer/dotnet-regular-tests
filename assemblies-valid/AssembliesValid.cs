@@ -44,7 +44,7 @@ namespace AssembliesValid
         public void ValidateAssemblies()
         {
             string dotnetPath = null;
-            int exitCode = RunProcessAndGetOutput(new string[] { "bash", "-c", "\"command", "-v", "dotnet\"" }, out dotnetPath);
+            int exitCode = RunProcessAndGetOutput(new string[] { "bash", "-c", "command -v dotnet" }, out dotnetPath);
             if (exitCode != 0)
             {
                 Console.Error.WriteLine("'dotnet' command not found");
@@ -120,8 +120,11 @@ namespace AssembliesValid
         static int RunProcessAndGetOutput(string[] processAndArguments, out string standardOutput)
         {
             ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = processAndArguments[0];
-            startInfo.Arguments = string.Join(" ", processAndArguments.Skip(1));
+            startInfo.FileName =  processAndArguments[0];
+            foreach (string arg in processAndArguments.Skip(1))
+            {
+                startInfo.ArgumentList.Add(arg);
+            }
             startInfo.RedirectStandardOutput = true;
 
             using (Process p = Process.Start(startInfo))
