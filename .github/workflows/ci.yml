@@ -18,17 +18,22 @@ jobs:
       fail-fast: false
       matrix:
         container_image:
-          - registry.fedoraproject.org/fedora:34
           - registry.fedoraproject.org/fedora:35
+          - registry.fedoraproject.org/fedora:36
+          - registry.fedoraproject.org/fedora:37
           - registry.fedoraproject.org/fedora:rawhide
           - registry.access.redhat.com/ubi8
+          - registry.access.redhat.com/ubi9
         dotnet_version:
           - "3.1"
-          - "5.0"
           - "6.0"
         exclude:
+          - container_image: registry.fedoraproject.org/fedora:37
+            dotnet_version: "3.1"
           - container_image: registry.fedoraproject.org/fedora:rawhide
-            dotnet_version: "5.0"
+            dotnet_version: "3.1"
+          - container_image: registry.access.redhat.com/ubi9
+            dotnet_version: "3.1"
 
     container:
       image: ${{ matrix.container_image }}
@@ -69,6 +74,10 @@ jobs:
           ### HACK: UBI 8 is missing strace and bash-completion packages for tests
           if [[ ${{ matrix.container_image }} == *ubi8* ]] ; then
               rm -rf telemetry-is-off-by-default bash-completion
+          fi
+          ### HACK: UBI 9 is missing strace package for tests
+          if [[ ${{ matrix.container_image }} == *ubi9* ]] ; then
+              rm -rf telemetry-is-off-by-default
           fi
 
           dotnet turkey/Turkey.dll -v --timeout 600
