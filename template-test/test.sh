@@ -32,6 +32,7 @@ dotnet6Templates=(
     razorcomponent
     react
     sln
+    solution
     tool-manifest
     viewimports
     viewstart
@@ -211,7 +212,7 @@ for autoTemplate in "${filteredAutoTemplates[@]}"; do
         fi
     done
     if [[ $found == 0 ]]; then
-        echo "error: auto-detected template ${autoTemplate} which is not in" \
+        echo "error: auto-detected template '${autoTemplate}' which is not in" \
              "the explicit list of templates to test. If this is intentional," \
              "add it to the templateIgnoreList."
         echo "detected templates:" "${filteredAutoTemplates[@]}"
