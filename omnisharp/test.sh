@@ -38,7 +38,7 @@ function run_omnisharp_against_projects
         # Omnisharp can spawn off a number of processes. If so, they
         # will include the current directory as a process argument, so
         # use that to identify and kill them.
-        pgrep -if omnisharp
+        pgrep -if omnisharp || true
         mapfile -t to_kill < <(pgrep -f "$(pwd)")
         if [[ "${#to_kill[@]}" -gt 0 ]] ; then
             kill "${to_kill[@]}"
@@ -55,33 +55,53 @@ function run_omnisharp_against_projects
     done
 }
 
+function ldd-okay
+{
+    file=$1
+    if [[ "$(ldd "$file" 2>&1 >/dev/null | wc -l )" -gt 0 ]]; then
+        return 1
+    fi
+    if ldd "$file" 2>&1 | grep -F 'not found'; then
+        return 1
+    fi
+    return 0
+}
+
 for download_url in "${omnisharp_urls[@]}"; do
     tarball=$(basename "$download_url")
     rm -f "$tarball"
     rm -rf omnisharp
-    wget --no-verbose "$download_url"
+
+    if [[ $(uname -m) == "aarch64" ]] && [[ "$download_url" = *"/v1.37.17/"* ]]; then
+        echo "OmniSharp v1.37.17 is not available for arm64/aarch64"
+        continue
+    fi
 
     if [[ "${version_split[0]}" -lt 6 ]] && [[ "$download_url" = *"net6.0"* ]]; then
         echo "Skipping .NET 6 build of OmniSharp on .NET ${version_split[0]}.${version_split[1]}"
         continue
     fi
 
+    wget --no-verbose "$download_url"
+
     mkdir omnisharp
     pushd omnisharp
     tar xf "../$tarball"
     if [ -f "omnisharp/bin/mono" ]; then
-        if [[ "$(ldd omnisharp/bin/mono 2>&1 >/dev/null | wc -l )" -gt 0 ]]; then
+        if ! ldd-okay omnisharp/bin/mono; then
             echo "This version of mono is incompatible. Skipping."
             continue
         fi
         run_omnisharp_against_projects omnisharp/bin/mono
     elif [ -f "run" ]; then
-        if [[ "$(ldd bin/mono 2>&1 >/dev/null | wc -l )" -gt 0 ]]; then
+        if ! ldd-okay bin/mono; then
             echo "This version of mono is incompatible. Skipping."
             continue
         fi
         run_omnisharp_against_projects ./run
     elif [ -f "OmniSharp" ]; then
+        # This uses the system .NET installation, and has no bundled/required
+        # mono or other libraries
         run_omnisharp_against_projects ./OmniSharp
     else
         echo "Unable to find Omnisharp"
