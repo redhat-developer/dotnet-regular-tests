@@ -1,0 +1,12 @@
+{
+  "name": "nativeaot",
+  "enabled": true,
+  "requiresSdk": true,
+  "version": "7.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "ignoredRIDs":[
+    "linux-s390x"
+  ]
+}
