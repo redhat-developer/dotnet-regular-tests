@@ -19,9 +19,10 @@ if [ "$PUBLISHED_FILE_COUNT" != "1" ]; then
     exit 1
 fi
 
-# Verify the application runs successfully.
-if ! ./bin/Debug/net*/*/publish/console; then
-    echo "FAIL: NativeAot console application failed to run."
+# Verify the application runs.
+APP_OUTPUT="$(./bin/Debug/net*/*/publish/console 2>&1)"
+if [ "$APP_OUTPUT" != "Hello, World!" ]; then
+    echo "FAIL: NativeAot console application did not have expected output."
     exit 1
 fi
 
