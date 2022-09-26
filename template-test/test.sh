@@ -10,6 +10,42 @@ set -euo pipefail
 # If additional templates are found via `dotnet new --list`, this test
 # will fail unless they are added here.
 
+dotnet7Templates=(
+    angular
+    blazorserver
+    blazorserver-empty
+    blazorwasm
+    blazorwasm-empty
+    classlib
+    console
+    editorconfig
+    gitignore
+    globaljson
+    grpc
+    mstest
+    mvc
+    nugetconfig
+    nunit
+    nunit-test
+    page
+    proto
+    razor
+    razorclasslib
+    razorcomponent
+    react
+    sln
+    solution
+    tool-manifest
+    viewimports
+    viewstart
+    web
+    webapi
+    webapp
+    webconfig
+    worker
+    xunit
+)
+
 dotnet6Templates=(
     angular
     blazorserver
@@ -124,7 +160,9 @@ dotnet3Templates=(
 templateActions=\
 "angular build
 blazorserver build
+blazorserver-empty build
 blazorwasm build
+blazorwasm-empty build
 classlib build
 console run
 mstest test
@@ -189,9 +227,11 @@ for template in "${allAutoTemplates[@]}"; do
     fi
 done
 
-IFS='.' read -ra VERSION_SPLIT <<< "$1"
+IFS='.-' read -ra VERSION_SPLIT <<< "$1"
 declare -a allTemplates
-if [[ ${VERSION_SPLIT[0]} == "6" ]]; then
+if [[ ${VERSION_SPLIT[0]} == "7" ]]; then
+    allTemplates=( "${dotnet7Templates[@]}" )
+elif [[ ${VERSION_SPLIT[0]} == "6" ]]; then
     allTemplates=( "${dotnet6Templates[@]}" )
 elif [[ ${VERSION_SPLIT[0]} == "5" ]]; then
     allTemplates=( "${dotnet5Templates[@]}" )

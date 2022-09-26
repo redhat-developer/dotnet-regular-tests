@@ -9,7 +9,7 @@ fi
 set -euo pipefail
 set -x
 
-IFS='.' read -ra VERSION_SPLIT <<< "$1"
+IFS='.-' read -ra VERSION_SPLIT <<< "$1"
 VERSION="${VERSION_SPLIT[0]}.${VERSION_SPLIT[1]}"
 
 # it's okay if the tool is already installed

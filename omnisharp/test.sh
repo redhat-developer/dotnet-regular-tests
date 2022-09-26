@@ -17,7 +17,7 @@ omnisharp_urls=(
     "https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.37.17/omnisharp-${runtime_id}.tar.gz"
 )
 
-IFS='.' read -ra version_split <<< "$1"
+IFS='.-' read -ra version_split <<< "$1"
 
 function run_omnisharp_against_projects
 {
