@@ -7,7 +7,7 @@ IFS=$'\n\t'
 
 framework_dir=$(../dotnet-directory --framework "$1")
 
-IFS='.' read -ra VERSION <<< "$1"
+IFS='.-' read -ra VERSION <<< "$1"
 
 if [[ ${VERSION[0]} -ge 6 ]]; then
     echo "We are not supposed to be shipping symbol files starting with .NET 6"

@@ -8,12 +8,13 @@ namespace DotNetCoreVersionApis
 {
     public class VersionTest
     {
+        public static readonly int MAX_DOTNET_MAJOR_VERSION = 7;
         [Fact]
         public void EnvironmentVersion()
         {
             var version = Environment.Version;
             Console.WriteLine($"Environment.Version: {version}");
-            Assert.InRange(version.Major, 3, 6);
+            Assert.InRange(version.Major, 3, MAX_DOTNET_MAJOR_VERSION);
         }
 
         [Fact]
@@ -45,7 +46,7 @@ namespace DotNetCoreVersionApis
 
             bool okay = Version.TryParse(plainVersion, out Version parsedVersion);
             Assert.True(okay);
-            Assert.InRange(parsedVersion.Major, 3, 6);
+            Assert.InRange(parsedVersion.Major, 3, MAX_DOTNET_MAJOR_VERSION);
 
             var commitId = versionParts[1];
             Regex commitRegex = new Regex("[0-9a-fA-F]{40}");

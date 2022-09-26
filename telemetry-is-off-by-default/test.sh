@@ -13,14 +13,14 @@ set -x
 
 no_server=("/nodeReuse:false" "/p:UseSharedCompilation=false" "/p:UseRazorBuildServer=false")
 
-IFS='.' read -ra VERSION_SPLIT <<< "$1"
+IFS='.-' read -ra VERSION_SPLIT <<< "$1"
 DOTNET_MAJOR="${VERSION_SPLIT[0]}"
 
 rm -rf HelloWeb
 
 mkdir HelloWeb
 pushd HelloWeb
-strace -s 512 -e network -fo ../new.log dotnet new web
+strace -s 512 -e network -fo ../new.log dotnet new web --no-restore
 strace -s 512 -e network -fo ../restore.log dotnet restore "${no_server[@]}"
 strace -s 512 -e network -fo ../build.log dotnet build -c Release  "${no_server[@]}"
 popd

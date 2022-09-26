@@ -36,7 +36,7 @@ if [[ -z ${version} ]]; then
 fi
 
 declare -a versions
-IFS='.' read -ra versions <<< "${version}"
+IFS='.-' read -ra versions <<< "${version}"
 dotnet_dir=$(dirname "$(readlink -f "$(command -v dotnet)")")
 framework_dirs=( "${dotnet_dir}/shared/Microsoft.NETCore.App/${versions[0]}.${versions[1]}"* )
 framework_dir="${framework_dirs[0]}"

@@ -19,16 +19,17 @@ namespace ReleaseVersionSane
             var currentSdkVersion = GetSdkVersion();
 
             string majorMinor = $"{currentRuntimeVersion.Major}.{currentRuntimeVersion.Minor}";
-            (List<string> publicSdkVersions, string publicRuntimeVersion) = await upstream.GetLatestRelease(new HttpClient(), majorMinor);
+            (List<string> publicSdkVersionsRaw, string publicRuntimeVersionRaw) = await upstream.GetLatestRelease(new HttpClient(), majorMinor);
+            List<Version> publicSdkVersions = publicSdkVersionsRaw.Select(v => Normalize(v)).ToList();
+            Version publicRuntimeVersion = Normalize(publicRuntimeVersionRaw);
 
             bool currentVersionNewerThanPublic = false;
-
-            if (publicRuntimeVersion != currentRuntimeVersion.ToString())
+            if ((publicRuntimeVersion != currentRuntimeVersion) && (currentRuntimeVersion.Build > 0))
             {
                 currentRuntimeVersion = new Version(currentRuntimeVersion.Major,
                                                     currentRuntimeVersion.Minor,
                                                     currentRuntimeVersion.Build - 1);
-                Assert.Equal(currentRuntimeVersion.ToString(), publicRuntimeVersion);
+                Assert.Equal(currentRuntimeVersion, publicRuntimeVersion);
                 currentVersionNewerThanPublic = true;
             }
 
@@ -42,7 +43,7 @@ namespace ReleaseVersionSane
             bool sdkMatched = false;
             foreach (var sdk in publicSdkVersions)
             {
-                if (sdk == currentSdkVersion.ToString())
+                if (sdk == currentSdkVersion)
                 {
                     sdkMatched = true;
                     break;
@@ -60,11 +61,11 @@ namespace ReleaseVersionSane
                 return null;
             }
 
-            return new Version(result
-                              .Split(Environment.NewLine)
-                              .Where(line => line.StartsWith("Microsoft.NETCore.App "))
-                              .Select(line => line.Split(' ')[1])
-                              .First());
+            return Normalize(result
+                             .Split(Environment.NewLine)
+                             .Where(line => line.StartsWith("Microsoft.NETCore.App "))
+                             .Select(line => line.Split(' ')[1])
+                             .First());
 
         }
 
@@ -76,10 +77,10 @@ namespace ReleaseVersionSane
                 return null;
             }
 
-            return new Version(result
-                              .Split(Environment.NewLine)
-                              .Select(line => line.Split(' ')[0])
-                              .First());
+            return Normalize(result
+                             .Split(Environment.NewLine)
+                             .Select(line => line.Split(' ')[0])
+                             .First());
 
         }
 
@@ -102,5 +103,10 @@ namespace ReleaseVersionSane
             }
         }
 
+        /// Normalize a version and remove parts that make it invalid. This includes 'preview' and 'rc' tags
+        public static Version Normalize(string version)
+        {
+             return new Version(version.Split('-')[0]);
+        }
     }
 }

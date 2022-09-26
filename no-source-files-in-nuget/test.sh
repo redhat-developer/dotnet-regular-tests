@@ -5,7 +5,7 @@ set -x
 
 rm -rf project.json
 
-IFS='.' read -ra VERSION <<< "$1"
+IFS='.-' read -ra VERSION <<< "$1"
 NEW_CMD="new console --force"
 if [[ "${VERSION[0]}" = "1" ]]; then
   NEW_CMD="new -t console"
