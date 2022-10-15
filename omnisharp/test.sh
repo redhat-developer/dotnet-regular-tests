@@ -19,6 +19,11 @@ omnisharp_urls=(
 
 IFS='.-' read -ra version_split <<< "$1"
 
+if [[ "${version_split[0]}" == "7" ]]; then
+    echo "warning: OmniSharp is known to be broken for .NET 7. Skipping."
+    exit 0
+fi
+
 function run_omnisharp_against_projects
 {
     for project in blazorserver blazorwasm classlib console mstest mvc nunit web webapp webapi worker xunit ; do
