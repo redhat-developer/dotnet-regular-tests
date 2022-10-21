@@ -11,6 +11,7 @@
     "centos.9",
     "fedora-arm64",
     "fedora-s390x",
+    "fedora-ppc64le",
     "rhel.8",
     "rhel.9"
   ]

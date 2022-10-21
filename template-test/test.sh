@@ -298,11 +298,11 @@ function testTemplate {
 
     if [ "${action}" = "new" ] ; then
         true # no additional action
-    elif [[ ( $(uname -m) == "s390x" ) && ( "${templateName}" == "angular" ) ]]; then
+    elif [[ ( $(uname -m) == "s390x" ||  $(uname -m) == "ppc64le" ) && ( "${templateName}" == "angular" ) ]]; then
         # angular needs the node module fsevents, which is not supported on s390x
         true
     elif [ "${action}" = "build" ] || [ "${action}" = "run" ] || [ "${action}" = "test" ] ; then
-        if [[ ( $(uname -m) == "s390x" ) && ( "${templateName}" == "xunit" || "${templateName}" == "nunit" || "${templateName}" == "mstest" ) ]]; then
+        if [[ ( $(uname -m) == "s390x" ||  $(uname -m) == "ppc64le" ) && ( "${templateName}" == "xunit" || "${templateName}" == "nunit" || "${templateName}" == "mstest" ) ]]; then
             # xunit/nunit/mstest need a package version fix for s390x;
             # the default templates are known to be broken out of the
             # box

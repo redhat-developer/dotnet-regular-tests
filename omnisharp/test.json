@@ -7,6 +7,7 @@
   "cleanup": true,
   "ignoredRIDs":[
     "linux-musl",
-    "linux-s390x"
+    "linux-s390x",
+    "linux-ppc64le"
   ]
 }

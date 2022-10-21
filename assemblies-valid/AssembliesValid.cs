@@ -92,7 +92,7 @@ namespace AssembliesValid
                         {
 #if NET6_0_OR_GREATER
                             // s390x (and arm) doesn't have aot support, and that's okay for now
-                            if (architecture != Architecture.S390x && architecture != Architecture.Arm)
+                            if (architecture != Architecture.S390x && architecture != Architecture.Arm && architecture != Architecture.Ppc64le)
                             {
 #endif
                                 valid = false;
@@ -149,6 +149,8 @@ namespace AssembliesValid
 #if NET6_0_OR_GREATER
                 case Architecture.S390x:
                     return Machine.Unknown;
+		case Architecture.Ppc64le;
+		    return Machine.Unknown;
 #endif
                 case Architecture.X64:
                     return Machine.Amd64;
