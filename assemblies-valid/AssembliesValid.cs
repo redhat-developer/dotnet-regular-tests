@@ -150,7 +150,7 @@ namespace AssembliesValid
                 case Architecture.Arm64:
                     return Machine.Arm64;
 #if NET7_0_OR_GREATER
-                case Architecture.Ppc64le;
+                case Architecture.Ppc64le:
                     return Machine.Unknown;
 #endif
 #if NET6_0_OR_GREATER
