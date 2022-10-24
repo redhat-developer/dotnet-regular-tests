@@ -90,15 +90,18 @@ namespace AssembliesValid
                         }
                         if (hasMethods && !hasAot)
                         {
+                            // 32-bit arm doesn't have AOT and niehter do s390x and ppc64le (which use mono). That's okay for now.
+                            if (architecture != Architecture.Arm
+#if NET7_0_OR_GREATER
+                                && architecture != Architecture.Ppc64le
+#endif
 #if NET6_0_OR_GREATER
-                            // s390x (and arm) doesn't have aot support, and that's okay for now
-                            if (architecture != Architecture.S390x && architecture != Architecture.Arm && architecture != Architecture.Ppc64le)
+                                && architecture != Architecture.S390x
+#endif
+                                )
                             {
-#endif
                                 valid = false;
-#if NET6_0_OR_GREATER
                             }
-#endif
                         }
 
                         if (valid)
@@ -146,11 +149,13 @@ namespace AssembliesValid
                     return Machine.Arm;
                 case Architecture.Arm64:
                     return Machine.Arm64;
+#if NET7_0_OR_GREATER
+                case Architecture.Ppc64le;
+                    return Machine.Unknown;
+#endif
 #if NET6_0_OR_GREATER
                 case Architecture.S390x:
                     return Machine.Unknown;
-		case Architecture.Ppc64le;
-		    return Machine.Unknown;
 #endif
                 case Architecture.X64:
                     return Machine.Amd64;
