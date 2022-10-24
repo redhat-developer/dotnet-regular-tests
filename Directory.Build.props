@@ -2,6 +2,6 @@
   <PropertyGroup>
     <XunitVersion>2.4.1</XunitVersion>
     <XunitRunnerVisualStudioVersion>2.4.3</XunitRunnerVisualStudioVersion>
-    <MicrosoftNetTestSdkVersion>17.0.0</MicrosoftNetTestSdkVersion>
+    <MicrosoftNetTestSdkVersion>17.5.0-preview-20221024-01</MicrosoftNetTestSdkVersion>
   </PropertyGroup>
 </Project>
