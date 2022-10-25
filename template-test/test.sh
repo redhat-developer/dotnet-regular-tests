@@ -302,11 +302,14 @@ function testTemplate {
         # angular needs the node module fsevents, which is not supported on s390x
         true
     elif [ "${action}" = "build" ] || [ "${action}" = "run" ] || [ "${action}" = "test" ] ; then
-        if [[ ( $(uname -m) == "s390x" ||  $(uname -m) == "ppc64le" ) && ( "${templateName}" == "xunit" || "${templateName}" == "nunit" || "${templateName}" == "mstest" ) ]]; then
+        if [[ ( $(uname -m) == "s390x" ) && ( "${templateName}" == "xunit" || "${templateName}" == "nunit" || "${templateName}" == "mstest" ) ]]; then
             # xunit/nunit/mstest need a package version fix for s390x;
             # the default templates are known to be broken out of the
             # box
             sed -i -E 's|(PackageReference Include="Microsoft.NET.Test.Sdk" Version=")16.11.0"|\117.0.0"|' ./*.csproj
+	elif [[ ( $(uname -m) == "ppc64le" ) && ( "${templateName}" == "xunit" || "${templateName}" == "nunit" || "${templateName}" == "mstest" ) ]]; then
+            # xunit/nunit/mstest need a package version fix for a version with enablement for ppc64le;
+            sed -i -E 's|(PackageReference Include="Microsoft.NET.Test.Sdk" Version=")17.3.2"|\117.5.0-preview-20221024-01"|' ./*.csproj
         fi
         if ! dotnet "${action}"; then
             failedTests=$((failedTests+1))
