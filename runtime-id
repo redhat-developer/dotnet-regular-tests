@@ -47,9 +47,17 @@ if [[ ${portable_rid} == 1 ]]; then
 else
     case "${ID}" in
         # Remove the minor version
-        alpine|ol|rhel|rocky) rid_version=${VERSION_ID%.*} ;;
+        alma|ol|rhel|rocky)
+            rid_version=${VERSION_ID%.*}
+            ;;
+        alpine)
+            # Remove _ and extra . to compute just the major.minor version
+            rid_version=$(echo "$VERSION_ID" | cut -d'_' -f1 | cut -d'.' -f1-2)
+            ;;
 
-        *) rid_version=${VERSION_ID} ;;
+        *)
+            rid_version=${VERSION_ID}
+            ;;
     esac
 
     echo "${ID}.${rid_version}-${arch}"

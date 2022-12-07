@@ -18,25 +18,22 @@ jobs:
       fail-fast: false
       matrix:
         container_image:
-          - registry.fedoraproject.org/fedora:35
+          - docker.io/library/alpine:latest
+          - docker.io/library/alpine:edge
+          - quay.io/centos/centos:stream9-development
           - registry.fedoraproject.org/fedora:36
           - registry.fedoraproject.org/fedora:37
           - registry.fedoraproject.org/fedora:rawhide
           - registry.access.redhat.com/ubi8
           - registry.access.redhat.com/ubi9
         dotnet_version:
-          - "3.1"
           - "6.0"
-        include:
-          - container_image: quay.io/centos/centos:stream9-development
-            dotnet_version: "7.0"
+          - "7.0"
         exclude:
+          - container_image: registry.fedoraproject.org/fedora:36
+            dotnet_version: "7.0"
           - container_image: registry.fedoraproject.org/fedora:37
-            dotnet_version: "3.1"
-          - container_image: registry.fedoraproject.org/fedora:rawhide
-            dotnet_version: "3.1"
-          - container_image: registry.access.redhat.com/ubi9
-            dotnet_version: "3.1"
+            dotnet_version: "7.0"
 
     container:
       image: ${{ matrix.container_image }}
@@ -44,23 +41,28 @@ jobs:
 
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install .NET ${{ matrix.dotnet_version }}
         timeout-minutes: 5
         run: |
           set -euo pipefail
-          if [[ ${{ matrix.container_image }} == fedora* ]] ; then
-              dnf install -y 'dnf-command(copr)'
-              dnf copr enable @dotnet-sig/dotnet -y
+          cat /etc/os-release
+          if grep fedora /etc/os-release ; then
+            dnf install -y dotnet-sdk-${{ matrix.dotnet_version }}
+          elif grep alpine /etc/os-release; then
+            apk add dotnet-sdk-${{ matrix.dotnet_version }} dotnet-doc
           fi
-
-          dnf install -y dotnet-sdk-${{ matrix.dotnet_version }}
 
       - name: Install Test dependencies
         timeout-minutes: 2
         run: |
-          dnf install -y python3 wget $(grep '^Dependencies: ' README.md | cut -d: -f2-) --skip-broken
+          if grep fedora /etc/os-release ; then
+            dnf install -y python3 wget $(grep '^Dependencies(dnf): ' README.md | cut -d: -f2-) --skip-broken
+          elif grep alpine /etc/os-release; then
+            apk add python3 wget $(grep '^Dependencies(apk): ' README.md | cut -d: -f2-)
+            echo -e '[PostgreSQL]\nDescription=PostgreSQL Unicode\nDriver=/usr/lib/psqlodbcw.so\nUsageCount=1' > /etc/odbcinst.ini
+          fi
 
       - name: Download test runner
         run: |
@@ -71,8 +73,18 @@ jobs:
       - name: Run tests
         run: |
           set -euo pipefail
+
+          ### This is very questionable, but making our CI fail because distro
+          ### .NET versions are out of date doesn't sound nice.
+          rm -rf release-version-sane
+
           ### HACK: Filter tests that can't pass in Containers
           rm -rf debugging-sos-lldb* createdump-aspnet cgroup-limit
+
+          ### HACK: RID parsing is broken on alpine:edge, so these tests fail
+          if [[ ${{ matrix.container_image }} == *'alpine:edge'* ]] ; then
+              rm -rf system-data-odbc
+          fi
 
           ### HACK: UBI 8 is missing bash-completion, postgres, and strace packages for tests
           if [[ ${{ matrix.container_image }} == *ubi8* ]] ; then

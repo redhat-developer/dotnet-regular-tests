@@ -201,6 +201,7 @@ done
 
 dotnet help > /dev/null 2>/dev/null
 
+dotnet new --list
 readarray -t allAutoTemplates < <(
     dotnet new --list |
         sed '0,/^--*/d' |

@@ -2,19 +2,31 @@
 
 set -euo pipefail
 
+set -x
+
 framework_dir=$(../dotnet-directory --framework "$1")
 
-ldd "${framework_dir}/libcoreclr.so" | grep 'libunwind.so'
-if [ $? -eq 1 ]; then
-  echo "libunwind not found"
-  exit 1
+libcoreclr=${framework_dir}/libcoreclr.so
+
+ldd "$libcoreclr"
+
+set +e
+ldd "$libcoreclr" | grep -F "libunwind.so"
+retval=$?
+set -e
+if [ $retval -eq 0 ]; then
+  echo "libunwind found"
+  exit 0
 fi
 
-ldd "${framework_dir}/libcoreclr.so" | grep 'libunwind-x86_64.so'
-if [ $? -eq 1 ]; then
-  echo "libunwind-x86_64 not found"
-  exit 1
+set +e
+ldd "$libcoreclr" | grep -F "libunwind-$(uname -m).so"
+retval=$?
+set -e
+if [ $retval -eq 0 ]; then
+  echo "libunwind-$(uname -m).so found"
+  exit 0
 fi
 
-echo "system-libunwind PASS"
-
+echo "fail: No linkage to libunwind found"
+exit 1
