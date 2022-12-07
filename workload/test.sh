@@ -13,7 +13,7 @@ mkdir -p "$(pwd)/workload-temp/"
 # This test *must* be run as non-root for it to have any meaning. So, force it
 # to re-run itself under a non-root user if it's accidentally run as root.
 if [[ $(id -u) == "0" ]]; then
-    id testrunner || useradd testrunner
+    id testrunner || useradd testrunner || adduser testrunner --disabled-password
     chmod ugo+rw "$(pwd)/workload-temp/"
     su testrunner -c "$(readlink -f "$0")" "$@"
     exit

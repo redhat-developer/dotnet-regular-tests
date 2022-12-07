@@ -4,7 +4,7 @@ set -euo pipefail
 set -x
 
 RUNTIME_ID=$(../runtime-id)
-declare -a packageNames
+packageNames=()
 set +e  # disable abort-on-error so we can have the pipeline below fail
 case $RUNTIME_ID in
   alpine*) ;;

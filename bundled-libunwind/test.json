@@ -7,7 +7,11 @@
   "type": "bash",
   "cleanup": true,
   "ignoredRIDs":[
-    "rhel7",
-    "fedora"
+    "alpine",
+    "fedora",
+    "linux-arm",
+    "linux-ppc64le",
+    "linux-s390x",
+    "rhel7"
   ]
 }

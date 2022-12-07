@@ -7,7 +7,7 @@ set -x
 framework_dir=$(../dotnet-directory --framework "$1")
 
 set +e
-ldd "${framework_dir}/libcoreclr.so" | grep 'libunwind.so'
+ldd "${framework_dir}/libcoreclr.so" | grep -F 'libunwind.so'
 retval=$?
 set -e
 if [ $retval -eq 1 ]; then
@@ -18,13 +18,13 @@ else
 fi
 
 set +e
-ldd "${framework_dir}/libcoreclr.so" | grep 'libunwind-x86_64.so'
+ldd "${framework_dir}/libcoreclr.so" | grep -F "libunwind-$(uname -m).so"
 retval=$?
 set -e
 if [ $retval -eq 1 ]; then
-  echo "pass: libunwind-x86_64 not found, assuming it is bundled"
+  echo "pass: libunwind-$(uname -m) not found, assuming it is bundled"
 else
-  echo "fail: libunwind-x86_64 found"
+  echo "fail: libunwind-$(uname -m) found"
   exit 1
 fi
 

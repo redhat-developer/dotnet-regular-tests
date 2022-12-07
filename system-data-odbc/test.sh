@@ -6,13 +6,14 @@ set -x
 
 # This test *must* be run as non-root; postgresql will refuse to start as root.
 if [[ $(id -u) == "0" ]]; then
-    id testrunner || useradd testrunner
+    id testrunner || useradd testrunner || adduser testrunner --disabled-password
     chown -R testrunner:testrunner "$(pwd)"
     su testrunner -c "$(readlink -f "$0")" "$@"
     exit
 fi
 
 function cleanup {
+    trap '' EXIT ERR  # Remove the traps to prevent multiple invocations
     pg_ctl stop -m fast
 
     while pg_ctl status; do
