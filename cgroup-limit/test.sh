@@ -13,6 +13,15 @@ if [[ "$(stat -f -c "%T" /sys/fs/cgroup)" == "cgroup2fs" ]] && [[ $(dotnet --ver
     exit 0
 fi
 
+# Enable "cgroup-limit" test on s390x on .NET 7.0 onwards
+if [ $(uname -m) == "s390x" ]; then
+  VERSION_STR="$(dotnet --version)"
+  VERSION_ID="$(echo "$(echo ${VERSION_STR} | cut -d"." -f1)")"
+  if [[ "$VERSION_ID" -lt "7" ]]; then
+    echo "On s390x, cgroup test is not supported on .NET 6.x. Its only supported from .NET 7.x onwards. Skipping."
+    exit 0
+  fi
+fi
 
 if [ -z "$(command -v systemctl)" ]; then
     echo "Environment does not use systemd"
