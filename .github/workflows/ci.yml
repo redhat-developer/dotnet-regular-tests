@@ -74,13 +74,13 @@ jobs:
           ### HACK: Filter tests that can't pass in Containers
           rm -rf debugging-sos-lldb* createdump-aspnet cgroup-limit
 
-          ### HACK: UBI 8 is missing strace and bash-completion packages for tests
+          ### HACK: UBI 8 is missing bash-completion, postgres, and strace packages for tests
           if [[ ${{ matrix.container_image }} == *ubi8* ]] ; then
-              rm -rf telemetry-is-off-by-default bash-completion
+              rm -rf bash-completion system-data-odbc telemetry-is-off-by-default
           fi
-          ### HACK: UBI 9 is missing strace package for tests
+          ### HACK: UBI 9 is missing postsgres and strace package for tests
           if [[ ${{ matrix.container_image }} == *ubi9* ]] ; then
-              rm -rf telemetry-is-off-by-default
+              rm -rf system-data-odbc telemetry-is-off-by-default 
           fi
 
           dotnet turkey/Turkey.dll -v --timeout 600

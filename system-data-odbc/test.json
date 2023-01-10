@@ -1,0 +1,11 @@
+{
+  "name": "system-data-odbc",
+  "enabled": true,
+  "requiresSdk": false,
+  "version": "6.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "ignoredRIDs":[
+  ]
+}
