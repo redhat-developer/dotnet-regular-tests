@@ -1,7 +1,8 @@
 <Project>
   <PropertyGroup>
+    <SystemDataOdbcVersion>6.0.0</SystemDataOdbcVersion>
+    <MicrosoftNetTestSdkVersion>17.4.0</MicrosoftNetTestSdkVersion>
     <XunitVersion>2.4.1</XunitVersion>
     <XunitRunnerVisualStudioVersion>2.4.3</XunitRunnerVisualStudioVersion>
-    <MicrosoftNetTestSdkVersion>17.4.0</MicrosoftNetTestSdkVersion>
   </PropertyGroup>
 </Project>
