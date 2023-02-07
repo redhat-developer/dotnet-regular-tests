@@ -27,7 +27,7 @@ function cleanup {
 PGDATA="$(pwd)/data"
 export PGDATA
 export PGHOST=localhost
-export PGPORT=$((1024 + "$RANDOM" ))
+export PGPORT=$((1024 + $RANDOM ))
 
 PGSOCKET="$(pwd)/socket"
 
@@ -38,6 +38,9 @@ trap cleanup EXIT ERR
 
 pg_ctl initdb
 pg_ctl start -o "-k $PGSOCKET"
+until pg_ctl status; do
+    sleep 1
+done
 
 psql template1 -c "CREATE DATABASE testdb;"
 psql testdb -c "CREATE TABLE test (ID INT PRIMARY KEY, NAME TEXT);"
