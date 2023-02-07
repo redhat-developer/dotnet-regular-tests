@@ -387,7 +387,7 @@ grep -E '[1-9][0-9]* gc heaps' dump.out
 
 heading "ehinfo"
 dump-analyze 'name2ee *!System.String.ToString' > dump.out
-dump-analyze 'ehinfo' > dump.out
+cat dump.out
 mapfile -t to_string_method_descriptors < <(grep 'MethodDesc:' dump.out | awk '{print $2}')
 for desc in "${to_string_method_descriptors[@]}"; do
     dump-analyze "ehinfo ${desc}" > dump.out
