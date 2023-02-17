@@ -570,7 +570,7 @@ cat dump.out
 heading "runtimes"
 dump-analyze 'runtimes' > dump.out
 cat dump.out
-grep -E '^#0 .NET Core runtime at [0-9a-fA-F]+ size [0-9a-fA-F]+ index [0-9a-fA-F]+$' dump.out
+grep -E '^#0 .NET Core runtime ([[:digit:]]+(\.[[:digit:]]+)* )?at [0-9a-fA-F]+ size [0-9a-fA-F]+ index [0-9a-fA-F]+$' dump.out
 grep -E '^    Runtime module path: /.*/libcoreclr.so$' dump.out
 grep -E '^        Dac .*/libmscordaccore.so LINUX [^ ]+ Coreclr [0-9a-fA-F]+$' dump.out
 grep -E '^        Dbi libmscordbi.so LINUX [^ ]+ Coreclr [0-9a-fA-F]+$' dump.out
