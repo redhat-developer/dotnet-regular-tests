@@ -348,7 +348,11 @@ function testTemplates {
 }
 
 trap cleanupFunc EXIT
-tmpDir="$( mktemp -d )"
+# This test creates multiple files that can take more than 1 GiB of disk space.
+# That's not suitable for use with /tmp/ which is often small and
+# memory-backed:
+# https://fedoraproject.org/wiki/Features/tmp-on-tmpfs#Comments_and_Discussion
+tmpDir="$( mktemp -d --tmpdir=/var/tmp )"
 
 scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 if [[ -f "${scriptDir}/nuget.config" ]]; then
