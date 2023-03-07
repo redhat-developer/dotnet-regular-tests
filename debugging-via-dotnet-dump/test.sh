@@ -211,8 +211,10 @@ for id in "${object_ids[@]}"; do
     cat single.dump.out >> dump.out
     grep 'Array:       Rank 1,' dump.out
 done
-grep -E '^\[0\]' dump.out
-grep -F '_stringLength' dump.out
+if grep 'Number of elements' dump.out | grep -cv 'Number of elements 0'; then
+    grep -E '^\[0\]' dump.out
+    grep -F '_stringLength' dump.out
+fi
 
 
 # TODO "dumpassembly"
@@ -445,14 +447,17 @@ done
 heading "gcroot"
 dump-analyze 'dso' > dump.out
 cat dump.out
-id=$(grep -F 'System.Threading.Tasks' dump.out | head -1 | cut -d' ' -f 2)
-dump-analyze "gcroot -all ${id}" > dump.out
-cat dump.out
-grep 'Found [[:digit:]]* roots' dump.out
-count=$(grep 'Found [[:digit:]]* roots' dump.out | sed -E 's|Found ([[:digit:]]*) roots.*|\1|')
-if [[ $count -le 0 ]]; then
-   echo "fail: $count unique roots found"
-   exit 2
+# Skipped on aarch64 due to https://github.com/dotnet/diagnostics/issues/3726
+if [[ "$(uname -m)" != "aarch64" ]]; then
+    id=$(grep -F 'System.Threading.Tasks' dump.out | head -1 | cut -d' ' -f 2)
+    dump-analyze "gcroot -all ${id}" > dump.out
+    cat dump.out
+    grep 'Found [[:digit:]]* roots' dump.out
+    count=$(grep 'Found [[:digit:]]* roots' dump.out | sed -E 's|Found ([[:digit:]]*) roots.*|\1|')
+    if [[ $count -le 0 ]]; then
+        echo "fail: $count unique roots found"
+        exit 2
+    fi
 fi
 
 
@@ -579,7 +584,7 @@ grep -E '^        Dbi libmscordbi.so LINUX [^ ]+ Coreclr [0-9a-fA-F]+$' dump.out
 heading "sosstatus"
 dump-analyze 'sosstatus' > dump.out
 cat dump.out
-grep -E 'Target OS: LINUX Architecture: (X64) ProcessId: [[:digit:]]+' dump.out
+grep -E 'Target OS: LINUX Architecture: (X64|Arm64) ProcessId: [[:digit:]]+' dump.out
 
 
 heading "syncblk"
@@ -633,10 +638,13 @@ grep -E '^ +[0-9]+ timers$' dump.out
 
 
 heading "traverseheap"
-dump-analyze 'traverseheap -xml -verify full-heap' > dump.out
-cat dump.out
-head full-heap
-tail full-heap
+# Skipped on aarch64 due to https://github.com/dotnet/diagnostics/issues/3726
+if [[ "$(uname -m)" != "aarch64" ]]; then
+    dump-analyze 'traverseheap -xml -verify full-heap' > dump.out
+    cat dump.out
+    head full-heap
+    tail full-heap
+fi
 
 
 heading "verifyheap"
