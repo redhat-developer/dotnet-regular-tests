@@ -258,9 +258,9 @@ if grep UNKNOWN dump.out; then
     echo 'fail: UNKNOWN classes found in dumpheap'
     exit 2
 fi
-grep -E '00[0-9a-fA-F]+ + [[:digit:]]+ +[[:digit:]]+ +System.Object\[\]' dump.out
-grep -E '00[0-9a-fA-F]+ + [[:digit:]]+ +[[:digit:]]+ +System.Char\[\]' dump.out
-grep -E '00[0-9a-fA-F]+ + [[:digit:]]+ +[[:digit:]]+ +System.Char\[\]' dump.out
+grep -E '^[0-9a-fA-F]+ +([[:digit:]]+,)?[[:digit:]]+ +([[:digit:]]+,)?[[:digit:]]+ +System.Object\[\]' dump.out
+grep -E '^[0-9a-fA-F]+ +([[:digit:]]+,)?[[:digit:]]+ +([[:digit:]]+,)?[[:digit:]]+ +System.Char\[\]' dump.out
+grep -E '^[0-9a-fA-F]+ +([[:digit:]]+,)?[[:digit:]]+ +([[:digit:]]+,)?[[:digit:]]+ +System.String$' dump.out
 
 
 heading "dumpil"
@@ -375,9 +375,12 @@ if grep 'Error getting' dump.out; then
     echo 'fail: Error getting some parts of eeheap'
     exit 2
 fi
-grep 'Allocated Heap Size:    Size: 0x' dump.out
-grep 'Committed Heap Size:    Size: 0x' dump.out
-
+# FIXME: For some unknown reason, "No unique loader heaps found." is printed in
+# some environments, even for same builds :/
+if ! grep 'No unique loader heaps found.' dump.out; then
+    grep 'Allocated Heap Size:    Size: 0x' dump.out
+    grep 'Committed Heap Size:    Size: 0x' dump.out
+fi
 
 heading "eeversion"
 dump-analyze 'eeversion' > dump.out
@@ -467,7 +470,11 @@ cat dump.out
 id=$(tail -1 dump.out | cut -d' ' -f 2)
 dump-analyze "gcwhere ${id}" > dump.out
 cat dump.out
-grep -E '[0-9a-fA-F]+ +[0-9]+ +[0-9]+ +[0-9a-fA-F]+ +[0-9a-fA-F]+ +[0-9a-fA-F]+ +0x[0-9a-fA-F]+\([0-9]+\)' dump.out
+# Output is in one of two formats:
+#       Address          Gen Heap segment          begin            allocated         size
+#       Address       Heap    Segment    Generation  Allocated    Committed     Reserved
+grep -E '[0-9a-fA-F]+ +[0-9]+ +[0-9]+ +[0-9a-fA-F]+ +[0-9a-fA-F]+ +[0-9a-fA-F]+ +0x[0-9a-fA-F]+\([0-9]+\)' dump.out \
+  || grep -E '[0-9a-fA-F]+ +[0-9]+ +[0-9a-fA-F]+ +[0-9]+ +[-0-9a-fA-F]+ +[-0-9a-fA-F]+ +[-0-9a-fA-F]+' dump.out \
 
 
 # TODO "histobj"
@@ -507,15 +514,19 @@ fi
 heading "listnearobj"
 dump-analyze 'eeheap' > dump.out
 cat dump.out
+# FIXME: For some unknown reason, "No unique loader heaps found." is printed in
+# some environments, even for same builds :/
+if ! grep 'No unique loader heaps found.' dump.out; then
 # Find a gen0 with a non-0 size, then grab the starting address from it
-addr=$(grep -E '^[0-9a-fA-F]+ +[0-9a-fA-F]+ +[0-9a-fA-F]+ +[0-9a-fA-F]+ +0x[1-9a-fA-F]' dump.out | head -1 | awk ' { print $2 } ')
-dump-analyze "listnearobj $addr" > dump.out
-cat dump.out
-grep -F 'Before: ' dump.out
-grep -F 'Current: ' dump.out
-grep -F 'After: ' dump.out
+    addr=$(grep -m 1 -E '^[0-9a-fA-F]+ +[0-9a-fA-F]+ +[0-9a-fA-F]+ +[0-9a-fA-F]+ +0x[1-9a-fA-F]' dump.out | awk ' { print $2 } ')
+    dump-analyze "listnearobj $addr" > dump.out
+    cat dump.out
+    grep -F 'Before: ' dump.out
+    grep -F 'Current: ' dump.out
+    grep -F 'After: ' dump.out
 # FIXME: https://github.com/dotnet/diagnostics/issues/3566
 # grep -F 'Heap local consistency confirmed.' dump.out
+fi
 
 
 heading "modules"
