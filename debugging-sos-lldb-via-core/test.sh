@@ -131,12 +131,9 @@ cat lldb.out
 # fi
 
 echo "[ip2md]"
-lldb-core 'clrthreads' > lldb.out
+lldb-core 'clrstack -all' > lldb.out
 cat lldb.out
-thread_id=$(grep -A5 'ID *OSID *ThreadOBJ' lldb.out | tail -4 | grep -vE 'Finalizer|Threadpool' | head -1 | awk '{print $1}')
-lldb-core "thread select ${thread_id}" 'clrstack' > lldb.out
-cat lldb.out
-ip=$(grep 'OS Thread Id:' lldb.out -A5 | tail -n3 | grep -v -F '[Prestub' | head -1 | cut -d' ' -f2)
+ip=$(grep 'Program.<Main>' lldb.out | cut -d' ' -f2)
 lldb-core "ip2md ${ip}" > lldb.out
 cat lldb.out
 if ! grep 'IsJitted' lldb.out ; then
@@ -167,7 +164,7 @@ grep -E 'Child-SP\s+RetAddr\s+Caller, Callee' lldb.out
 echo "[clrstack]"
 lldb-core 'clrstack' > lldb.out
 cat lldb.out
-grep 'TestDir.Program.Main' lldb.out
+grep 'Program.<Main>' lldb.out
 
 echo "[bpmd] breakpoints make no sense for core files"
 
@@ -176,7 +173,7 @@ echo "[bpmd] breakpoints make no sense for core files"
 echo "[eeheap]"
 lldb-core 'eeheap' > lldb.out
 cat lldb.out
-grep 'GC Heap Size:    Size: 0x' lldb.out
+grep 'GC Committed Heap Size:    Size: 0x' lldb.out
 # TODO: enable this
 # if grep 'Error getting' lldb.out; then
 #     echo 'fail: Error getting some parts of eeheap'
@@ -200,11 +197,12 @@ grep 'System.Runtime.dll' lldb.out
 grep 'Microsoft.AspNetCore.dll' lldb.out
 to_string_method_descriptor=$(grep 'MethodDesc:' lldb.out | head -1 | awk '{print $2}')
 
-echo "[dumpmt]"
-lldb-core "dumpmt ${string_method_table}" > lldb.out
-cat lldb.out
-grep 'Name:            System.String' lldb.out
-grep -F "File:            ${framework_dir}" lldb.out
+# https://github.com/dotnet/diagnostics/issues/3757
+# echo "[dumpmt]"
+# lldb-core "dumpmt ${string_method_table}" > lldb.out
+# cat lldb.out
+# grep 'Name:            System.String' lldb.out
+# grep -F "File:            ${framework_dir}" lldb.out
 
 echo "[dumpclass]"
 lldb-core "dumpclass ${string_eeclass}" > lldb.out
@@ -225,12 +223,11 @@ grep "Name: *${framework_dir}" lldb.out
 grep 'Attributes: *PEFile' lldb.out
 grep 'MetaData start address: *0' lldb.out
 
-# TODO bug https://github.com/dotnet/diagnostics/issues/448
-# echo "[dumpil]"
-# lldb-core "dumpil ${to_string_method_descriptor}" > lldb.out
-# cat lldb.out
-# grep 'IL_0000: ldarg.0' lldb.out
-# grep 'IL_0001: ret ' lldb.out
+echo "[dumpil]"
+lldb-core "dumpil ${to_string_method_descriptor}" > lldb.out
+cat lldb.out
+grep 'IL_0000: ldarg.0' lldb.out
+grep 'IL_0001: ret ' lldb.out
 
 echo "[dumplog]"
 
