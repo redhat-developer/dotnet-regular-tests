@@ -102,20 +102,23 @@ cat lldb.out
 echo "[gcroot]"
 lldb-core 'dso' > lldb.out
 cat lldb.out
-id=$(grep -F 'System.Threading.Tasks' lldb.out | head -1 | cut -d' ' -f 2)
-lldb-core "gcroot ${id}" > lldb.out
-cat lldb.out
-grep 'Found [[:digit:]]* unique roots' lldb.out
-count=$(grep 'Found [[:digit:]]* unique roots' lldb.out | sed -E 's|Found ([[:digit:]]*) unique roots.*|\1|')
-if [[ $count -le 0 ]]; then
-   echo "fail: $count unique roots found"
-   exit 2
+# FIXME enable on aarch64 when https://github.com/dotnet/diagnostics/issues/3726 is fixed
+if [[ $(uname -m) != "aarch64" ]]; then
+    id=$(grep -F 'System.Threading.Tasks' lldb.out | head -1 | cut -d' ' -f 2)
+    lldb-core "gcroot ${id}" > lldb.out
+    cat lldb.out
+    grep 'Found [[:digit:]]* unique roots' lldb.out
+    count=$(grep 'Found [[:digit:]]* unique roots' lldb.out | sed -E 's|Found ([[:digit:]]*) unique roots.*|\1|')
+    if [[ $count -le 0 ]]; then
+       echo "fail: $count unique roots found"
+       exit 2
+    fi
+    # TODO: enable
+    # if grep -F '<error>' lldb.out; then
+    #     echo 'fail: <error> found in gcroot output'
+    #     exit 2
+    # fi
 fi
-# TODO: enable
-# if grep -F '<error>' lldb.out; then
-#     echo 'fail: <error> found in gcroot output'
-#     exit 2
-# fi
 
 echo "[pe]"
 
@@ -159,7 +162,7 @@ cat lldb.out
 echo "[eestack]"
 lldb-core 'eestack' > lldb.out
 cat lldb.out
-grep -E 'Child-SP\s+RetAddr\s+Caller, Callee' lldb.out
+grep -E 'Child(-SP|FP)\s+RetAddr\s+Caller, Callee' lldb.out
 
 echo "[clrstack]"
 lldb-core 'clrstack' > lldb.out
