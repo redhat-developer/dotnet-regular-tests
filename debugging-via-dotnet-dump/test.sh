@@ -89,6 +89,8 @@ heading "Installing dotnet-dump"
 
 dotnet tool uninstall -g dotnet-dump || true
 dotnet tool install -g dotnet-dump
+# For preview releases:
+#dotnet tool install -g dotnet-dump --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
 
 framework_dir=$(../dotnet-directory --framework "${sdk_version}")
 test -f "${framework_dir}/createdump"
@@ -453,10 +455,10 @@ cat dump.out
 # Skipped on aarch64 due to https://github.com/dotnet/diagnostics/issues/3726
 if [[ "$(uname -m)" != "aarch64" ]]; then
     id=$(grep -F 'System.Threading.Tasks' dump.out | head -1 | cut -d' ' -f 2)
-    dump-analyze "gcroot -all ${id}" > dump.out
+    dump-analyze "gcroot ${id}" > dump.out
     cat dump.out
-    grep 'Found [[:digit:]]* roots' dump.out
-    count=$(grep 'Found [[:digit:]]* roots' dump.out | sed -E 's|Found ([[:digit:]]*) roots.*|\1|')
+    grep -E 'Found [[:digit:]]* (unique )?roots' dump.out
+    count=$(grep -E 'Found [[:digit:]]* (unique )?roots' dump.out | sed -E 's|Found ([[:digit:]]*) (unique )?roots.*|\1|')
     if [[ $count -le 0 ]]; then
         echo "fail: $count unique roots found"
         exit 2
@@ -554,7 +556,17 @@ cat dump.out
 id=$(tail -1 dump.out | cut -d' ' -f 2)
 dump-analyze "objsize ${id}" > dump.out
 cat dump.out
-grep -E '^sizeof\([0-9a-fA-F]+\) += +[0-9]+ \(0x[0-9a-fA-F]+\) bytes' dump.out
+if grep -F 'transitively keep alive' dump.out; then
+    # Updated output from objsize looks like this:
+    #
+    # Objects which 7f85ab80efd8(System.String[]) transitively keep alive:
+    #
+    #      Address           MT         Size
+    # 7f85ab80efd8 7fc58eb2e0c0           24
+    grep -E "${id:10} +[0-9a-fA-F]+ +[0-9]+" dump.out
+else
+    grep -E '^sizeof\([0-9a-fA-F]+\) += +[0-9]+ \(0x[0-9a-fA-F]+\) bytes' dump.out
+fi
 
 
 heading "parallelstacks"
