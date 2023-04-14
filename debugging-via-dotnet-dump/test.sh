@@ -343,9 +343,9 @@ grep 'Array:       Rank 1,' dump.out
 heading "dumpruntimetypes"
 dump-analyze "dumpruntimetypes" > dump.out
 cat dump.out
-grep -E '^00[0-9a-fA-F]+ +[0-9a-fA-F]+ +[0-9a-fA-F]+ +System\.String$' dump.out
-grep -E '^00[0-9a-fA-F]+ +[0-9a-fA-F]+ +[0-9a-fA-F]+ +System\.Byte$' dump.out
-grep -E '^00[0-9a-fA-F]+ +[0-9a-fA-F]+ +[0-9a-fA-F]+ +Microsoft\.Extensions\.Logging' dump.out
+grep -E '^ *[0-9a-fA-F]+ +[0-9a-fA-F]+ +[0-9a-fA-F]+ +System\.String$' dump.out
+grep -E '^ *[0-9a-fA-F]+ +[0-9a-fA-F]+ +[0-9a-fA-F]+ +System\.Byte$' dump.out
+grep -E '^ *[0-9a-fA-F]+ +[0-9a-fA-F]+ +[0-9a-fA-F]+ +Microsoft\.Extensions\.Logging' dump.out
 
 
 # TODO "dumpsig"
@@ -581,7 +581,8 @@ grep -E '==> [[:digit:]]+ threads with [[:digit:]]+ roots' dump.out
 heading "registers"
 dump-analyze 'registers' > dump.out
 cat dump.out
-if [[ $(wc -l dump.out) -lt 20 ]]; then
+lines=$(wc -l dump.out | awk '{ print $1 }')
+if [[ "$lines"  -lt 20 ]]; then
    echo "fail: too few registers"
    exit 2
 fi
@@ -623,7 +624,13 @@ grep -E 'Free +[0-9]+$' dump.out
 heading "threadpool"
 dump-analyze 'threadpool' > dump.out
 cat dump.out
-grep -E 'Worker Thread: Total: [0-9]+ Running: [0-9]+ Idle: [0-9]+ MaxLimit: [0-9]+ MinLimit: [0-9]+' dump.out
+if ! grep -E 'Worker Thread: Total: [0-9]+ Running: [0-9]+ Idle: [0-9]+ MaxLimit: [0-9]+ MinLimit: [0-9]+' dump.out; then
+    grep -E 'Workers Total: [0-9]+' dump.out
+    grep -E 'Workers Running: [0-9]+' dump.out
+    grep -E 'Workers Idle: [0-9]+' dump.out
+    grep -E 'Worker Min Limit: [0-9]+' dump.out
+    grep -E 'Worker Max Limit: [0-9]+' dump.out
+fi
 
 
 # TODO: "threadpoolqueue"
@@ -632,7 +639,8 @@ grep -E 'Worker Thread: Total: [0-9]+ Running: [0-9]+ Idle: [0-9]+ MaxLimit: [0-
 heading "threads"
 dump-analyze 'threads' > dump.out
 cat dump.out
-if [[ $(wc -l dump.out) -lt 9 ]]; then
+lines=$(wc -l dump.out | awk '{ print $1 }')
+if [[ "$lines" -lt 9 ]]; then
     echo 'fail: too few threads'
     exit 2
 fi
@@ -663,7 +671,12 @@ grep -E '^ +[0-9]+ timers$' dump.out
 heading "traverseheap"
 # Skipped on aarch64 due to https://github.com/dotnet/diagnostics/issues/3726
 if [[ "$(uname -m)" != "aarch64" ]]; then
-    dump-analyze 'traverseheap -xml -verify full-heap' > dump.out
+    dump-analyze 'help traverseheap' > dump.out
+    if grep -F -- '-verify' dump.out; then
+        dump-analyze 'traverseheap -xml -verify full-heap' > dump.out
+    else
+        dump-analyze 'traverseheap -xml full-heap' > dump.out
+    fi
     cat dump.out
     head full-heap
     tail full-heap
