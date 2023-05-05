@@ -160,7 +160,7 @@ grep -F 'PARAMETERS:' dump.out
 grep -F 'LOCALS:' dump.out
 dump-analyze 'clrthreads' > dump.out
 cat dump.out
-thread_id=$(grep -A5 'ID *OSID *ThreadOBJ' dump.out | tail -4 | grep -vE 'Finalizer|Threadpool' | head -1 | awk '{print $1}')
+thread_id=$(grep -A5 'ID *OSID *ThreadOBJ' dump.out | tail -4 | grep -vE 'Finalizer|Threadpool' | { head -1; cat > /dev/null; } | awk '{print $1}')
 dump-analyze "threads ${thread_id}" 'clrstack' > dump.out
 cat dump.out
 grep -E 'System\.Threading|DebuggerU2MCatchHandlerFrame' dump.out
@@ -177,7 +177,7 @@ grep -E 'Hosted Runtime: *no' dump.out
 # TODO: "dumpalc": https://github.com/dotnet/diagnostics/issues/3565
 # dump-analyze 'clrstack -a' > dump.out
 # grep -E 'this \([^)]+\) = 0x[0-9a-f]+' dump.out
-# addr=$(grep -E 'this \([^)]+\) = 0x[0-9a-f]+' dump.out | cut -d'=' -f2 | head -1)
+# addr=$(grep -E 'this \([^)]+\) = 0x[0-9a-f]+' dump.out | cut -d'=' -f2 | { head -1; cat > /dev/null; } )
 # dump-analyze "dumpalc $addr" > dump.out
 # cat dump.out
 
@@ -195,7 +195,10 @@ grep -E 'Awaiting: [a-zA-Z0-9]+ [a-zA-Z0-9]+ System.Runtime.CompilerServices.Val
 
 heading "dumpgen"
 for gen in gen0 gen1 gen2 loh poh; do
+    # Disable exit on error for dumpgen. Reported as https://github.com/dotnet/diagnostics/issues/3842
+    set +e
     dump-analyze "dumpgen $gen" > dump.out
+    set -e
     cat dump.out
     total=$( (grep -E '00[0-9a-fA-F]+ +[[:digit:]]+ +[[:digit:]]+ +' dump.out | awk '{print $2}' | paste -sd+ | bc) || echo 0)
     grep -F "Total ${total} objects" dump.out
@@ -228,7 +231,7 @@ heading "dumpclass"
 dump-analyze 'name2ee *!System.String' > dump.out
 cat dump.out
 grep 'EEClass: ' dump.out
-string_eeclass=$(grep 'EEClass:' dump.out | head -1 | awk '{print $2}')
+string_eeclass=$(grep 'EEClass:' dump.out | { head -1; cat > /dev/null; }  | awk '{print $2}')
 dump-analyze "dumpclass ${string_eeclass}" > dump.out
 cat dump.out
 grep 'Class Name:      System.String' dump.out
@@ -285,10 +288,10 @@ grep 'IL_0001: ret ' dump.out
 heading "dumpmd"
 dump-analyze 'clrthreads' > dump.out
 cat dump.out
-thread_id=$(grep -A5 'ID *OSID *ThreadOBJ' dump.out | tail -4 | grep -vE 'Finalizer|Threadpool' | head -1 | awk '{print $1}')
+thread_id=$(grep -A5 'ID *OSID *ThreadOBJ' dump.out | tail -4 | grep -vE 'Finalizer|Threadpool' | { head -1; cat > /dev/null; }  | awk '{print $1}')
 dump-analyze "threads ${thread_id}" 'clrstack' > dump.out
 cat dump.out
-ip=$(grep 'OS Thread Id:' dump.out -A5 | tail -n3 | grep -v -F '[Prestub' | head -1 | cut -d' ' -f2)
+ip=$(grep 'OS Thread Id:' dump.out -A5 | tail -n3 | grep -v -F '[Prestub' | { head -1; cat > /dev/null; }  | cut -d' ' -f2)
 dump-analyze "dumpmd ${ip}" > dump.out
 cat dump.out
 if grep 'Unmanaged code' dump.out; then
@@ -300,7 +303,7 @@ cat dump.out
 grep 'TestDir.dll' dump.out
 grep 'System.Runtime.dll' dump.out
 grep 'Microsoft.AspNetCore.dll' dump.out
-to_string_method_descriptor=$(grep 'MethodDesc:' dump.out | head -1 | awk '{print $2}')
+to_string_method_descriptor=$(grep 'MethodDesc:' dump.out | { head -1; cat > /dev/null; }  | awk '{print $2}')
 dump-analyze "dumpmd ${to_string_method_descriptor}" > dump.out
 cat dump.out
 grep -F 'Method Name:          System.String.ToString()' dump.out
@@ -311,7 +314,7 @@ grep 'Version History:' dump.out
 heading "dumpmodule"
 dump-analyze 'name2ee *!System.String' > dump.out
 cat dump.out
-string_module=$(grep 'Module: ' dump.out | head -1 | awk '{print $2}')
+string_module=$(grep 'Module: ' dump.out | { head -1; cat > /dev/null; }  | awk '{print $2}')
 dump-analyze "dumpmodule ${string_module}" > dump.out
 cat dump.out
 grep "Name: *${framework_dir}" dump.out
@@ -334,7 +337,7 @@ grep 'MetaData start address: *0' dump.out
 heading "dumpobj"
 dump-analyze 'dumpstackobjects' > dump.out
 cat dump.out
-id=$(grep -F 'System.String[]' dump.out | head -1 | cut -d' ' -f 2)
+id=$(grep -F 'System.String[]' dump.out | { head -1; cat > /dev/null; }  | cut -d' ' -f 2)
 dump-analyze "dumpobj ${id}" > dump.out
 cat dump.out
 grep 'Array:       Rank 1,' dump.out
@@ -417,7 +420,7 @@ grep -E 'generation [[:digit:]]+ has [[:digit:]] finalizable objects' dump.out
 heading "findappdomain"
 dump-analyze 'dumpstackobjects' > dump.out
 cat dump.out
-id=$(grep -F 'System.String[]' dump.out | head -1 | cut -d' ' -f 2)
+id=$(grep -F 'System.String[]' dump.out | { head -1; cat > /dev/null; }  | cut -d' ' -f 2)
 dump-analyze "findappdomain ${id}" > dump.out
 cat dump.out
 
@@ -454,7 +457,7 @@ dump-analyze 'dso' > dump.out
 cat dump.out
 # Skipped on aarch64 due to https://github.com/dotnet/diagnostics/issues/3726
 if [[ "$(uname -m)" != "aarch64" ]]; then
-    id=$(grep -F 'System.Threading.Tasks' dump.out | head -1 | cut -d' ' -f 2)
+    id=$(grep -F 'System.Threading.Tasks' dump.out | { head -1; cat > /dev/null; }  | cut -d' ' -f 2)
     dump-analyze "gcroot ${id}" > dump.out
     cat dump.out
     grep -E 'Found [[:digit:]]* (unique )?roots' dump.out
@@ -496,7 +499,7 @@ while true; do
     i=$((i + 1))
     thread_id=$(grep -A999 'ID *OSID *ThreadOBJ' dump.out | tail -n +2 \
                     | grep -vE 'Finalizer|Threadpool' \
-                    | head -"$i" | tail -1 \
+                    | { head -"$i"; cat > /dev/null; }  | tail -1 \
                     | awk '{print $1}')
     dump-analyze "threads ${thread_id}" 'clrstack' > dump.out
     cat dump.out
@@ -504,7 +507,7 @@ while true; do
        break
     fi
 done
-ip=$(grep 'OS Thread Id:' dump.out -A5 | tail -n3 | grep -v -F '[Prestub' | head -1 | cut -d' ' -f2)
+ip=$(grep 'OS Thread Id:' dump.out -A5 | tail -n3 | grep -v -F '[Prestub' | { head -1; cat > /dev/null; }  | cut -d' ' -f2)
 dump-analyze "ip2md ${ip}" > dump.out
 cat dump.out
 if ! grep 'IsJitted' dump.out ; then
@@ -591,7 +594,7 @@ fi
 heading "readmemory"
 dump-analyze 'dumpruntimetypes' > dump.out
 cat dump.out
-address=$(grep -F 'System.String' dump.out | head -1 | cut -d' ' -f1)
+address=$(grep -F 'System.String' dump.out | { head -1; cat > /dev/null; }  | cut -d' ' -f1)
 dump-analyze "readmemory ${address} --length 100" > dump.out
 cat dump.out
 
@@ -672,14 +675,22 @@ heading "traverseheap"
 # Skipped on aarch64 due to https://github.com/dotnet/diagnostics/issues/3726
 if [[ "$(uname -m)" != "aarch64" ]]; then
     dump-analyze 'help traverseheap' > dump.out
+    # Disable exit on error for traverseheap. Reported as https://github.com/dotnet/diagnostics/issues/3842
     if grep -F -- '-verify' dump.out; then
+        set +e
         dump-analyze 'traverseheap -xml -verify full-heap' > dump.out
+        set -e
     else
+        set +e
         dump-analyze 'traverseheap -xml full-heap' > dump.out
+        set -e
     fi
     cat dump.out
     head full-heap
     tail full-heap
+    grep -E '<type id="[[:digit:]]+" name="System.Object\[\]" */>' full-heap
+    grep -E '<object address="[^"]+" typeid="1" size="[0-9]+"' full-heap
+    grep -E '<object address="[^"]+" typeid="2" size="[0-9]+"' full-heap
 fi
 
 
