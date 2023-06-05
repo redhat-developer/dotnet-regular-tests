@@ -21,8 +21,8 @@ jobs:
           - docker.io/library/alpine:latest
           - docker.io/library/alpine:edge
           - quay.io/centos/centos:stream9-development
-          - registry.fedoraproject.org/fedora:36
           - registry.fedoraproject.org/fedora:37
+          - registry.fedoraproject.org/fedora:38
           - registry.fedoraproject.org/fedora:rawhide
           - registry.access.redhat.com/ubi8
           - registry.access.redhat.com/ubi9

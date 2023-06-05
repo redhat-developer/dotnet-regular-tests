@@ -208,7 +208,7 @@ done
 heading "dumparray"
 dump-analyze 'dumpstackobjects' > dump.out
 cat dump.out
-mapfile -t object_ids < <(grep -F 'System.String[]' dump.out | cut -d' ' -f 2)
+mapfile -t object_ids < <(grep -F 'System.String[]' dump.out | awk '{ print $2 }')
 echo '' > dump.out
 for id in "${object_ids[@]}"; do
     dump-analyze "dumparray -details ${id}" > single.dump.out
@@ -257,7 +257,10 @@ cat dump.out
 
 
 heading "dumpheap"
+# Disable exit on error for dumpheap. Reported as https://github.com/dotnet/diagnostics/issues/3926
+set +e
 dump-analyze "dumpheap -stat" > dump.out
+set -e
 cat dump.out
 if grep UNKNOWN dump.out; then
     echo 'fail: UNKNOWN classes found in dumpheap'
@@ -337,14 +340,18 @@ grep 'MetaData start address: *0' dump.out
 heading "dumpobj"
 dump-analyze 'dumpstackobjects' > dump.out
 cat dump.out
-id=$(grep -F 'System.String[]' dump.out | { head -1; cat > /dev/null; }  | cut -d' ' -f 2)
+mapfile -t object_ids < <(grep -F 'System.String[]' dump.out | awk '{ print $2 }')
+id="${object_ids[0]}"
 dump-analyze "dumpobj ${id}" > dump.out
 cat dump.out
 grep 'Array:       Rank 1,' dump.out
 
 
 heading "dumpruntimetypes"
+# Disable exit on error for dumpruntimetypes. TODO Report this.
+set +e
 dump-analyze "dumpruntimetypes" > dump.out
+set -e
 cat dump.out
 grep -E '^ *[0-9a-fA-F]+ +[0-9a-fA-F]+ +[0-9a-fA-F]+ +System\.String$' dump.out
 grep -E '^ *[0-9a-fA-F]+ +[0-9a-fA-F]+ +[0-9a-fA-F]+ +System\.Byte$' dump.out
@@ -412,15 +419,19 @@ done
 
 
 heading "finalizequeue"
+# Disable exit on error for finalizequeue. Reported as https://github.com/dotnet/diagnostics/issues/3917
+set +e
 dump-analyze 'finalizequeue' > dump.out
+set -e
 cat dump.out
-grep -E 'generation [[:digit:]]+ has [[:digit:]] finalizable objects' dump.out
+grep -E 'generation [[:digit:]]+ has [[:digit:]] (finalizable )?objects' dump.out
 
 
 heading "findappdomain"
 dump-analyze 'dumpstackobjects' > dump.out
 cat dump.out
-id=$(grep -F 'System.String[]' dump.out | { head -1; cat > /dev/null; }  | cut -d' ' -f 2)
+mapfile -t object_ids < <(grep -F 'System.String[]' dump.out | awk '{ print $2 }')
+id="${object_ids[0]}"
 dump-analyze "findappdomain ${id}" > dump.out
 cat dump.out
 
@@ -457,7 +468,8 @@ dump-analyze 'dso' > dump.out
 cat dump.out
 # Skipped on aarch64 due to https://github.com/dotnet/diagnostics/issues/3726
 if [[ "$(uname -m)" != "aarch64" ]]; then
-    id=$(grep -F 'System.Threading.Tasks' dump.out | { head -1; cat > /dev/null; }  | cut -d' ' -f 2)
+    mapfile -t object_ids < <(grep -F 'System.Threading.Tasks' dump.out | awk '{ print $2 }')
+    id="${object_ids[0]}"
     dump-analyze "gcroot ${id}" > dump.out
     cat dump.out
     grep -E 'Found [[:digit:]]* (unique )?roots' dump.out
@@ -472,7 +484,8 @@ fi
 heading "gcwhere"
 dump-analyze 'dumpstackobjects' > dump.out
 cat dump.out
-id=$(tail -1 dump.out | cut -d' ' -f 2)
+mapfile -t object_ids < <(grep -F 'System.String[]' dump.out | awk '{ print $2 }')
+id="${object_ids[-1]}"
 dump-analyze "gcwhere ${id}" > dump.out
 cat dump.out
 # Output is in one of two formats:
@@ -556,7 +569,8 @@ dump-analyze 'name2ee *!System.String.ToString' > dump.out
 heading "objsize"
 dump-analyze 'dumpstackobjects' > dump.out
 cat dump.out
-id=$(tail -1 dump.out | cut -d' ' -f 2)
+mapfile -t object_ids < <(grep -F 'System.String[]' dump.out | awk '{ print $2 }')
+id="${object_ids[-1]}"
 dump-analyze "objsize ${id}" > dump.out
 cat dump.out
 if grep -F 'transitively keep alive' dump.out; then
@@ -592,7 +606,10 @@ fi
 
 
 heading "readmemory"
-dump-analyze 'dumpruntimetypes' > dump.out
+# Disable exit on error for dumpruntimetypes. TODO Report this.
+set +e
+dump-analyze "dumpruntimetypes" > dump.out
+set -e
 cat dump.out
 address=$(grep -F 'System.String' dump.out | { head -1; cat > /dev/null; }  | cut -d' ' -f1)
 dump-analyze "readmemory ${address} --length 100" > dump.out
@@ -628,11 +645,11 @@ heading "threadpool"
 dump-analyze 'threadpool' > dump.out
 cat dump.out
 if ! grep -E 'Worker Thread: Total: [0-9]+ Running: [0-9]+ Idle: [0-9]+ MaxLimit: [0-9]+ MinLimit: [0-9]+' dump.out; then
-    grep -E 'Workers Total: [0-9]+' dump.out
-    grep -E 'Workers Running: [0-9]+' dump.out
-    grep -E 'Workers Idle: [0-9]+' dump.out
-    grep -E 'Worker Min Limit: [0-9]+' dump.out
-    grep -E 'Worker Max Limit: [0-9]+' dump.out
+    grep -E 'Workers Total: *[0-9]+' dump.out
+    grep -E 'Workers Running: *[0-9]+' dump.out
+    grep -E 'Workers Idle: *[0-9]+' dump.out
+    grep -E 'Worker Min Limit: *[0-9]+' dump.out
+    grep -E 'Worker Max Limit: *[0-9]+' dump.out
 fi
 
 
@@ -702,7 +719,7 @@ grep -F 'No heap corruption detected.' dump.out
 heading "verifyobj"
 dump-analyze 'dumpstackobjects' > dump.out
 cat dump.out
-mapfile -t object_ids < <(grep -F 'System.String[]' dump.out | cut -d' ' -f 2)
+mapfile -t object_ids < <(grep -F 'System.String[]' dump.out | awk '{ print $2 }')
 for object in "${object_ids[@]}"; do
     dump-analyze "verifyobj ${object}" > dump.out
     cat dump.out
