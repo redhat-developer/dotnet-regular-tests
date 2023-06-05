@@ -34,8 +34,12 @@ set -x
 
 dotnet tool uninstall -g dotnet-sos || true
 dotnet tool uninstall -g dotnet-dump || true
+# For GA releases
 dotnet tool install -g dotnet-sos
 dotnet tool install -g dotnet-dump
+# For preview releases:
+#dotnet tool install -g dotnet-dump --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
+#dotnet tool install -g dotnet-sos --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
 
 dotnet sos install
 
@@ -76,7 +80,8 @@ test -f "${coredump}"
 echo "[dumpobj]"
 lldb-core 'dso' > lldb.out
 cat lldb.out
-id=$(grep -F 'System.String[]' lldb.out | head -1 | cut -d' ' -f 2)
+mapfile -t object_ids < <(grep -F 'System.String[]' lldb.out | awk '{ print $2 }')
+id="${object_ids[0]}"
 lldb-core "dumpobj ${id}" > lldb.out
 cat lldb.out
 grep 'Array:       Rank 1,' lldb.out
@@ -104,7 +109,8 @@ lldb-core 'dso' > lldb.out
 cat lldb.out
 # FIXME enable on aarch64 when https://github.com/dotnet/diagnostics/issues/3726 is fixed
 if [[ $(uname -m) != "aarch64" ]]; then
-    id=$(grep -F 'System.Threading.Tasks' lldb.out | head -1 | cut -d' ' -f 2)
+    mapfile -t object_ids < <(grep -F 'System.Threading.Tasks' lldb.out | awk '{ print $2 }')
+    id="${object_ids[0]}"
     lldb-core "gcroot ${id}" > lldb.out
     cat lldb.out
     grep 'Found [[:digit:]]* unique roots' lldb.out
