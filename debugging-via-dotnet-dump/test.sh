@@ -174,12 +174,11 @@ grep -E 'BackgroundThread: *[[:digit:]]' dump.out
 grep -E 'Hosted Runtime: *no' dump.out
 
 
-# TODO: "dumpalc": https://github.com/dotnet/diagnostics/issues/3565
-# dump-analyze 'clrstack -a' > dump.out
-# grep -E 'this \([^)]+\) = 0x[0-9a-f]+' dump.out
-# addr=$(grep -E 'this \([^)]+\) = 0x[0-9a-f]+' dump.out | cut -d'=' -f2 | { head -1; cat > /dev/null; } )
-# dump-analyze "dumpalc $addr" > dump.out
-# cat dump.out
+dump-analyze 'clrstack -a' > dump.out
+grep -E 'this \([^)]+\) = 0x[0-9a-f]+' dump.out
+addr=$(grep -E 'this \([^)]+\) = 0x[0-9a-f]+' dump.out | cut -d'=' -f2 | { head -1; cat > /dev/null; } )
+dump-analyze "dumpalc $addr" > dump.out
+cat dump.out
 
 
 heading "dumpasync"
