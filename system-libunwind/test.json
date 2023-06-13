@@ -6,6 +6,9 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen": [
+    "os=fedora,version=8" // see https://github.com/redhat-developer/dotnet-regular-tests/issues/254
+  ],
   "ignoredRIDs":[
     "centos.8",
     "centos.9",

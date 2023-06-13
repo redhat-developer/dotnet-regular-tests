@@ -6,6 +6,9 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen": [
+    "vmr-ci" // man page not installed
+  ],
   "ignoredRIDs":[
   ]
 }

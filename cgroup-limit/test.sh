@@ -28,7 +28,7 @@ if [ -z "$(command -v systemctl)" ]; then
     exit 0
 fi
 
-dotnet publish
+dotnet publish -c Release
 
 SYSTEMD_RUN="systemd-run"
 if [ "$UID" != "0" ]; then
@@ -41,7 +41,7 @@ if [ "$UID" != "0" ]; then
   fi
 fi
 
-mapfile -t DOTNET_LIMITS < <($SYSTEMD_RUN  -q --scope -p CPUQuota=100% -p MemoryLimit=100M bin/Debug/net*/cgroup-limit)
+mapfile -t DOTNET_LIMITS < <($SYSTEMD_RUN  -q --scope -p CPUQuota=100% -p MemoryLimit=100M bin/Release/net*/cgroup-limit)
 
 if [ "${DOTNET_LIMITS[0]}" == "Limits:" ] &&      # Application ran.
    [ "${DOTNET_LIMITS[1]}" == "1" ] &&            # Available processors is 1.
