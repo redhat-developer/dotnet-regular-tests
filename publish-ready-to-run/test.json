@@ -6,6 +6,9 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen": [
+    "ci" // portable runtime/crossgen packs not published
+  ],
   "ignoredRIDs":[
     "linux-s390x",
     "linux-ppc64le"

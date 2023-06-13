@@ -3,9 +3,8 @@
 # Check whether dotnet-dump, and its subcommands like `ps`, `collect`
 # and `analyze` are working
 
-if [ -f /etc/profile ]; then
-  source /etc/profile
-fi
+# Ensure global tools are on PATH.
+export PATH=~/.dotnet/tools:$PATH
 
 # Enable "unofficial strict mode" only after loading /etc/profile
 # because that usually contains lots of "errors".

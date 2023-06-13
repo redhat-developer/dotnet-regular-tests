@@ -6,6 +6,9 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen": [
+    "ci" // not packaged (tar.gz build)
+  ],
   "ignoredRIDs":[
 
   ]

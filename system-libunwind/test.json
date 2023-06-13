@@ -6,6 +6,9 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen": [
+    "os=fedora,version=8" // .NET 8 on Fedora uses bundled libunwind.
+  ],
   "ignoredRIDs":[
     "centos.8",
     "centos.9",

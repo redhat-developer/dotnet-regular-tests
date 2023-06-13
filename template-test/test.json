@@ -6,6 +6,9 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen": [
+    "ci" // template packages not published
+  ],
   "ignoredRIDs":[
   ]
 }

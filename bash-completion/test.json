@@ -6,6 +6,9 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen": [
+    "ci" // bash completion script not installed
+  ],
   "ignoredRIDs":[
   ]
 }

@@ -5,6 +5,9 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen": [
+    "ci" // workload packages not published
+  ],
   "ignoredRIDs": [
     "alpine", // see https://github.com/redhat-developer/dotnet-regular-tests/pull/222
     "linux-arm64",
