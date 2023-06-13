@@ -6,10 +6,6 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
-  "skipWhen": [
-    "os=fedora,version=6", // .NET 6 on Fedora uses system libunwind.
-    "os=fedora,version=7"  // .NET 7 on Fedora uses system libunwind.
-  ],
   "ignoredRIDs":[
     "alpine",
     "fedora",
