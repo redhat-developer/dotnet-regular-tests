@@ -6,7 +6,8 @@
   "type": "bash",
   "cleanup": true,
   "skipWhen": [
-    "version=8" // see https://github.com/redhat-developer/dotnet-regular-tests/issues/250
+    "version=7", // see https://github.com/redhat-developer/dotnet-regular-tests/issues/212
+    "version=8"  // see https://github.com/redhat-developer/dotnet-regular-tests/issues/250
   ],
   "ignoredRIDs":[
     "linux-musl",
