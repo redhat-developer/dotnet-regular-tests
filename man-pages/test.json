@@ -7,7 +7,7 @@
   "type": "bash",
   "cleanup": true,
   "skipWhen": [
-    "ci" // man page not installed
+    "vmr-ci" // man page not installed
   ],
   "ignoredRIDs":[
   ]

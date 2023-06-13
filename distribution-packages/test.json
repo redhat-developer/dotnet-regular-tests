@@ -6,7 +6,7 @@
   "type": "bash",
   "cleanup": true,
   "skipWhen": [
-    "ci" // not packaged (tar.gz build)
+    "vmr-ci" // not packaged (tar.gz build)
   ],
   "ignoredRIDs":[
     "rhel7",

@@ -7,7 +7,7 @@
   "type": "bash",
   "cleanup": true,
   "skipWhen": [
-    "ci" // portable runtime/crossgen packs not published
+    "vmr-ci" // portable runtime/crossgen packs not published
   ],
   "ignoredRIDs":[
     "linux-s390x",

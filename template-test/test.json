@@ -7,7 +7,7 @@
   "type": "bash",
   "cleanup": true,
   "skipWhen": [
-    "ci" // template packages not published
+    "vmr-ci" // template packages not published
   ],
   "ignoredRIDs":[
   ]
