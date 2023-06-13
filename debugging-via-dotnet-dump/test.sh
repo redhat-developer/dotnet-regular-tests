@@ -109,6 +109,7 @@ dotnet build "${no_server[@]}"
 
 dotnet bin/Debug/net*/TestDir.dll &
 run_pid=$!
+trap "kill ${run_pid}" EXIT
 
 sleep 5
 
@@ -128,6 +129,7 @@ dotnet dump collect --type full --output "coredump.${run_pid}" --process-id "${r
 #"${framework_dir}"/createdump --full --name "$(pwd)/coredump.${run_pid}" "${run_pid}" | tee run.pid
 
 kill "${run_pid}" || ( sleep 1; kill -9 "${run_pid}" )
+trap - EXIT
 
 coredump="coredump.${run_pid}"
 test -f "${coredump}"
