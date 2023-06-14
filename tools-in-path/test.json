@@ -5,6 +5,9 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen": [
+    "vmr-ci" // tools PATH not configured (tar.gz build)
+  ],
   "ignoredRIDs": [
   ]
 }
