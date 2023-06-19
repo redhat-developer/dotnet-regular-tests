@@ -7,7 +7,7 @@
   "type": "bash",
   "cleanup": true,
   "skipWhen": [
-    "os=rhel.9,version=8" // see https://github.com/redhat-developer/dotnet-regular-tests/issues/259
+    "version=8" // see https://github.com/redhat-developer/dotnet-regular-tests/issues/259
   ],
   "ignoredRIDs":[
     "linux-ppc64le",
