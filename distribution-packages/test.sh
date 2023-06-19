@@ -2,8 +2,10 @@
 
 set -euo pipefail
 
-sdk_version="$(dotnet --version | cut -d- -f1)"
-runtime_version="$(dotnet --list-runtimes | head -1 | awk '{ print $2 }' | cut -d- -f1)"
+set -x
+
+sdk_version="$(dotnet --version)"
+runtime_version="$(dotnet --list-runtimes | head -1 | awk '{ print $2 }')"
 runtime_id=$(../runtime-id)
 # This might be the final/only netstandard version from now on
 netstandard_version=2.1

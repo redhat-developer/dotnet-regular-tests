@@ -10,6 +10,53 @@ set -euo pipefail
 # If additional templates are found via `dotnet new --list`, this test
 # will fail unless they are added here.
 
+dotnet8Templates=(
+    api
+    apicontroller
+    angular
+    blazor
+    blazorserver
+    blazorserver-empty
+    blazorwasm
+    blazorwasm-empty
+    buildprops
+    buildtargets
+    classlib
+    console
+    editorconfig
+    .editorconfig
+    gitignore
+    .gitignore
+    globaljson
+    global.json
+    grpc
+    mstest
+    mvc
+    mvccontroller
+    nugetconfig
+    nuget.config
+    nunit
+    nunit-test
+    page
+    proto
+    razor
+    razorclasslib
+    razorcomponent
+    react
+    sln
+    solution
+    tool-manifest
+    view
+    viewimports
+    viewstart
+    web
+    webapi
+    webapp
+    webconfig
+    worker
+    xunit
+)
+
 dotnet7Templates=(
     angular
     blazorserver
@@ -80,40 +127,6 @@ dotnet6Templates=(
     xunit
 )
 
-dotnet5Templates=(
-    angular
-    blazorserver
-    blazorwasm
-    classlib
-    console
-    editorconfig
-    gitignore
-    globaljson
-    grpc
-    mstest
-    mvc
-    nugetconfig
-    nunit
-    nunit-test
-    page
-    proto
-    razor
-    razorclasslib
-    razorcomponent
-    react
-    reactredux
-    sln
-    tool-manifest
-    viewimports
-    viewstart
-    web
-    webapi
-    webapp
-    webconfig
-    worker
-    xunit
-)
-
 dotnet3Templates=(
     angular
     blazorserver
@@ -145,6 +158,7 @@ dotnet3Templates=(
     xunit
 )
 
+
 # All templates are tested with "dotnet template new", but this list
 # adds further actions (eg, build, run) for some templates. These
 # templates are only tested if `dotnet new --list` shows the template
@@ -158,23 +172,37 @@ dotnet3Templates=(
 #    test - create template and run its tests ( dotnet test )
 
 templateActions=\
-"angular build
+"api build
+apicontroller new
+angular build
+blazor build
 blazorserver build
 blazorserver-empty build
 blazorwasm build
 blazorwasm-empty build
+buildprops new
+buildtargets new
 classlib build
 console run
+editorconfig new
+.editorconfig new
+gitignore new
+.gitignore new
+globaljson new
+global.json new
 mstest test
 mvc build
 nunit test
+page new
 razor build
 razorclasslib build
 react build
 reactredux build
+sln new
+view new
+web build
 webapi build
 webapp build
-web build
 worker build
 xunit test"
 
@@ -182,6 +210,9 @@ xunit test"
 # --list output but are safe to ignore. We we don't want to test these
 # because they are known to not work on the platforms we care about.
 templateIgnoreList=(
+    # playwright needs powershell and needs to be interactively used to install browser integration pieces
+    mstest-playwright
+    nunit-playwright
     winforms
     winformslib
     wpf
@@ -230,12 +261,12 @@ done
 
 IFS='.-' read -ra VERSION_SPLIT <<< "$1"
 declare -a allTemplates
-if [[ ${VERSION_SPLIT[0]} == "7" ]]; then
+if [[ ${VERSION_SPLIT[0]} == "8" ]]; then
+    allTemplates=( "${dotnet8Templates[@]}" )
+elif [[ ${VERSION_SPLIT[0]} == "7" ]]; then
     allTemplates=( "${dotnet7Templates[@]}" )
 elif [[ ${VERSION_SPLIT[0]} == "6" ]]; then
     allTemplates=( "${dotnet6Templates[@]}" )
-elif [[ ${VERSION_SPLIT[0]} == "5" ]]; then
-    allTemplates=( "${dotnet5Templates[@]}" )
 elif [[ ${VERSION_SPLIT[0]} == "3" ]]; then
     allTemplates=( "${dotnet3Templates[@]}" )
 else
@@ -330,8 +361,8 @@ function testTemplates {
     for templateName in "${allTemplates[@]}"; do
         action="${knownTemplateActions[$templateName]:-new}"
 
-        mkdir -p "${tmpDir}/${templateName}-template"
-        pushd "${tmpDir}/${templateName}-template" > /dev/null
+        mkdir -p "${tmpDir}/${templateName}_template"
+        pushd "${tmpDir}/${templateName}_template" > /dev/null
 
         testTemplate "${templateName}" "${action}"
 

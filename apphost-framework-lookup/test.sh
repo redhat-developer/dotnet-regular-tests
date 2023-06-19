@@ -17,8 +17,8 @@ test_publish()
   name=$1
   mkdir $name && pushd $name
   dotnet new console
-  dotnet publish -r "$runtime_id" --self-contained $2
-  ./bin/Debug/net*/"$runtime_id"/publish/$name
+  dotnet publish -c Release -r "$runtime_id" --self-contained $2
+  ./bin/Release/net*/"$runtime_id"/publish/$name
   popd
 }
 
