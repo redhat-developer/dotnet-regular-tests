@@ -29,11 +29,11 @@ jobs:
         dotnet_version:
           - "6.0"
           - "7.0"
-        exclude:
-          - container_image: registry.fedoraproject.org/fedora:36
-            dotnet_version: "7.0"
-          - container_image: registry.fedoraproject.org/fedora:37
-            dotnet_version: "7.0"
+        include:
+          - container_image: registry.fedoraproject.org/fedora:38
+            dotnet_version: "8.0"
+          - container_image: registry.access.redhat.com/ubi8
+            dotnet_version: "8.0"
 
     container:
       image: ${{ matrix.container_image }}
@@ -48,6 +48,14 @@ jobs:
         run: |
           set -euo pipefail
           cat /etc/os-release
+          if [[ ${{ matrix.dotnet_version }} == "8.0" ]]; then
+            dnf install -y dnf-plugins-core
+            if [[ ${{ matrix.container_image }} == *ubi8* ]] ; then
+              dnf copr enable -y @dotnet-sig/dotnet-preview rhel-8-$(uname -m)
+            else
+              dnf copr enable -y @dotnet-sig/dotnet-preview
+            fi
+          fi
           if grep fedora /etc/os-release ; then
             dnf install -y dotnet-sdk-${{ matrix.dotnet_version }}
           elif grep alpine /etc/os-release; then

@@ -9,8 +9,8 @@ framework_dir=$(../dotnet-directory --framework "$1")
 
 IFS='.-' read -ra VERSION <<< "$1"
 
-if [[ ${VERSION[0]} -ge 6 ]]; then
-    echo "We are not supposed to be shipping symbol files starting with .NET 6"
+if [[ ${VERSION[0]} ==  6 ]] || [[ ${VERSION[0]} == 7 ]]; then
+    echo "We are not supposed to be shipping symbol files for .NET 6 and .NET 7"
 
     find "${framework_dir}" -name '*.pdb' || true
 
