@@ -341,7 +341,7 @@ function testTemplate {
             sed -i -E 's|(PackageReference Include="Microsoft.NET.Test.Sdk" Version=")16.11.0"|\117.0.0"|' ./*.csproj
 	elif [[ ( $(uname -m) == "ppc64le" ) && ( "${templateName}" == "xunit" || "${templateName}" == "nunit" || "${templateName}" == "mstest" ) ]]; then
             # xunit/nunit/mstest need a package version fix for a version with enablement for ppc64le;
-            sed -i -E 's|(PackageReference Include="Microsoft.NET.Test.Sdk" Version=")17.3.2"|\117.5.0-preview-20221024-01"|' ./*.csproj
+            sed -i -E 's|(PackageReference Include="Microsoft.NET.Test.Sdk" Version=")17.3.2"|\117.5.0"|' ./*.csproj
         fi
         if ! dotnet "${action}"; then
             failedTests=$((failedTests+1))
