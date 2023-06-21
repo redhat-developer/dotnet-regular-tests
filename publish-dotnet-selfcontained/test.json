@@ -1,5 +1,5 @@
 {
-  "name": "publish-console-selfcontained",
+  "name": "publish-dotnet-selfcontained",
   "enabled": true,
   "requiresSdk": true,
   "version": "8.0",
