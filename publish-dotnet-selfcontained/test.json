@@ -1,0 +1,10 @@
+{
+  "name": "publish-dotnet-selfcontained",
+  "enabled": true,
+  "requiresSdk": true,
+  "version": "8.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true
+}
+
