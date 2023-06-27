@@ -4,6 +4,8 @@ set -euo pipefail
 
 set -x
 
+runtime_id="$(../runtime-id)"
+
 cat /proc/self/mountinfo
 
 cat /proc/self/cgroup
@@ -34,7 +36,11 @@ SYSTEMD_RUN="systemd-run"
 if [ "$UID" != "0" ]; then
   if ! grep -q "cpu" "/sys/fs/cgroup/user.slice/user-$UID.slice/user@$UID.service/cgroup.controllers" ; then
     # user can't set cpu limits, use sudo.
-    SYSTEMD_RUN="sudo -n $SYSTEMD_RUN -E PATH=$PATH -E DOTNET_ROOT=$DOTNET_ROOT"
+    SYSTEMD_RUN="sudo -n $SYSTEMD_RUN"
+
+    # Pass DOTNET_ROOT to support testing against a dotnet tarball.
+    # On RHEL 7 we don't pass the envvar because systemd-run doesn't support '-E' yet and the envvar is passed by default.
+    [ "$runtime_id" != "rhel.7" ] && SYSTEMD_RUN="$SYSTEMD_RUN -E DOTNET_ROOT=$DOTNET_ROOT"
   else
     # run on behalf of user.
     SYSTEMD_RUN="$SYSTEMD_RUN --user"
