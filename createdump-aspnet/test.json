@@ -6,8 +6,9 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen": [
+    "runtime=mono" // 'createdump' is not included with mono
+  ],
   "ignoredRIDs":[
-    "linux-s390x",
-    "linux-ppc64le"
   ]
 }

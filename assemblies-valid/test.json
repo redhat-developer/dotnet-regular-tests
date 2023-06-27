@@ -6,7 +6,9 @@
   "versionSpecific": false,
   "type": "xunit",
   "cleanup": true,
+  "skipWhen": [
+    "runtime=mono,arch=x64" // test assumes x64 means coreclr
+  ],
   "ignoredRIDs":[
   ]
 }
-
