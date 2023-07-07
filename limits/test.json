@@ -1,0 +1,10 @@
+{
+  "name": "limits",
+  "enabled": true,
+  "requiresSdk": true,
+  "version": "8.0",
+  "versionSpecific": false,
+  "type": "xunit",
+  "cleanup": true,
+  "ignoredRIDs": []
+}
