@@ -40,7 +40,9 @@ if [ "$UID" != "0" ]; then
 
     # Pass DOTNET_ROOT to support testing against a dotnet tarball.
     # On RHEL 7 we don't pass the envvar because systemd-run doesn't support '-E' yet and the envvar is passed by default.
-    [ "$runtime_id" != "rhel.7" ] && SYSTEMD_RUN="$SYSTEMD_RUN -E DOTNET_ROOT=$DOTNET_ROOT"
+    if [[ "$runtime_id" != "rhel.7"* ]]; then
+       SYSTEMD_RUN="$SYSTEMD_RUN -E DOTNET_ROOT=$DOTNET_ROOT"
+    fi
   else
     # run on behalf of user.
     SYSTEMD_RUN="$SYSTEMD_RUN --user"
