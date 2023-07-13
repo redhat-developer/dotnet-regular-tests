@@ -12,7 +12,7 @@ public class LimitsTest
         int softLimit = int.Parse(RunAndGetProcessOutput("ulimit", new List<string> { "-Sn" }), CultureInfo.InvariantCulture);
         int hardLimit = int.Parse(RunAndGetProcessOutput("ulimit", new List<string> { "-Hn" }), CultureInfo.InvariantCulture);
 
-        Assert.Equal(hardLimit, softLimit, $"File descriptor soft limit ({softLimit}) should be the same as the hard limit ({hardLimit}).");
+        Assert.True(hardLimit == softLimit, $"File descriptor soft limit ({softLimit}) should be the same as the hard limit ({hardLimit}).");
     }
 
     private static string RunAndGetProcessOutput(string name, List<string> args)
