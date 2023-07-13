@@ -15,8 +15,6 @@ dotnet8Templates=(
     apicontroller
     angular
     blazor
-    blazorserver
-    blazorserver-empty
     blazorwasm
     blazorwasm-empty
     buildprops
