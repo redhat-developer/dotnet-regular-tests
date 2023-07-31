@@ -399,7 +399,7 @@ dump-analyze 'eeversion' > dump.out
 cat dump.out
 grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' dump.out
 grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+ +@Commit: [0-9a-fA-F]+$' dump.out
-grep -E '[1-9][0-9]* gc heaps' dump.out
+grep -E '^(Workstation mode|Server mode with [[:digit:]]+ gc heaps)$' dump.out
 
 
 heading "ehinfo"
