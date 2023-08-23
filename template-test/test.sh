@@ -11,9 +11,7 @@ set -euo pipefail
 # will fail unless they are added here.
 
 dotnet8Templates=(
-    api
     apicontroller
-    angular
     blazor
     blazorwasm
     blazorwasm-empty
@@ -29,6 +27,7 @@ dotnet8Templates=(
     global.json
     grpc
     mstest
+    mstest-playwright
     mvc
     mvccontroller
     nugetconfig
@@ -40,7 +39,6 @@ dotnet8Templates=(
     razor
     razorclasslib
     razorcomponent
-    react
     sln
     solution
     tool-manifest
@@ -49,6 +47,7 @@ dotnet8Templates=(
     viewstart
     web
     webapi
+    webapiaot
     webapp
     webconfig
     worker
