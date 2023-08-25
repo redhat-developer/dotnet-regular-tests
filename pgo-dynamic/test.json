@@ -1,0 +1,12 @@
+{
+  "name": "pgo-dynamic",
+  "enabled": true,
+  "requiresSdk": true,
+  "version": "7.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "skipWhen": [
+    "runtime=mono"
+  ]
+}
