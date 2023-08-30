@@ -6,9 +6,7 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
-  "ignoredRIDs":[
-    "linux-ppc64le",
-    "linux-s390x"
+  "skipWhen": [
+    "runtime=mono" // lldb sos relies on coreclr features
   ]
 }
-
