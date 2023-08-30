@@ -6,7 +6,7 @@
   "versionSpecific": false,
   "type": "xunit",
   "cleanup": true,
-  "ignoredRIDs":[
-
+  "skipWhen": [
+    "vmr-ci" // see https://github.com/redhat-developer/dotnet-regular-tests/issues/282
   ]
 }
