@@ -8,7 +8,7 @@
   "cleanup": true,
   "ignoredRIDs":[
     "centos",
-    "fedora.37",
+    "fedora", // see https://github.com/redhat-developer/dotnet-regular-tests/issues/202
     "rhel"
   ]
 }
