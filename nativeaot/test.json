@@ -6,8 +6,7 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
-  "ignoredRIDs":[
-    "linux-s390x",
-    "linux-ppc64le"
+  "skipWhen": [
+    "runtime=mono" // nativeaot is not available with mono
   ]
 }
