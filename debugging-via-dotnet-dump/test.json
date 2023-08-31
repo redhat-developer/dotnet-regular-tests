@@ -7,11 +7,8 @@
   "type": "bash",
   "cleanup": true,
   "skipWhen": [
-    "version=8" // see https://github.com/redhat-developer/dotnet-regular-tests/issues/249
-  ],
-  "ignoredRIDs":[
-    "linux-ppc64le",
-    "linux-s390x"
+    "version=8",   // see https://github.com/redhat-developer/dotnet-regular-tests/issues/249
+    "runtime=mono" // dotnet-dump relies on coreclr features
   ]
 }
 
