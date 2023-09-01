@@ -5,47 +5,85 @@
 
 set -euo pipefail
 
-function usage() {
-    echo "usage: $0 [--home | --framework] <version>"
-    echo ""
-    echo "Shows a .NET directory."
+print_err()
+{
+    echo "err: $@" 1>&2;
 }
 
-print_home=0
-print_framework=0
+print_usage() {
+    echo "usage: $0 [--root (default) | --sdk | --framework <runtime version> | --help ]" 1>&2
+    echo "" 1>&2
+    echo "Shows a .NET directory." 1>&2
+}
 
-positional_args=()
-while [[ $# -gt 0 ]]; do
-    arg=$1
-    shift
-    case "$arg" in
-        --home) print_home=1 ;;
-        --framework) print_framework=1 ;;
-        --*) usage; exit 1 ;;
-        *)
-            positional_args+=("$arg")
-            ;;
-    esac
-done
-
-version=${positional_args[0]:-}
-if [[ -z ${version} ]]; then
-    echo "error: missing argument."
-    usage
-    exit 1
+if [ "${1:-}" == "--help" ]; then
+    print_usage
+    exit 0
 fi
 
-declare -a versions
-IFS='.-' read -ra versions <<< "${version}"
-dotnet_dir=$(dirname "$(readlink -f "$(command -v dotnet)")")
-framework_dirs=( "${dotnet_dir}/shared/Microsoft.NETCore.App/${versions[0]}.${versions[1]}"* )
-framework_dir="${framework_dirs[0]}"
+dotnet_command_path=$(command -v dotnet || true)
+if [ -z "$dotnet_command_path" ]; then
+    print_err "'dotnet' command not found."
+    exit 1
+fi
+dotnet_dir=$(dirname "$(realpath "$dotnet_command_path")")
 
-if [[ ${print_home} == 1 ]]; then
+print_root() {
+    if [ ! -d "$dotnet_dir" ]; then
+        print_err "dotnet root directory not found."
+        exit 1
+    fi
     echo "${dotnet_dir}"
-elif [[ ${print_framework} == 1 ]]; then
+    exit 0
+}
+
+print_sdk() {
+    local sdk_version="$(dotnet --version)"
+    local sdk_dir="${dotnet_dir}/sdk/${sdk_version}"
+    if [ ! -d "$sdk_dir" ]; then
+        print_err "sdk directory for $sdk_version not found."
+        exit 1
+    fi
+    echo "${sdk_dir}"
+    exit 0
+}
+
+print_framework() {
+    if [[ $# -eq 0 ]]; then
+        print_err "Missing <version> argument."
+        exit 1
+    fi
+    local version="$1"
+    declare -a versions
+    IFS='.-' read -ra versions <<< "${version}"
+    framework_dirs=( "${dotnet_dir}/shared/Microsoft.NETCore.App/${versions[0]}.${versions[1]:-}"* )
+    framework_dir="${framework_dirs[0]}"
+    if [ ! -d "$framework_dir" ]; then
+        print_err "framework directory for $version not found."
+        exit 1
+    fi
     echo "${framework_dir}"
+    exit 0
+}
+
+if [[ $# -eq 0 ]]; then
+    command="--root"
 else
-    echo "error"
-    exit 1
+    command="$1"
+    shift
 fi
+case "$command" in
+    --root)
+        print_root "$@"
+        ;;
+    --framework)
+        print_framework "$@"
+        ;;
+    --sdk)
+        print_sdk "$@"
+        ;;
+    *)
+        print_err "unknown argument: $1."
+        print_usage
+        exit 1
+esac
