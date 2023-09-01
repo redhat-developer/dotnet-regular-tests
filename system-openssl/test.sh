@@ -6,7 +6,7 @@
 set -euo pipefail
 set -x
 
-dotnet_dir="$(../dotnet-directory --home "$1")"
+dotnet_dir="$(../dotnet-directory)"
 
 find_ssl_args=("-regex" '.*System\.Security\.Cryptography\.Native\.OpenSsl\.so$')
 

@@ -14,10 +14,7 @@ expected_sdks=(
     Microsoft.NET.Sdk.Worker
 )
 
-IFS='.-' read -ra dotnet_versions <<< "$1"
-
-declare -a sdk_dir
-sdk_dir=( "$(../dotnet-directory --home "$1")"/sdk/"${dotnet_versions[0]}"* )
+sdk_dir=$(../dotnet-directory --sdk)
 
 echo "Looking for SDKs at" "${sdk_dir[@]}"
 

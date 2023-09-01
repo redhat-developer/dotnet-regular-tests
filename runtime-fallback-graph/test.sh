@@ -5,7 +5,7 @@
 set -euo pipefail
 set -x
 
-dotnet_dir="$(../dotnet-directory --home "$1")"
+dotnet_dir="$(../dotnet-directory)"
 portable_rid="$(../runtime-id --portable)"
 non_portable_rid="$(../runtime-id)"
 
