@@ -7,7 +7,8 @@
   "type": "bash",
   "cleanup": true,
   "skipWhen": [
-    "os=fedora,version=8" // see https://github.com/redhat-developer/dotnet-regular-tests/issues/254
+    "os=fedora,version=8", // see https://github.com/redhat-developer/dotnet-regular-tests/issues/254
+    "vmr-ci"               // using system libunwind is configured in the rpm build
   ],
   "ignoredRIDs":[
     "centos.8",
