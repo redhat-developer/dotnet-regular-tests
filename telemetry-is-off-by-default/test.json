@@ -6,6 +6,9 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen": [
+    "vmr-ci,version=6" // pre .NET 7, the telemetry opt-out is patched by the rpm build.
+  ],
   "ignoredRIDs":[
   ]
 }
