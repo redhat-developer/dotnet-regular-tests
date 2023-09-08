@@ -1,0 +1,11 @@
+{
+  "name": "host-probes-rid-assets",
+  "enabled": true,
+  "requiresSdk": true,
+  "version": "8.0", // .NET 8+ host probes a hard-coded list of rids.
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "ignoredRIDs":[
+  ]
+}
