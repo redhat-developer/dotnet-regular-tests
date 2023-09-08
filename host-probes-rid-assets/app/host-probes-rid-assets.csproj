@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+      <RestoreSources>$(MSBuildThisFileDirectory)/../packages</RestoreSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="lib" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>
