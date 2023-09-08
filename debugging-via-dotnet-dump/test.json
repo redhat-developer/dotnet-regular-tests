@@ -6,6 +6,7 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "timeoutMultiplier": 2,
   "skipWhen": [
     "version=8",   // see https://github.com/redhat-developer/dotnet-regular-tests/issues/249
     "runtime=mono" // dotnet-dump relies on coreclr features
