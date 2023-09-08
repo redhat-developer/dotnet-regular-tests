@@ -5,6 +5,7 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "timeoutMultiplier": 2,
   "skipWhen": [
     "version=7", // see https://github.com/redhat-developer/dotnet-regular-tests/issues/212
     "version=8"  // see https://github.com/redhat-developer/dotnet-regular-tests/issues/250
