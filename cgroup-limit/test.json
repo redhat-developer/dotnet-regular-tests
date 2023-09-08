@@ -6,6 +6,9 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen": [
+    "vmr-ci,os=rhel.7" // test doesn't work when it needs sudo on rhel7 because DOTNET_ROOT isn't passed through.
+  ],
   "ignoredRIDs":[
   ]
 }
