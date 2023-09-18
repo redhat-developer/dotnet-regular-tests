@@ -312,6 +312,12 @@ function testTemplate {
 
     echo "### Testing: ${templateName}"
 
+    if [[ ( $(uname -m) == "s390x" ||  $(uname -m) == "ppc64le" ) && ( "${templateName}" == "webapiaot" ) ]]; then
+        # webapiaot implies AOT which will not even restore on mono (ppc64le/s390x), skip it
+        echo "SKIP skipping webapiaot on ppc64/s390x"
+        return
+    fi
+
     dotnet new "${templateName}" 2>&1 | tee "${templateName}.log"
     if grep -i failed "${templateName}.log"; then
         echo "error: ${templateName} failed."
@@ -336,7 +342,7 @@ function testTemplate {
             # the default templates are known to be broken out of the
             # box
             sed -i -E 's|(PackageReference Include="Microsoft.NET.Test.Sdk" Version=")16.11.0"|\117.0.0"|' ./*.csproj
-	elif [[ ( $(uname -m) == "ppc64le" ) && ( "${templateName}" == "xunit" || "${templateName}" == "nunit" || "${templateName}" == "mstest" ) ]]; then
+        elif [[ ( $(uname -m) == "ppc64le" ) && ( "${templateName}" == "xunit" || "${templateName}" == "nunit" || "${templateName}" == "mstest" ) ]]; then
             # xunit/nunit/mstest need a package version fix for a version with enablement for ppc64le;
             sed -i -E 's|(PackageReference Include="Microsoft.NET.Test.Sdk" Version=")17.3.2"|\117.5.0"|' ./*.csproj
         fi
