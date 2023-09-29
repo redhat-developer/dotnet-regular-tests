@@ -2,6 +2,9 @@
 
 set -euox pipefail
 
+# This test is testing the same functionality as host-probes-rid-assets
+# but when opting in to use the legacy graph (by setting System.Runtime.Loader.UseRidGraph=true).
+
 # The lib project packages a native library in a rid-specific folder.
 # Only one rid is considered per nuget package.
 # We pack it once for the sdk rid, and once for a base rid ('unix').
