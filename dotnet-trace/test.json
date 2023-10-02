@@ -5,5 +5,8 @@
 	"version": "6.0",
 	"versionSpecific": false,
 	"type": "bash",
-	"cleanup": false
+	"cleanup": false,
+	"skipWhen": [
+		"arch=s390x"  // https://github.com/dotnet/runtime/issues/92891
+	]
 }
