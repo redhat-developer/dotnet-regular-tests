@@ -18,6 +18,8 @@ function usage() {
     echo "$0 --sdk        prints the rid the SDK was built for"
 }
 
+portable_rid=0
+sdk_rid=0
 while [[ $# -gt 0 ]]; do
     arg=$1
     shift
@@ -28,7 +30,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if [[ ${sdk_rid:-} == 1 ]]; then
+if [[ ${sdk_rid} == 1 ]]; then
   sdk_dir=$("$SCRIPT_DIR/dotnet-directory" --sdk)
   rid_line=$(grep -m 1 "<NETCoreSdkRuntimeIdentifier>" "$sdk_dir/Microsoft.NETCoreSdk.BundledVersions.props")
   rid_regex="<NETCoreSdkRuntimeIdentifier>(.*)</NETCoreSdkRuntimeIdentifier>"
@@ -57,8 +59,6 @@ archmap=(
 )
 
 arch=${archmap["$(uname -m)"]}
-
-portable_rid=0
 
 if [[ ${portable_rid} == 1 ]]; then
     if (ldd --version 2>&1 || true) | grep -q musl ; then
