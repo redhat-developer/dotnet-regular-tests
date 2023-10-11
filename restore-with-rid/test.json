@@ -6,7 +6,11 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen":[
+    "version=6,arch=s390x",
+    "version=7,arch=s390x",
+    "version=7,arch=ppc64le"
+  ],
   "ignoredRIDs":[
-    "linux-s390x"
   ]
 }
