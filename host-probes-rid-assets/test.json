@@ -2,10 +2,14 @@
   "name": "host-probes-rid-assets",
   "enabled": true,
   "requiresSdk": true,
-  "version": "8.0", // .NET 8+ host probes a hard-coded list of rids.
+  "version": "6.0",
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen": [
+    "os=alpine,version=6", // see https://github.com/redhat-developer/dotnet-regular-tests/pull/303#issuecomment-1755727884
+    "os=alpine,version=7",
+  ],
   "ignoredRIDs":[
   ]
 }
