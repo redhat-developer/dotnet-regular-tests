@@ -1,5 +1,9 @@
 <Project>
   <PropertyGroup>
+    <!-- This property will be set by the test runner.
+         You can change it locally when running without the test runner to match with the .NET SDK under test. -->
+    <TestTargetFramework Condition="'$(TestTargetFramework)' == ''">net6.0</TestTargetFramework>
+
     <SystemDataOdbcVersion>6.0.0</SystemDataOdbcVersion>
     <MicrosoftNetTestSdkVersion>17.4.0</MicrosoftNetTestSdkVersion>
     <XunitVersion>2.4.1</XunitVersion>

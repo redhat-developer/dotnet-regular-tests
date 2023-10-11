@@ -1,0 +1,11 @@
+{
+  "name": "host-probes-rid-assets-legacy",
+  "enabled": true,
+  "requiresSdk": true,
+  "version": "8.0", // test opts into using the legacy graph.
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "ignoredRIDs":[
+  ]
+}

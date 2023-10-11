@@ -11,4 +11,8 @@
     <PackageReference Include="host-probes-rid-assets-mylib-sdkrid" Version="1.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <RuntimeHostConfigurationOption Include="System.Runtime.Loader.UseRidGraph" Value="true" />
+  </ItemGroup>
+
 </Project>

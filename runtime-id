@@ -5,11 +5,44 @@
 
 set -euo pipefail
 
+SCRIPT_PATH=$(realpath $0)
+SCRIPT_DIR=$(dirname "$SCRIPT_PATH")
+
 function usage() {
-    echo "usage: $0 [--portable]"
+    echo "usage: $0 [--portable] [--sdk]"
     echo ""
-    echo "Shows the runtime id of the current OS distribution, or general OS (with the --portable flag)"
+    echo "Prints a rid for the current environment"
+    echo ""
+    echo "$0              prints the non-portable rid for the OS"
+    echo "$0 --portable   prints the portable rid for the OS"
+    echo "$0 --sdk        prints the rid the SDK was built for"
 }
+
+portable_rid=0
+sdk_rid=0
+while [[ $# -gt 0 ]]; do
+    arg=$1
+    shift
+    case "$arg" in
+        --portable) portable_rid=1 ;;
+        --sdk)      sdk_rid=1 ;;
+        *) usage; exit 1 ;;
+    esac
+done
+
+if [[ ${sdk_rid} == 1 ]]; then
+  sdk_dir=$("$SCRIPT_DIR/dotnet-directory" --sdk)
+  rid_line=$(grep -m 1 "<NETCoreSdkRuntimeIdentifier>" "$sdk_dir/Microsoft.NETCoreSdk.BundledVersions.props")
+  rid_regex="<NETCoreSdkRuntimeIdentifier>(.*)</NETCoreSdkRuntimeIdentifier>"
+  if [[ "$rid_line" =~ $rid_regex ]]; then
+      sdk_rid="${BASH_REMATCH[1]}"
+  else
+    echo "failed to parse id from: '$rid_line'"
+    exit 1
+  fi
+  echo $sdk_rid
+  exit 0
+fi
 
 source /etc/os-release
 
@@ -26,17 +59,6 @@ archmap=(
 )
 
 arch=${archmap["$(uname -m)"]}
-
-portable_rid=0
-
-while [[ $# -gt 0 ]]; do
-    arg=$1
-    shift
-    case "$arg" in
-        --portable) portable_rid=1 ;;
-        *) usage; exit 1 ;;
-    esac
-done
 
 if [[ ${portable_rid} == 1 ]]; then
     if (ldd --version 2>&1 || true) | grep -q musl ; then
