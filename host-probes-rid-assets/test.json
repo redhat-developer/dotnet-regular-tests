@@ -6,6 +6,10 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen": [
+    "os=alpine,version=6", // see https://github.com/redhat-developer/dotnet-regular-tests/pull/303#issuecomment-1755727884
+    "os=alpine,version=7",
+  ],
   "ignoredRIDs":[
   ]
 }
