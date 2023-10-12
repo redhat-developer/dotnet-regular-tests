@@ -9,6 +9,8 @@ framework_dir=$(../dotnet-directory --framework "$1")
 
 IFS='.-' read -ra VERSION <<< "$1"
 
+exit_code=0
+
 if [[ ${VERSION[0]} ==  6 ]] || [[ ${VERSION[0]} == 7 ]]; then
     echo "We are not supposed to be shipping symbol files for .NET 6 and .NET 7"
 
@@ -25,7 +27,9 @@ else
         System.Runtime.CompilerServices.Unsafe.dll
     )
 
-    find "${framework_dir}" -name '*.dll' -type f | sort -u | while read dll_name; do
+    framework_dlls=( $(find "${framework_dir}" -name '*.dll' -type f) )
+    for dll_name in "${framework_dlls[@]}"
+    do
         base_dll_name=$(basename "${dll_name}")
         is_special=0
         for ignore_case in "${ignore_cases[@]}"; do
@@ -41,11 +45,17 @@ else
             if [ -f "${pdb_name}" ]; then
                 echo "OK: ${base_dll_name} -> ${pdb_name}"
             else
+                exit_code=1
                 echo "error: missing ${pdb_name} (${base_dll_name})"
-                exit 1
             fi
         fi
     done
 fi
 
-echo PASS
+if [ $exit_code -eq 0 ]; then
+    echo "PASS: all pdbs found."
+else
+    echo "FAIL: missing pdbs. See errors above."
+fi
+
+exit $exit_code
