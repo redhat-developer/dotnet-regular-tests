@@ -30,7 +30,7 @@ function create_project_for_package()
   cat >$test_folder/testapp.csproj <<EOF
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>netcoreapp${runtime_version_major_minor}</TargetFramework>
+    <TargetFramework>\$(TestTargetFramework)</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="$package" />

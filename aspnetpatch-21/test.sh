@@ -55,7 +55,7 @@ EOF
   cat >$test_folder/testapp.csproj <<EOF
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>\$(TestTargetFramework)</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="$package" />
