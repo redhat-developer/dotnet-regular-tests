@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>$(TestTargetFramework)</TargetFramework>
     <MvcRazorCompileOnPublish>true</MvcRazorCompileOnPublish>
     <UserSecretsId>aspnet-hello_world-DE94012D-DD42-4C41-9932-5D416EA18C14</UserSecretsId>
   </PropertyGroup>

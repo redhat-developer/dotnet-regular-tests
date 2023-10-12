@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>$(TestTargetFramework)</TargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
