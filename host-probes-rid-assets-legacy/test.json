@@ -6,6 +6,9 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen": [
+    "vmr-ci" // test fails against stage 1 build (https://github.com/redhat-developer/dotnet-regular-tests/issues/289#issuecomment-1705268294)
+  ],
   "ignoredRIDs":[
   ]
 }
