@@ -6,6 +6,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 framework_dir=$(../dotnet-directory --framework "$1")
+aspnet_dir=$(../dotnet-directory --aspnet "$1")
 
 IFS='.-' read -ra VERSION <<< "$1"
 
@@ -20,14 +21,22 @@ if [[ ${VERSION[0]} ==  6 ]] || [[ ${VERSION[0]} == 7 ]]; then
         echo "error: Found some pdb file."
         exit 1
     fi
+
+    find "${aspnet_dir}" -name '*.pdb' || true
+
+    if [[ "$(find "${aspnet_dir}" -name '*.pdb' -printf '.' | wc -c)" -gt 0 ]] ; then
+        echo "error: Found some pdb file."
+        exit 1
+    fi
+
 else
-    echo "We are supposed to be shipping symbol files between .NET Core 2.1 and .NET 5"
+    echo "Checking symbol files..."
 
     ignore_cases=(
         System.Runtime.CompilerServices.Unsafe.dll
     )
-
-    framework_dlls=( $(find "${framework_dir}" -name '*.dll' -type f) )
+    framework_dlls=( $(find "${framework_dir}" -name '*.dll' -type f))
+    framework_dlls+=( $(find "${aspnet_dir}" -name '*.dll' -type f))
     for dll_name in "${framework_dlls[@]}"
     do
         base_dll_name=$(basename "${dll_name}")
