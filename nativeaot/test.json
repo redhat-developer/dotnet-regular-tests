@@ -7,6 +7,7 @@
   "type": "bash",
   "cleanup": true,
   "skipWhen": [
-    "runtime=mono" // nativeaot is not available with mono
+    "runtime=mono", // nativeaot is not available with mono
+    "vmr-ci"        // nativeaot packages not published
   ]
 }
