@@ -14,7 +14,6 @@ dotnet8Templates=(
     apicontroller
     blazor
     blazorwasm
-    blazorwasm-empty
     buildprops
     buildtargets
     classlib
