@@ -8,15 +8,14 @@
   "cleanup": true,
   "skipWhen": [
     "os=fedora,version=8", // see https://github.com/redhat-developer/dotnet-regular-tests/issues/254
-    "vmr-ci"               // using system libunwind is configured in the rpm build
+    "vmr-ci",              // using system libunwind is configured in the rpm build
+    "runtime=mono",        // mono does not use libunwind
   ],
   "ignoredRIDs":[
     "centos.8",
     "centos.9",
     "linux-arm",
     "linux-arm64",
-    "linux-s390x",
-    "linux-ppc64le",
     "rhel.8",
     "rhel.9"
   ]

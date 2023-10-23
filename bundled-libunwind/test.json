@@ -6,12 +6,13 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen": [
+    "runtime=mono", // mono does not use libunwind
+  ],
   "ignoredRIDs":[
     "alpine",
     "fedora",
     "linux-arm",
-    "linux-ppc64le",
-    "linux-s390x",
     "rhel7"
   ]
 }

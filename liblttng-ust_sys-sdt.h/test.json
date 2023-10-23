@@ -6,9 +6,10 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen": [
+    "runtime=mono", // mono does not use lttng
+  ],
   "ignoredRIDs":[
     "alpine", // see https://github.com/redhat-developer/dotnet-regular-tests/pull/222
-    "linux-s390x",
-    "linux-ppc64le"
   ]
 }
