@@ -6,6 +6,9 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "skipWhen": [
+    "runtime=mono", // mono does not use lttng
+  ],
   "ignoredRIDs":[
     "centos",
     "fedora", // see https://github.com/redhat-developer/dotnet-regular-tests/issues/202
