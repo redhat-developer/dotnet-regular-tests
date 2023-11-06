@@ -195,10 +195,7 @@ grep -E 'Awaiting: [a-zA-Z0-9]+ [a-zA-Z0-9]+ System.Runtime.CompilerServices.Val
 
 heading "dumpgen"
 for gen in gen0 gen1 gen2 loh poh; do
-    # Disable exit on error for dumpgen. Reported as https://github.com/dotnet/diagnostics/issues/3842
-    set +e
     dump-analyze "dumpgen $gen" > dump.out
-    set -e
     cat dump.out
     total=$( (grep -E '00[0-9a-fA-F]+ +[[:digit:]]+ +[[:digit:]]+ +' dump.out | awk '{print $2}' | paste -sd+ | bc) || echo 0)
     grep -F "Total ${total} objects" dump.out
@@ -257,10 +254,7 @@ cat dump.out
 
 
 heading "dumpheap"
-# Disable exit on error for dumpheap. Reported as https://github.com/dotnet/diagnostics/issues/3926
-set +e
 dump-analyze "dumpheap -stat" > dump.out
-set -e
 cat dump.out
 if grep UNKNOWN dump.out; then
     echo 'fail: UNKNOWN classes found in dumpheap'
@@ -373,8 +367,9 @@ fi
 dump-analyze 'clrstack' > dump.out
 cat dump.out
 stack_pointer=$(grep 'OS Thread Id' dump.out -A3 | tail -1 | awk '{ print $1}')
-dump-analyze "dumpstackobjects ${stack_pointer}"
-cat dump.out
+# Disabled due to: https://github.com/dotnet/diagnostics/issues/4368
+# dump-analyze "dumpstackobjects ${stack_pointer}"
+# cat dump.out
 
 
 # TODO "dumpvc"
@@ -419,10 +414,7 @@ done
 
 
 heading "finalizequeue"
-# Disable exit on error for finalizequeue. Reported as https://github.com/dotnet/diagnostics/issues/3917
-set +e
 dump-analyze 'finalizequeue' > dump.out
-set -e
 cat dump.out
 grep -E 'generation [[:digit:]]+ has [[:digit:]] (finalizable )?objects' dump.out
 
@@ -466,18 +458,15 @@ done
 heading "gcroot"
 dump-analyze 'dso' > dump.out
 cat dump.out
-# Skipped on aarch64 due to https://github.com/dotnet/diagnostics/issues/3726
-if [[ "$(uname -m)" != "aarch64" ]]; then
-    mapfile -t object_ids < <(grep -F 'System.Threading.Tasks' dump.out | awk '{ print $2 }')
-    id="${object_ids[0]}"
-    dump-analyze "gcroot ${id}" > dump.out
-    cat dump.out
-    grep -E 'Found [[:digit:]]* (unique )?roots' dump.out
-    count=$(grep -E 'Found [[:digit:]]* (unique )?roots' dump.out | sed -E 's|Found ([[:digit:]]*) (unique )?roots.*|\1|')
-    if [[ $count -le 0 ]]; then
-        echo "fail: $count unique roots found"
-        exit 2
-    fi
+mapfile -t object_ids < <(grep -F 'System.Threading.Tasks' dump.out | awk '{ print $2 }')
+id="${object_ids[0]}"
+dump-analyze "gcroot ${id}" > dump.out
+cat dump.out
+grep -E 'Found [[:digit:]]* (unique )?roots' dump.out
+count=$(grep -E 'Found [[:digit:]]* (unique )?roots' dump.out | sed -E 's|Found ([[:digit:]]*) (unique )?roots.*|\1|')
+if [[ $count -le 0 ]]; then
+    echo "fail: $count unique roots found"
+    exit 2
 fi
 
 
@@ -542,8 +531,7 @@ if ! grep 'No unique loader heaps found.' dump.out; then
     grep -F 'Before: ' dump.out
     grep -F 'Current: ' dump.out
     grep -F 'After: ' dump.out
-# FIXME: https://github.com/dotnet/diagnostics/issues/3566
-# grep -F 'Heap local consistency confirmed.' dump.out
+grep -F 'Heap local consistency confirmed.' dump.out
 fi
 
 
@@ -689,26 +677,18 @@ grep -E '^ +[0-9]+ timers$' dump.out
 
 
 heading "traverseheap"
-# Skipped on aarch64 due to https://github.com/dotnet/diagnostics/issues/3726
-if [[ "$(uname -m)" != "aarch64" ]]; then
-    dump-analyze 'help traverseheap' > dump.out
-    # Disable exit on error for traverseheap. Reported as https://github.com/dotnet/diagnostics/issues/3842
-    if grep -F -- '-verify' dump.out; then
-        set +e
-        dump-analyze 'traverseheap -xml -verify full-heap' > dump.out
-        set -e
-    else
-        set +e
-        dump-analyze 'traverseheap -xml full-heap' > dump.out
-        set -e
-    fi
-    cat dump.out
-    head full-heap
-    tail full-heap
-    grep -E '<type id="[[:digit:]]+" name="System.Object\[\]" */>' full-heap
-    grep -E '<object address="[^"]+" typeid="1" size="[0-9]+"' full-heap
-    grep -E '<object address="[^"]+" typeid="2" size="[0-9]+"' full-heap
+dump-analyze 'help traverseheap' > dump.out
+if grep -F -- '-verify' dump.out; then
+    dump-analyze 'traverseheap -xml -verify full-heap' > dump.out
+else
+    dump-analyze 'traverseheap -xml full-heap' > dump.out
 fi
+cat dump.out
+head full-heap
+tail full-heap
+grep -E '<type id="[[:digit:]]+" name="System.Object\[\]" */>' full-heap
+grep -E '<object address="[^"]+" typeid="1" size="[0-9]+"' full-heap
+grep -E '<object address="[^"]+" typeid="2" size="[0-9]+"' full-heap
 
 
 heading "verifyheap"
