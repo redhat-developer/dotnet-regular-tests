@@ -49,14 +49,15 @@ print_sdk() {
 }
 
 print_framework() {
-    if [[ $# -eq 0 ]]; then
+    if [[ $# -lt 2 ]]; then
         print_err "Missing <version> argument."
         exit 1
     fi
-    local version="$1"
+    local dir_name="$1"
+    local version="$2"
     declare -a versions
     IFS='.-' read -ra versions <<< "${version}"
-    framework_dirs=( "${dotnet_dir}/shared/Microsoft.NETCore.App/${versions[0]}.${versions[1]:-}"* )
+    framework_dirs=( "${dotnet_dir}/shared/$dir_name/${versions[0]}.${versions[1]:-}"* )
     framework_dir="${framework_dirs[0]}"
     if [ ! -d "$framework_dir" ]; then
         print_err "framework directory for $version not found."
@@ -77,8 +78,11 @@ case "$command" in
         print_root "$@"
         ;;
     --framework)
-        print_framework "$@"
+        print_framework "Microsoft.NETCore.App" "$@"
         ;;
+    --aspnet)
+        print_framework "Microsoft.AspNetCore.App" "$@"
+        ;; 
     --sdk)
         print_sdk "$@"
         ;;
@@ -87,3 +91,4 @@ case "$command" in
         print_usage
         exit 1
 esac
+
