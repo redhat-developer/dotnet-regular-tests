@@ -2,7 +2,7 @@
 	"name": "dotnet-trace",
 	"enabled": true,
 	"requireSdk": true,
-	"version": "6.0",
+	"version": "8.0",
 	"versionSpecific": false,
 	"type": "bash",
 	"cleanup": false,

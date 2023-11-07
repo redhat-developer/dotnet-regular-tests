@@ -48,14 +48,22 @@ else
    exit 1
 fi 
 
-dotnet-trace report $FILENAME topN
-if [ -f $REPORTNAME ]; then
-   echo "report - OK"
-else 
+output=$(dotnet-trace report $FILENAME topN)
+if [[ $output == *"Missing Symbol"* ]]; then 
    echo "report - FAIL"
    rm -r $PROJNAME
    rm $FILENAME
    rm $SPEEDSCOPENAME
+   rm $REPORTNAME
+   exit 1
+elif [[ $output == *"Top 5 Functions (Exclusive)"* ]]; then
+   echo "report - OK"
+else
+   echo "report - FAIL"
+   rm -r $PROJNAME
+   rm $FILENAME
+   rm $SPEEDSCOPENAME
+   rm $REPORTNAME
    exit 1
 fi
 
