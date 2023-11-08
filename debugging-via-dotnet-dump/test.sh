@@ -458,15 +458,18 @@ done
 heading "gcroot"
 dump-analyze 'dso' > dump.out
 cat dump.out
-mapfile -t object_ids < <(grep -F 'System.Threading.Tasks' dump.out | awk '{ print $2 }')
-id="${object_ids[0]}"
-dump-analyze "gcroot ${id}" > dump.out
-cat dump.out
-grep -E 'Found [[:digit:]]* (unique )?roots' dump.out
-count=$(grep -E 'Found [[:digit:]]* (unique )?roots' dump.out | sed -E 's|Found ([[:digit:]]*) (unique )?roots.*|\1|')
-if [[ $count -le 0 ]]; then
-    echo "fail: $count unique roots found"
-    exit 2
+# Skipped on aarch64 due to https://github.com/dotnet/diagnostics/issues/4388
+if [[ "$(uname -m)" != "aarch64" ]]; then
+    mapfile -t object_ids < <(grep -F 'System.Threading.Tasks' dump.out | awk '{ print $2 }')
+    id="${object_ids[0]}"
+    dump-analyze "gcroot ${id}" > dump.out
+    cat dump.out
+    grep -E 'Found [[:digit:]]* (unique )?roots' dump.out
+    count=$(grep -E 'Found [[:digit:]]* (unique )?roots' dump.out | sed -E 's|Found ([[:digit:]]*) (unique )?roots.*|\1|')
+    if [[ $count -le 0 ]]; then
+        echo "fail: $count unique roots found"
+        exit 2
+    fi
 fi
 
 
@@ -677,18 +680,25 @@ grep -E '^ +[0-9]+ timers$' dump.out
 
 
 heading "traverseheap"
-dump-analyze 'help traverseheap' > dump.out
-if grep -F -- '-verify' dump.out; then
-    dump-analyze 'traverseheap -xml -verify full-heap' > dump.out
-else
-    dump-analyze 'traverseheap -xml full-heap' > dump.out
+if [[ "$(uname -m)" != "aarch64" ]]; then
+    dump-analyze 'help traverseheap' > dump.out
+    # Disable exit on error for traverseheap. Reported as https://github.com/dotnet/diagnostics/issues/3842
+    if grep -F -- '-verify' dump.out; then
+        set +e
+        dump-analyze 'traverseheap -xml -verify full-heap' > dump.out
+        set -e
+    else
+        set +e
+        dump-analyze 'traverseheap -xml full-heap' > dump.out
+        set -e
+    fi
+    cat dump.out
+    head full-heap
+    tail full-heap
+    grep -E '<type id="[[:digit:]]+" name="System.Object\[\]" */>' full-heap
+    grep -E '<object address="[^"]+" typeid="1" size="[0-9]+"' full-heap
+    grep -E '<object address="[^"]+" typeid="2" size="[0-9]+"' full-heap
 fi
-cat dump.out
-head full-heap
-tail full-heap
-grep -E '<type id="[[:digit:]]+" name="System.Object\[\]" */>' full-heap
-grep -E '<object address="[^"]+" typeid="1" size="[0-9]+"' full-heap
-grep -E '<object address="[^"]+" typeid="2" size="[0-9]+"' full-heap
 
 
 heading "verifyheap"
