@@ -7,7 +7,7 @@ if [ -f /etc/profile ]; then
 fi
 
 set -euo pipefail
-
+IFS=$'\n\t'
 set -x
 
 echo "$PATH"
@@ -19,10 +19,7 @@ else
     exit 1
 fi
 
-if dotnet tool list -g | grep -F dotnet-ef; then
-    true
-else
-    dotnet tool install -g dotnet-ef || true
-fi
+IFS='.-' read -ra VERSION_SPLIT <<< "$1" 
+dotnet tool update -g dotnet-ef --version "${VERSION_SPLIT[0]}.*-*"
 
 dotnet ef --version
