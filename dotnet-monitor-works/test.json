@@ -1,0 +1,11 @@
+{
+	"name": "dotnet-monitor-works",
+	"enabled": true,
+	"requireSdk": true,
+	"version": "6.0",
+	"versionSpecific": false,
+	"type": "bash",
+	"cleanup": false,
+	"skipWhen": [
+	]
+}
