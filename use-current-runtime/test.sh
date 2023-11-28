@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-
+IFS=$'\n\t'
 set -x
 
 PORTABLE_RID="$(../runtime-id --portable)"

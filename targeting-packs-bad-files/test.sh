@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-
+IFS=$'\n\t'
 set -x
 
 dotnet_dir=$(dirname "$(readlink -f "$(command -v dotnet)")")

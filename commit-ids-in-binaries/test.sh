@@ -12,7 +12,6 @@
 
 set -euo pipefail
 IFS=$'\n\t'
-
 set -x
 
 dotnet_home="$(dirname "$(readlink -f "$(command -v dotnet)")")"

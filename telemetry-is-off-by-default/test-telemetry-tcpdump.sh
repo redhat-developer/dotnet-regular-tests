@@ -4,6 +4,7 @@
 
 set -euo pipefail
 set -x
+IFS=$'\n\t'
 
 # found via experimentation
 telemetry_host=dc.services.visualstudio.com

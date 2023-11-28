@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euox pipefail
+IFS=$'\n\t'
 
 # This test is testing the same functionality as host-probes-rid-assets
 # but when opting in to use the legacy graph (by setting System.Runtime.Loader.UseRidGraph=true).

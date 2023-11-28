@@ -7,6 +7,7 @@ fi
 # Enable "unofficial strict mode" only after loading /etc/profile
 # because that usually contains lots of "errors".
 set -euo pipefail
+IFS=$'\n\t'
 set -x
 
 IFS='.-' read -ra VERSION_SPLIT <<< "$1"

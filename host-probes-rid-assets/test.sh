@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euox pipefail
+IFS=$'\n\t'
 
 # The lib project packages a native library in a rid-specific folder.
 # Only one rid is considered per nuget package.

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+IFS=$'\n\t'
 set -x
 
 RUNTIME_ID=$(../runtime-id)

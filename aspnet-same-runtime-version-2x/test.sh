@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-
+IFS=$'\n\t'
 set -x
 
 # There's always a version of Microsoft.AspNetCore.App for each

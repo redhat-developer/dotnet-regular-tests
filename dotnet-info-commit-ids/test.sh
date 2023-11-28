@@ -2,7 +2,7 @@
 
 # unofficial bash strict mode
 set -euo pipefail
-
+IFS=$'\n\t'
 set -x
 
 dotnet --info

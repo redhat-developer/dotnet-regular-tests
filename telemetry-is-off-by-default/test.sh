@@ -9,6 +9,7 @@
 # access.
 
 set -euo pipefail
+IFS=$'\n\t'
 set -x
 
 no_server=("/nodeReuse:false" "/p:UseSharedCompilation=false" "/p:UseRazorBuildServer=false")
