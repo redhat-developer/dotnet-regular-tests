@@ -3,7 +3,7 @@
 # Check if the .NET Runtime can use dynamic PGO at runtime
 
 set -euo pipefail
-
+IFS=$'\n\t'
 set -x
 
 IFS='.-' read -ra VERSION <<< "$1"

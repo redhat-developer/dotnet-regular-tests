@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-set -x
 IFS=$'\n\t'
+set -x
 
 IFS='.-' read -ra VERSION_SPLIT <<< "$1" 
 dotnet tool update -g dotnet-monitor --version "${VERSION_SPLIT[0]}.*-*"

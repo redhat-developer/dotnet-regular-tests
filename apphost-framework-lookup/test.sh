@@ -8,6 +8,7 @@ fi
 # because that usually contains lots of "errors".
 
 set -euo pipefail
+IFS=$'\n\t'
 set -x
 
 runtime_id="$(../runtime-id --portable)"

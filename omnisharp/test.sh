@@ -2,7 +2,6 @@
 
 set -euo pipefail
 IFS=$'\n\t'
-
 set -x
 
 rm -rf workdir

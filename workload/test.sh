@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-
+IFS=$'\n\t'
 set -x
 
 # In some environments, such as Github Actions, /tmp/ is strange and

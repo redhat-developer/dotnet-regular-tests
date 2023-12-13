@@ -7,6 +7,7 @@ if [ -f /etc/profile ]; then
 fi
 
 set -euo pipefail
+IFS=$'\n\t'
 
 # Verify DOTNET_BUNDLE_EXTRACT_BASE_DIR is set.
 if [[ "${DOTNET_BUNDLE_EXTRACT_BASE_DIR:-}" != "$HOME/.cache/dotnet_bundle_extract" ]]; then

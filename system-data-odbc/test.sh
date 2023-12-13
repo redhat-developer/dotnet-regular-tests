@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
-
+IFS=$'\n\t'
 set -x
 
 # This test *must* be run as non-root; postgresql will refuse to start as root.

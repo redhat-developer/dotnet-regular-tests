@@ -4,6 +4,7 @@
 # using OpenSSL via dlopen (which is more likely to fail at runtime).
 
 set -euo pipefail
+IFS=$'\n\t'
 set -x
 
 dotnet_dir="$(../dotnet-directory)"

@@ -2,7 +2,7 @@
 
 # Enable "unofficial bash strict mode"
 set -euo pipefail
-
+IFS=$'\n\t'
 set -x
 
 IFS='.-' read -ra VERSION_SPLIT <<< "$1"

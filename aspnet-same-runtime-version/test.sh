@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+IFS=$'\n\t'
 
 # Check Microsoft.AspNetCore.App's version matches that of Microsoft.NETCore.App
 

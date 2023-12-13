@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+IFS=$'\n\t'
 
 SESSION_NAME=my-session
 TEST_FOLDER=/tmp/$SESSION_NAME

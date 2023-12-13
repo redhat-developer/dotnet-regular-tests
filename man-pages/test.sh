@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+IFS=$'\n\t'
 
 helpPages=$(dotnet --help | grep -A 999 'SDK commands' | grep -E -B 999 'Common options|Additional commands' | awk 'NR>1 {print $1}' | head -n-2)
 

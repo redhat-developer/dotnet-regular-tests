@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-
+IFS=$'\n\t'
 set -x
 
 framework_dir=$(../dotnet-directory --framework "$1")

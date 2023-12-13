@@ -4,7 +4,8 @@
 # dotnet new <template>
 
 set -euo pipefail
-#set -x
+IFS=$'\n\t'
+set -x
 
 # The list of templates in each version of .NET that we want to test.
 # If additional templates are found via `dotnet new --list`, this test
