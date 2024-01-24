@@ -20,7 +20,8 @@ jobs:
         container_image:
           - docker.io/library/alpine:latest
           - docker.io/library/alpine:edge
-          - quay.io/centos/centos:stream9-development
+          - quay.io/centos/centos:stream8
+          - quay.io/centos/centos:stream9
           - registry.fedoraproject.org/fedora:38
           - registry.fedoraproject.org/fedora:39
           - registry.fedoraproject.org/fedora:rawhide
@@ -30,6 +31,11 @@ jobs:
           - "6.0"
           - "7.0"
           - "8.0"
+        exclude:
+          - container_image: docker.io/library/alpine:latest
+            dotnet_version: "8.0"
+          - container_image: docker.io/library/alpine:edge
+            dotnet_version: "8.0"
 
     container:
       image: ${{ matrix.container_image }}
