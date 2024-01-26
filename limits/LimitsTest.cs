@@ -9,8 +9,8 @@ public class LimitsTest
     [Fact]
     public void FileDescriptorLimitIsAtMax()
     {
-        int softLimit = int.Parse(RunAndGetProcessOutput("ulimit", new List<string> { "-Sn" }), CultureInfo.InvariantCulture);
-        int hardLimit = int.Parse(RunAndGetProcessOutput("ulimit", new List<string> { "-Hn" }), CultureInfo.InvariantCulture);
+        int softLimit = int.Parse(RunAndGetProcessOutput("../../../ulimit-wrapper.sh", new List<string> { "-Sn" }), CultureInfo.InvariantCulture);
+        int hardLimit = int.Parse(RunAndGetProcessOutput("../../../ulimit-wrapper.sh", new List<string> { "-Hn" }), CultureInfo.InvariantCulture);
 
         Assert.True(hardLimit == softLimit, $"File descriptor soft limit ({softLimit}) should be the same as the hard limit ({hardLimit}).");
     }
