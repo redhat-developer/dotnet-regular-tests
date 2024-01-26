@@ -312,8 +312,8 @@ function testTemplate {
 
     echo "### Testing: ${templateName}"
 
-	if [[ ( $(uname -m) == "s390x" ||  $(uname -m) == "ppc64le" || $(uname -m) == "armv7" ) && ( "${templateName}" == "webapiaot" ) ]]; then
-        # webapiaot implies AOT which will not even restore on mono (ppc64le/s390x) and armv7, skip it
+    if [[ ( $(uname -m) == "s390x" ||  $(uname -m) == "ppc64le" || $(uname -m) == "armv7" || $(uname -m) == "armv8l" ) && ( "${templateName}" == "webapiaot" ) ]]; then
+        # webapiaot implies AOT which will not even restore on mono (ppc64le/s390x) and arm, skip it
         echo "SKIP skipping webapiaot on ppc64/s390x/armv7"
         return
     fi
