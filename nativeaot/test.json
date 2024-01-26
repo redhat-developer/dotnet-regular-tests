@@ -9,5 +9,8 @@
   "skipWhen": [
     "runtime=mono", // nativeaot is not available with mono
     "vmr-ci"        // nativeaot packages not published
+  ],
+  "ignoredRIDs": [
+    "linux-arm" // nativeaot not supported on arm
   ]
 }
