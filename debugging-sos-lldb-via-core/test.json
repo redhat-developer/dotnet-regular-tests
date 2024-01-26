@@ -6,6 +6,9 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "ignoredRIDs": [
+     "linux-arm" // lldb sos relies on features not implemented on arm
+  ],
   "skipWhen": [
     "runtime=mono" // lldb sos relies on coreclr features
   ]
