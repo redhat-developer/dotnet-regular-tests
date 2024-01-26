@@ -6,6 +6,9 @@
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
+  "ignoredRIDs": [
+    "linux-arm" // pgo optimization not supported on arm
+  ],
   "skipWhen": [
     "runtime=mono"
   ]
