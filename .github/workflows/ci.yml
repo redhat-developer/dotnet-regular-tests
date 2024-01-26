@@ -34,8 +34,6 @@ jobs:
         exclude:
           - container_image: docker.io/library/alpine:latest
             dotnet_version: "8.0"
-          - container_image: docker.io/library/alpine:edge
-            dotnet_version: "8.0"
           - container_image: registry.fedoraproject.org/fedora:rawhide
             dotnet_version: "7.0"
 
@@ -55,7 +53,16 @@ jobs:
           if grep fedora /etc/os-release ; then
             dnf install -y dotnet-sdk-${{ matrix.dotnet_version }}
           elif grep alpine /etc/os-release; then
+            if grep edge /etc/os-release; then
+              echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+            fi
             apk add dotnet-sdk-${{ matrix.dotnet_version }} dotnet-doc
+            if [[ ! ${{ matrix.dotnet_version }} == *6* ]] && [[ ! ${{ matrix.dotnet_version }} == *7* ]]; then
+              apk add \
+                dotnet-sdk-dbg-${{ matrix.dotnet_version }} \
+                dotnet-runtime-dbg-${{ matrix.dotnet_version }} \
+                aspnetcore-runtime-dbg-${{ matrix.dotnet_version }}
+            fi
           fi
 
       - name: Install Test dependencies
@@ -64,7 +71,7 @@ jobs:
           if grep fedora /etc/os-release ; then
             dnf install -y python3 wget $(grep '^Dependencies(dnf): ' README.md | cut -d: -f2-) --skip-broken
           elif grep alpine /etc/os-release; then
-            apk add python3 wget $(grep '^Dependencies(apk): ' README.md | cut -d: -f2-)
+            apk add python3 wget curl $(grep '^Dependencies(apk): ' README.md | cut -d: -f2-)
             echo -e '[PostgreSQL]\nDescription=PostgreSQL Unicode\nDriver=/usr/lib/psqlodbcw.so\nUsageCount=1' > /etc/odbcinst.ini
           fi
 
