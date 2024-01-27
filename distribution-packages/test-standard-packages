@@ -5,6 +5,7 @@
 
 import argparse
 from collections import namedtuple
+from enum import Enum
 import pathlib
 import subprocess
 import sys
@@ -16,7 +17,28 @@ suggestions by scanning the local packages, or, optionally, in the
 local directory.
 '''
 
-PackageRequirement = namedtuple('PackageRequirement', ['name', 'version', 'another_version', 'dependencies', 'contains'])
+class SymbolsPresence(Enum):
+    NOT_ALLOWED = 1
+    ONLY_SYMBOLS_ALLOWED = 2
+
+class PackageRequirement:
+
+    def __init__(self, name: str, version: str,
+                 dependencies: List[str],
+                 contains: List[str],
+                 symbols: SymbolsPresence,
+                 another_version: bool = False,
+                 minimum_version_for_requirement: str = '1.0'):
+        self.name = name
+        self.version = version
+        self.dependencies = dependencies
+        self.contains = contains
+        self.symbols = symbols
+        self.another_version = another_version
+        self.minimum_version_for_requirement = minimum_version_for_requirement
+
+    def applies_to_dotnet_major_minor(self, major_dot_minor: str) -> bool:
+        return float(self.minimum_version_for_requirement) <= float(major_dot_minor)
 
 # This is a machine-readable version of the guidelines at
 # https://docs.microsoft.com/en-us/dotnet/core/build/distribution-packaging
@@ -40,7 +62,6 @@ PACKAGE_REQUIREMENTS = [
     PackageRequirement(
         name='dotnet-sdk-{major}.{minor}',
         version='{sdk_version}',
-        another_version=False,
         dependencies=[
             'dotnet-runtime-{major}.{minor}',
             'aspnetcore-runtime-{major}.{minor}',
@@ -51,33 +72,64 @@ PACKAGE_REQUIREMENTS = [
             'netstandard-targeting-pack-{netstandard_major}.{netstandard_minor}',
         ],
         contains=['/sdk/', '/sdk/{major}.{minor}'],
+        symbols=SymbolsPresence.NOT_ALLOWED,
+    ),
+    PackageRequirement(
+        name='dotnet-sdk-dbg-{major}.{minor}',
+        version='{sdk_version}',
+        dependencies=[
+            'dotnet-sdk-{major}.{minor}',
+        ],
+        contains=['/sdk/', '/sdk/{major}.{minor}'],
+        symbols=SymbolsPresence.ONLY_SYMBOLS_ALLOWED,
+        minimum_version_for_requirement='8.0',
     ),
     PackageRequirement(
         name='aspnetcore-runtime-{major}.{minor}',
         version='{aspnetcore_runtime_version}',
-        another_version=False,
         dependencies=[
             'dotnet-runtime-{major}.{minor}',
         ],
         contains=['/shared/', '/shared/Microsoft.AspNetCore.App/{major}.{minor}'],
+        symbols=SymbolsPresence.NOT_ALLOWED,
+    ),
+    PackageRequirement(
+        name='aspnetcore-runtime-dbg-{major}.{minor}',
+        version='{aspnetcore_runtime_version}',
+        dependencies=[
+            'aspnetcore-runtime-{major}.{minor}',
+        ],
+        contains=['/shared/', '/shared/Microsoft.AspNetCore.App/{major}.{minor}'],
+        symbols=SymbolsPresence.ONLY_SYMBOLS_ALLOWED,
+        minimum_version_for_requirement='8.0',
     ),
     PackageRequirement(
         name='dotnet-runtime-{major}.{minor}',
         version='{runtime_version}',
-        another_version=False,
         dependencies=[
             'dotnet-hostfxr-{major}.{minor}',
         ],
         contains=['/shared/', '/shared/Microsoft.NETCore.App/{major}.{minor}'],
+        symbols=SymbolsPresence.NOT_ALLOWED,
+    ),
+    PackageRequirement(
+        name='dotnet-runtime-dbg-{major}.{minor}',
+        version='{runtime_version}',
+        dependencies=[
+            'dotnet-runtime-{major}.{minor}',
+        ],
+        contains=['/shared/', '/shared/Microsoft.NETCore.App/{major}.{minor}'],
+        symbols=SymbolsPresence.ONLY_SYMBOLS_ALLOWED,
+        minimum_version_for_requirement='8.0',
     ),
     PackageRequirement(
         name='dotnet-hostfxr-{major}.{minor}',
         version='{runtime_version}',
-        another_version=False,
         dependencies=[
             'dotnet-host',
         ],
         contains=['/host/fxr/{major}.{minor}'],
+        symbols=SymbolsPresence.NOT_ALLOWED,
     ),
     PackageRequirement(
         name='dotnet-host',
@@ -92,27 +144,28 @@ PACKAGE_REQUIREMENTS = [
             '/usr/share/man/man1/dotnet.1.gz',
             '/etc/dotnet/install_location'
         ],
+        symbols=SymbolsPresence.NOT_ALLOWED,
     ),
     PackageRequirement(
         name='dotnet-apphost-pack-{major}.{minor}',
         version='{runtime_version}',
-        another_version=False,
         dependencies=[],
         contains=['/packs/Microsoft.NETCore.App.Host.{rid}/{major}.{minor}'],
+        symbols=SymbolsPresence.NOT_ALLOWED,
     ),
     PackageRequirement(
         name='dotnet-targeting-pack-{major}.{minor}',
         version='{runtime_version}',
-        another_version=False,
         dependencies=[],
         contains=['/packs/Microsoft.NETCore.App.Ref/{major}.{minor}'],
+        symbols=SymbolsPresence.NOT_ALLOWED,
     ),
     PackageRequirement(
         name='aspnetcore-targeting-pack-{major}.{minor}',
         version='{aspnetcore_runtime_version}',
-        another_version=False,
         dependencies=[],
         contains=['/packs/Microsoft.AspNetCore.App.Ref/{major}.{minor}'],
+        symbols=SymbolsPresence.NOT_ALLOWED,
     ),
     PackageRequirement(
         name='netstandard-targeting-pack-{netstandard_major}.{netstandard_minor}',
@@ -120,13 +173,14 @@ PACKAGE_REQUIREMENTS = [
         another_version=True,
         dependencies=[],
         contains=['/packs/NETStandard.Library.Ref/{netstandard_major}.{netstandard_minor}'],
+        symbols=SymbolsPresence.NOT_ALLOWED,
     ),
     PackageRequirement(
         name='dotnet-templates-{major}.{minor}',
         version='{sdk_version}',
-        another_version=False,
         dependencies=[],
         contains=['/templates/{major}.{minor}'],
+        symbols=SymbolsPresence.NOT_ALLOWED,
     ),
 ]
 
@@ -283,10 +337,13 @@ def check_packages(package_source: PackageSource, package_prefix: str, runtime_i
                    sdk_version: str, netstandard_version: str) -> bool:
     okay = True
 
+    major = runtime_version.split('.')[0]
+    minor = runtime_version.split('.')[1]
+
     format_dict = {
         'rid': runtime_id,
-        'major': runtime_version.split('.')[0],
-        'minor': runtime_version.split('.')[1],
+        'major': major,
+        'minor': minor,
         'runtime_version': runtime_version,
         'aspnetcore_runtime_version': aspnetcore_runtime_version,
         'sdk_version': sdk_version,
@@ -302,6 +359,10 @@ def check_packages(package_source: PackageSource, package_prefix: str, runtime_i
         known_packages[package_name] = package_version
 
     for requirement in PACKAGE_REQUIREMENTS:
+
+        if not requirement.applies_to_dotnet_major_minor(f'{major}.{minor}'):
+            continue
+
         package_name = package_prefix + requirement.name.format(**format_dict)
         package = package_source.find_package(package_name)
 
@@ -323,7 +384,10 @@ def check_packages(package_source: PackageSource, package_prefix: str, runtime_i
         issues += check_package_dependencies(package_source, package_name, runtime_id, known_packages, resolved_deps)
 
         contains = [path.format(**format_dict) for path in requirement.contains]
-        issues += check_package_contents(package_source, package_name, runtime_id, contains)
+
+        symbols = requirement.symbols
+
+        issues += check_package_contents(package_source, package_name, runtime_id, contains, symbols)
 
         if not issues:
             print(f'✓ {package_name} ')
@@ -383,8 +447,8 @@ def check_package_dependencies(package_source: PackageSource, package_name: str,
 
 
 def check_package_contents(package_source: PackageSource, package_name: str, runtime_id: str,
-                           expected_contents: List[str]) -> List[str]:
-    package_files = package_source.rpm_query(package_name, ['-l']).split('\n')
+                           expected_contents: List[str], symbols: SymbolsPresence) -> List[str]:
+    package_files = package_source.rpm_query(package_name, ['-l']).strip().split('\n')
     issues: List[str] = []
     for expected in expected_contents:
         found = False
@@ -394,6 +458,12 @@ def check_package_contents(package_source: PackageSource, package_name: str, run
                 break
         if not found:
             issues += [f'package {package_name} is missing the file {expected}']
+
+    for file in package_files:
+        if file.endswith('.pdb') and symbols == SymbolsPresence.NOT_ALLOWED:
+            issues += [f'package {package_name} is includes a symbol file {file}.']
+        if symbols == SymbolsPresence.ONLY_SYMBOLS_ALLOWED and not file.endswith('.pdb'):
+            issues += [f'package {package_name} is includes non-symbol file {file}.']
 
     return issues
 
