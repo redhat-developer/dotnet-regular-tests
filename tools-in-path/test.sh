@@ -19,7 +19,7 @@ else
     exit 1
 fi
 
-IFS='.-' read -ra VERSION_SPLIT <<< "$1" 
-dotnet tool update -g dotnet-ef --version "${VERSION_SPLIT[0]}.*-*"
+framework_dir=$(../dotnet-directory --framework "$1")
+dotnet tool update -g dotnet-ef --version "${framework_dir#*App/}.*-*"
 
 dotnet ef --version
