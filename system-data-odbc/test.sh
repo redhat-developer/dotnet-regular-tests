@@ -29,7 +29,7 @@ export PGDATA
 export PGHOST=localhost
 export PGPORT=$((1024 + $RANDOM ))
 
-PGSOCKET="$(pwd)/socket"
+PGSOCKET="$(mktemp -d)/socket"
 
 rm -rf "$PGDATA" "$PGSOCKET"
 mkdir -p "$PGDATA" "$PGSOCKET"
