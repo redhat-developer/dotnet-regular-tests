@@ -19,7 +19,8 @@ local directory.
 
 class SymbolsPresence(Enum):
     NOT_ALLOWED = 1
-    ONLY_SYMBOLS_ALLOWED = 2
+    NOT_ALLOWED_EXCEPT_LEGACY = 2
+    ONLY_SYMBOLS_ALLOWED = 3
 
 class PackageRequirement:
 
@@ -72,7 +73,7 @@ PACKAGE_REQUIREMENTS = [
             'netstandard-targeting-pack-{netstandard_major}.{netstandard_minor}',
         ],
         contains=['/sdk/', '/sdk/{major}.{minor}'],
-        symbols=SymbolsPresence.NOT_ALLOWED,
+        symbols=SymbolsPresence.NOT_ALLOWED_EXCEPT_LEGACY,
     ),
     PackageRequirement(
         name='dotnet-sdk-dbg-{major}.{minor}',
@@ -339,6 +340,7 @@ def check_packages(package_source: PackageSource, package_prefix: str, runtime_i
 
     major = runtime_version.split('.')[0]
     minor = runtime_version.split('.')[1]
+    major_minor = f'{major}.{minor}'
 
     format_dict = {
         'rid': runtime_id,
@@ -360,7 +362,7 @@ def check_packages(package_source: PackageSource, package_prefix: str, runtime_i
 
     for requirement in PACKAGE_REQUIREMENTS:
 
-        if not requirement.applies_to_dotnet_major_minor(f'{major}.{minor}'):
+        if not requirement.applies_to_dotnet_major_minor(major_minor):
             continue
 
         package_name = package_prefix + requirement.name.format(**format_dict)
@@ -387,7 +389,7 @@ def check_packages(package_source: PackageSource, package_prefix: str, runtime_i
 
         symbols = requirement.symbols
 
-        issues += check_package_contents(package_source, package_name, runtime_id, contains, symbols)
+        issues += check_package_contents(package_source, package_name, runtime_id, int(major), contains, symbols)
 
         if not issues:
             print(f'✓ {package_name} ')
@@ -447,6 +449,7 @@ def check_package_dependencies(package_source: PackageSource, package_name: str,
 
 
 def check_package_contents(package_source: PackageSource, package_name: str, runtime_id: str,
+                           major: int,
                            expected_contents: List[str], symbols: SymbolsPresence) -> List[str]:
     package_files = package_source.rpm_query(package_name, ['-l']).strip().split('\n')
     issues: List[str] = []
@@ -460,6 +463,8 @@ def check_package_contents(package_source: PackageSource, package_name: str, run
             issues += [f'package {package_name} is missing the file {expected}']
 
     for file in package_files:
+        if file.endswith('.pdb') and symbols == SymbolsPresence.NOT_ALLOWED_EXCEPT_LEGACY and major >= 8:
+            issues += [f'package {package_name} is includes a symbol file {file}.']
         if file.endswith('.pdb') and symbols == SymbolsPresence.NOT_ALLOWED:
             issues += [f'package {package_name} is includes a symbol file {file}.']
         if symbols == SymbolsPresence.ONLY_SYMBOLS_ALLOWED and not file.endswith('.pdb'):
