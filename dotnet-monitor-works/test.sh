@@ -10,16 +10,13 @@ dotnet tool update -g dotnet-monitor --version "${VERSION_SPLIT[0]}.*-*"
 export PATH="$HOME/.dotnet/tools:$PATH"
 
 dotnet-monitor collect --no-auth &
-sleep 5
-indexhttps=$(wget --no-check-certificate -O https.html https://127.0.0.1:52323/info)
+../run-until-success-with-backoff wget --no-check-certificate -O https.html https://127.0.0.1:52323/info
 
 https=$(cat https.html)
 
 if [[ $https == *"version"* ]]; then
-   sleep 5
    echo "collect - OK"
 else
-   sleep 5
    pkill dotnet-monitor
    rm "https.html"
    echo "collect - FAIL"
