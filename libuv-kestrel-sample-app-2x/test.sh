@@ -9,9 +9,7 @@ dotnet build
 dotnet bin/Debug/netcoreapp*/libuv-kestrel-sample-app-2x.dll &
 root_pid=$!
 
-sleep 5
-
-curl "http://localhost:5000"
+../run-until-success-with-backoff curl "http://localhost:5000"
 
 kill -s SIGTERM "${root_pid}"
 sleep 1

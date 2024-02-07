@@ -28,9 +28,8 @@ ASPNETCORE_URLS="$url" "./$output_dir/web" &
 run_pid=$!
 trap "kill $run_pid && wait $run_pid" EXIT
 
-sleep 5
 
-if ! curl "$url"; then
+if ! ../run-until-success-with-backoff curl "$url" ; then
   echo 'FAIL: ASP.NET app failed to respond'
   exit 2
 fi

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -euo pipefail
+
+echo "Running with backoff:" "$@"
+
+max_retries=10
+
+iterations=0
+total_slept=0 # seconds
+
+sleep $((iterations + 1))
+((total_slept += iterations + 1))
+
+until "$@"; do
+    ((iterations += 1))
+    if (( total_slept > 10 )); then
+        echo "$@" "still failing after more than ${total_slept} seconds"
+    fi
+    if (( iterations == max_retries )); then
+        echo "$@" "still failing after $max_retries retries"
+        exit 1
+    fi
+    sleep $iterations
+    ((total_slept += iterations))
+done
