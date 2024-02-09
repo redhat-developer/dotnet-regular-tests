@@ -23,7 +23,13 @@ jobs:
           - quay.io/centos/centos:stream8
           - quay.io/centos/centos:stream9
           - registry.fedoraproject.org/fedora:38
+          - registry.fedoraproject.org/fedora:38-aarch64
+          - registry.fedoraproject.org/fedora:38-s390x
+          - registry.fedoraproject.org/fedora:38-ppc64le
           - registry.fedoraproject.org/fedora:39
+          - registry.fedoraproject.org/fedora:39-aarch64
+          - registry.fedoraproject.org/fedora:39-s390x
+          - registry.fedoraproject.org/fedora:39-ppc64le
           - registry.fedoraproject.org/fedora:rawhide
           - registry.access.redhat.com/ubi8
           - registry.access.redhat.com/ubi9
