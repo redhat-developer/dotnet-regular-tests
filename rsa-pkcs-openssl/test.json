@@ -7,7 +7,7 @@
   "type": "bash",
   "cleanup": true,
   "skipWhen": [
-    "vmr-ci,version=9", // upstream main branch opts out of the OpenSSL change.
+    "vmr-ci",           // upstream opts out of the OpenSSL change.
     "os=rhel.7",        // RHEL 7 is not getting OpenSSL changes.
     "os=alpine"         // test validates behavior for Fedora/RHEL.
   ],
