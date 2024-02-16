@@ -14,46 +14,43 @@ namespace ReleaseVersionSane
         [Fact]
         public async Task VersionIsSane()
         {
-            var upstream = new UpstreamRelease();
-            var currentRuntimeVersion = GetRuntimeVersion();
-            var currentSdkVersion = GetSdkVersion();
+            // This test is meant for release pipelines and verifies the version being built
+            // either matches the upstream 'major.minor.patch' or 'major.minor.(patch + 1)'.
 
-            string majorMinor = $"{currentRuntimeVersion.Major}.{currentRuntimeVersion.Minor}";
+            string runtimeVersionRaw = GetRuntimeVersion();
+            string sdkVersionRaw = GetSdkVersion();
+            Version runtimeVersion = Normalize(runtimeVersionRaw);
+            Version sdkVersion = Normalize(sdkVersionRaw);
+
+            string majorMinor = $"{runtimeVersion.Major}.{runtimeVersion.Minor}";
+            var upstream = new UpstreamRelease();
             (List<string> publicSdkVersionsRaw, string publicRuntimeVersionRaw) = await upstream.GetLatestRelease(new HttpClient(), majorMinor);
             List<Version> publicSdkVersions = publicSdkVersionsRaw.Select(v => Normalize(v)).ToList();
             Version publicRuntimeVersion = Normalize(publicRuntimeVersionRaw);
 
-            bool currentVersionNewerThanPublic = false;
-            if ((publicRuntimeVersion != currentRuntimeVersion) && (currentRuntimeVersion.Build > 0))
+            Version publicRuntimeVersionNextPatch = new Version(publicRuntimeVersion.Major,
+                                                                publicRuntimeVersion.Minor,
+                                                                publicRuntimeVersion.Build + 1);
+            bool matchesUpstream = runtimeVersion.Equals(publicRuntimeVersion);
+            bool matchesUpstreamNext = runtimeVersion.Equals(publicRuntimeVersionNextPatch);
+            Version expectedPublicSdkVersion = null;
+            if (matchesUpstream)
             {
-                currentRuntimeVersion = new Version(currentRuntimeVersion.Major,
-                                                    currentRuntimeVersion.Minor,
-                                                    currentRuntimeVersion.Build - 1);
-                Assert.Equal(currentRuntimeVersion, publicRuntimeVersion);
-                currentVersionNewerThanPublic = true;
+                expectedPublicSdkVersion = sdkVersion;
+            }
+            else if (matchesUpstreamNext)
+            {
+                expectedPublicSdkVersion = new Version(sdkVersion.Major,
+                                                       sdkVersion.Minor,
+                                                       sdkVersion.Build - 1);
             }
 
-            if (currentVersionNewerThanPublic)
-            {
-                currentSdkVersion = new Version(currentSdkVersion.Major,
-                                                currentSdkVersion.Minor,
-                                                currentSdkVersion.Build - 1);
-            }
-
-            bool sdkMatched = false;
-            foreach (var sdk in publicSdkVersions)
-            {
-                if (sdk == currentSdkVersion)
-                {
-                    sdkMatched = true;
-                    break;
-                }
-            }
-
-            Assert.True(sdkMatched);
+            Assert.True(matchesUpstream || matchesUpstreamNext, $"{runtimeVersionRaw} is not expected with public version {publicRuntimeVersionRaw}");
+            Assert.NotNull(expectedPublicSdkVersion);
+            Assert.Contains(expectedPublicSdkVersion, publicSdkVersions);
         }
 
-        private Version GetRuntimeVersion()
+        private string GetRuntimeVersion()
         {
             int exitCode = RunProcessAndGetOutput(new string[] { "dotnet" , "--list-runtimes" }, out string result);
             if (exitCode != 0)
@@ -61,15 +58,13 @@ namespace ReleaseVersionSane
                 return null;
             }
 
-            return Normalize(result
-                             .Split(Environment.NewLine)
-                             .Where(line => line.StartsWith("Microsoft.NETCore.App "))
-                             .Select(line => line.Split(' ')[1])
-                             .First());
-
+            return result.Split(Environment.NewLine)
+                         .Where(line => line.StartsWith("Microsoft.NETCore.App "))
+                         .Select(line => line.Split(' ')[1])
+                         .First();
         }
 
-        private Version GetSdkVersion()
+        private string GetSdkVersion()
         {
             int exitCode = RunProcessAndGetOutput(new string[] { "dotnet" , "--list-sdks" }, out string result);
             if (exitCode != 0)
@@ -77,11 +72,10 @@ namespace ReleaseVersionSane
                 return null;
             }
 
-            return Normalize(result
-                             .Split(Environment.NewLine)
-                             .Select(line => line.Split(' ')[0])
-                             .First());
-
+            return result
+                    .Split(Environment.NewLine)
+                    .Select(line => line.Split(' ')[0])
+                    .First();
         }
 
 
