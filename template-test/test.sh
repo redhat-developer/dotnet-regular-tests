@@ -11,6 +11,49 @@ set -x
 # If additional templates are found via `dotnet new --list`, this test
 # will fail unless they are added here.
 
+dotnet9Templates=(
+    apicontroller
+    blazor
+    blazorwasm
+    buildprops
+    buildtargets
+    classlib
+    console
+    editorconfig
+    .editorconfig
+    gitignore
+    .gitignore
+    global.json
+    globaljson
+    grpc
+    mstest
+    mvc
+    mvccontroller
+    nuget.config
+    nugetconfig
+    nunit
+    nunit-test
+    packagesprops
+    page
+    proto
+    razor
+    razorclasslib
+    razorcomponent
+    sln
+    solution
+    tool-manifest
+    view
+    viewimports
+    viewstart
+    web
+    webapi
+    webapiaot
+    webapp
+    webconfig
+    worker
+    xunit
+)
+
 dotnet8Templates=(
     apicontroller
     blazor
@@ -258,15 +301,10 @@ done
 
 IFS='.-' read -ra VERSION_SPLIT <<< "$1"
 declare -a allTemplates
-if [[ ${VERSION_SPLIT[0]} == "8" ]]; then
-    allTemplates=( "${dotnet8Templates[@]}" )
-elif [[ ${VERSION_SPLIT[0]} == "7" ]]; then
-    allTemplates=( "${dotnet7Templates[@]}" )
-elif [[ ${VERSION_SPLIT[0]} == "6" ]]; then
-    allTemplates=( "${dotnet6Templates[@]}" )
-elif [[ ${VERSION_SPLIT[0]} == "3" ]]; then
-    allTemplates=( "${dotnet3Templates[@]}" )
-else
+major_version="${VERSION_SPLIT[0]}"
+template_names="dotnet${major_version}Templates[@]"
+allTemplates=( "${!template_names}" )
+if [[ -z "$allTemplates" ]] ; then
     echo "error: unknown dotnet version " "${VERSION_SPLIT[@]}"
     echo "Need a new template list for this. Here's a starting point:"
     echo "${filteredAutoTemplates[@]}"

@@ -5,7 +5,7 @@ IFS=$'\n\t'
 set -x
 
 sdk_version="$(dotnet --version)"
-runtime_version="$(dotnet --list-runtimes | head -1 | awk '{ print $2 }')"
+runtime_version="$(dotnet --list-runtimes | grep Microsoft.NETCore.App | awk '{ print $2 }')"
 runtime_id=$(../runtime-id)
 # This might be the final/only netstandard version from now on
 netstandard_version=2.1
