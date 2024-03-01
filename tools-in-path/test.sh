@@ -20,6 +20,6 @@ else
 fi
 
 framework_dir=$(../dotnet-directory --framework "$1")
-dotnet tool update -g dotnet-ef --version "${framework_dir#*App/}.*-*"
+dotnet tool update -g dotnet-ef --version "${framework_dir#*App/}.*"
 
 dotnet ef --version

@@ -325,11 +325,8 @@ def main() -> int:
 
 def to_package_version(version: str) -> str:
     if '-preview.' or '-rc.' in version:
-        # Convert upstream version 11.2.3-preview.999.1234 to RPM-style 11.2.3~preview.999
-        parts = version.split('-')
-        if len(parts) == 2:
-            release_prefix = '.'.join(parts[1].split('.')[0:2])
-            return parts[0] + '~' + release_prefix
+        # Convert upstream version 11.2.3-preview.999.1234 to RPM-style 11.2.3~preview.999.1234
+        return version.replace('-', '~')
     return version
 
 
