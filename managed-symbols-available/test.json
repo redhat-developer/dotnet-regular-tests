@@ -9,7 +9,7 @@
   "skipWhen": [
     "vmr-ci,version=6", // unpacking symbols is a hassle
     "vmr-ci,version=7",
-    "non-rpm"
+    "non-packaged",
   ],
   "ignoredRIDs":[
   ]
