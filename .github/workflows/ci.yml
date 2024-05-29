@@ -22,7 +22,6 @@ jobs:
           - docker.io/library/alpine:edge
           - quay.io/centos/centos:stream8
           - quay.io/centos/centos:stream9
-          - registry.fedoraproject.org/fedora:38
           - registry.fedoraproject.org/fedora:39
           - registry.fedoraproject.org/fedora:40
           - registry.fedoraproject.org/fedora:rawhide
@@ -30,17 +29,10 @@ jobs:
           - registry.access.redhat.com/ubi9
         dotnet_version:
           - "6.0"
-          - "7.0"
           - "8.0"
         exclude:
-          - container_image: docker.io/library/alpine:edge
-            dotnet_version: "7.0"
           - container_image: docker.io/library/alpine:latest
             dotnet_version: "8.0"
-          - container_image: registry.fedoraproject.org/fedora:40
-            dotnet_version: "7.0"
-          - container_image: registry.fedoraproject.org/fedora:rawhide
-            dotnet_version: "7.0"
 
     container:
       image: ${{ matrix.container_image }}
@@ -57,7 +49,7 @@ jobs:
           cat /etc/os-release
           if grep fedora /etc/os-release ; then
             dnf install -y dotnet-sdk-${{ matrix.dotnet_version }}
-            if [[ ! ${{ matrix.dotnet_version }} == *6* ]] && [[ ! ${{ matrix.dotnet_version }} == *7* ]]; then
+            if [[ ! ${{ matrix.dotnet_version }} == *6* ]]; then
               dnf install -y \
                 dotnet-sdk-dbg-${{ matrix.dotnet_version }} \
                 dotnet-runtime-dbg-${{ matrix.dotnet_version }} \
@@ -68,7 +60,7 @@ jobs:
               echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
             fi
             apk add dotnet-sdk-${{ matrix.dotnet_version }} dotnet-doc
-            if [[ ! ${{ matrix.dotnet_version }} == *6* ]] && [[ ! ${{ matrix.dotnet_version }} == *7* ]]; then
+            if [[ ! ${{ matrix.dotnet_version }} == *6* ]]; then
               apk add \
                 dotnet-sdk-dbg-${{ matrix.dotnet_version }} \
                 dotnet-runtime-dbg-${{ matrix.dotnet_version }} \
