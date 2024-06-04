@@ -7,8 +7,6 @@
     "type": "bash",
     "cleanup": true,
     "skipWhen": [
-      "os=rhel.9,version=7", // Test fails on RHEL9 with .NET 7: https://issues.redhat.com/browse/RHEL-25254
-      "os=centos.9,version=7", // Test fails on RHEL9 with .NET 7: https://issues.redhat.com/browse/RHEL-25254
     ],
     "ignoredRIDs":[
     ]
