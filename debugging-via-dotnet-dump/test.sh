@@ -319,17 +319,15 @@ grep 'Attributes: *PEFile' dump.out
 grep 'MetaData start address: *0' dump.out
 
 
-# FIXME: dumpmt seems to work on 7.0.1 but not 7.0.0?
-# heading "dumpmt"
-# dump-analyze 'name2ee *!System.String' > dump.out
-# cat dump.out
-# grep 'MethodTable:' dump.out | awk '{print $2}'
-# string_method_table=$(grep 'MethodTable:' dump.out | awk '{print $2}')
-# dump-analyze "dumpmt ${string_method_table}" > dump.out
-# cat dump.out
-# grep -E '^Name:[ \n\t]+System.String' dump.out
-# grep -E "^File:[ \n\t]+${framework_dir}" dump.out
-
+heading "dumpmt"
+dump-analyze 'name2ee *!System.String' > dump.out
+cat dump.out
+grep 'MethodTable:' dump.out | awk '{print $2}'
+string_method_table=$(grep 'MethodTable:' dump.out | awk '{print $2}')
+dump-analyze "dumpmt ${string_method_table}" > dump.out
+cat dump.out
+grep -E '^Name:[ \n\t]+System.String' dump.out
+grep -E "^File:[ \n\t]+${framework_dir}" dump.out
 
 heading "dumpobj"
 dump-analyze 'dumpstackobjects' > dump.out

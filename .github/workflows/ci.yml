@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install .NET ${{ matrix.dotnet_version }}
-        timeout-minutes: 5
+        timeout-minutes: 10
         run: |
           set -euo pipefail
           cat /etc/os-release
@@ -65,7 +65,7 @@ jobs:
           fi
 
       - name: Install Test dependencies
-        timeout-minutes: 2
+        timeout-minutes: 5
         run: |
           if grep fedora /etc/os-release ; then
             dnf install -y python3 wget $(grep '^Dependencies(dnf): ' README.md | cut -d: -f2-) --skip-broken
