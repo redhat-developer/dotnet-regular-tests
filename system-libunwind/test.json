@@ -14,9 +14,11 @@
   "ignoredRIDs":[
     "centos.8",
     "centos.9",
+    "centos.10",
     "linux-arm",
     "linux-arm64",
     "rhel.8",
-    "rhel.9"
+    "rhel.9",
+    "rhel.10",
   ]
 }
