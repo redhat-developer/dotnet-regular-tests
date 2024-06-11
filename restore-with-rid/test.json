@@ -8,6 +8,7 @@
   "cleanup": true,
   "skipWhen":[
     "version=6,arch=s390x", // no runtime pack available
+    "non-packaged",
   ],
   "ignoredRIDs":[
   ]
