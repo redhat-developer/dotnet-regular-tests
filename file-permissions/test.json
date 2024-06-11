@@ -7,7 +7,8 @@
   "type": "bash",
   "cleanup": true,
   "skipWhen": [
-    "vmr-ci" // not packaged (tar.gz build)
+    "vmr-ci", // not packaged (tar.gz build)
+    "non-packaged",
   ],
   "ignoredRIDs":[
 

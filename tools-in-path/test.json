@@ -6,7 +6,8 @@
   "type": "bash",
   "cleanup": true,
   "skipWhen": [
-    "vmr-ci" // tools PATH not configured (tar.gz build)
+    "vmr-ci", // tools PATH not configured (tar.gz build)
+    "non-packaged",
   ],
   "ignoredRIDs": [
   ]
