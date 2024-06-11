@@ -7,7 +7,7 @@
     "type": "bash",
     "cleanup": true,
     "skipWhen": [
-      "non-packaged",
+      "non-packaged", // skip during cross-bld-sdk/tarball validation
     ],
     "ignoredRIDs":[
     ]

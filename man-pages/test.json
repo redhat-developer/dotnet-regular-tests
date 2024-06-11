@@ -8,7 +8,7 @@
   "cleanup": true,
   "skipWhen": [
     "vmr-ci", // man page not installed
-    "non-packaged",
+    "non-packaged", // skip during cross-bld-sdk/tarball validation
   ],
   "ignoredRIDs":[
   ]
