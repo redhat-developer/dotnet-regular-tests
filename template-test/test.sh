@@ -26,6 +26,8 @@ dotnet9Templates=(
     global.json
     globaljson
     grpc
+    mstest-playwright
+    mstest-class
     mstest
     mvc
     mvccontroller
@@ -33,6 +35,7 @@ dotnet9Templates=(
     nugetconfig
     nunit
     nunit-test
+    nunit-playwright
     packagesprops
     page
     proto
