@@ -7,7 +7,7 @@
     "type": "bash",
     "cleanup": true,
     "skipWhen": [
-      "non-packaged", // skip during cross-bld-sdk/tarball validation
+      "vmr-ci", // skip during cross-bld-sdk/tarball validation
     ],
     "ignoredRIDs":[
     ]

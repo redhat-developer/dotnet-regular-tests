@@ -10,7 +10,6 @@
     "vmr-ci",           // upstream opts out of the OpenSSL change.
     "os=rhel.7",        // RHEL 7 is not getting OpenSSL changes.
     "os=alpine",         // test validates behavior for Fedora/RHEL.
-    "non-packaged",  // skip during cross-bld-sdk/tarball validation
   ],
   "ignoredRIDs":[
   ]
