@@ -8,7 +8,7 @@
   "cleanup": true,
   "skipWhen":[
     "version=6,arch=s390x", // no runtime pack available
-    "non-packaged", // skip during cross-bld-sdk/tarball validation
+    "portable", // skip during cross-bld-sdk/tarball validation
   ],
   "ignoredRIDs":[
   ]

@@ -8,7 +8,6 @@
   "cleanup": true,
   "skipWhen": [
     "vmr-ci", // not packaged (tar.gz build)
-    "non-packaged", // skip during cross-bld-sdk/tarball validation
   ],
   "ignoredRIDs":[
 
