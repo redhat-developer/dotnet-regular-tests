@@ -20,6 +20,12 @@ else
 fi
 
 framework_dir=$(../dotnet-directory --framework "$1")
-dotnet tool update -g dotnet-ef --version "${framework_dir#*App/}.*"
+runtime_version=${framework_dir#*App/}
+if [[ $runtime_version = *preview* ]] || [[ $runtime_version = *rc* ]]; then
+    # delete the last digit (which is the build version)
+    runtime_version=$(echo $runtime_version | sed -E 's|.[[:digit:]]+$||')
+fi
+tool_version="$runtime_version.*"
+dotnet tool update -g dotnet-ef --version "$tool_version"
 
 dotnet ef --version

@@ -29,6 +29,9 @@ jobs:
         dotnet_version:
           - "6.0"
           - "8.0"
+        include:
+          - container_image: registry.fedoraproject.org/fedora:40
+            dotnet_version: "9.0"
 
     container:
       image: ${{ matrix.container_image }}
@@ -44,6 +47,10 @@ jobs:
           set -euo pipefail
           cat /etc/os-release
           if grep fedora /etc/os-release ; then
+            if [[ ${{ matrix.dotnet_version }} == 9.* ]]; then
+              dnf install 'dnf-command(copr)' -y
+              dnf copr enable @dotnet-sig/dotnet-preview -y
+            fi
             dnf install -y dotnet-sdk-${{ matrix.dotnet_version }}
             if [[ ! ${{ matrix.dotnet_version }} == *6* ]]; then
               dnf install -y \
