@@ -14,7 +14,7 @@ cat > nuget.config <<EOF
 </configuration>
 EOF
 
-runtime_id="$(../runtime-id)"
+runtime_id="$(../runtime-id --sdk)"
 
 dir=console
 output_dir=output
