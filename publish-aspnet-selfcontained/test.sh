@@ -14,7 +14,7 @@ cat > nuget.config <<EOF
 </configuration>
 EOF
 
-runtime_id="$(../runtime-id)"
+runtime_id="$(../runtime-id --sdk)"
 
 url="http://localhost:5000"
 
