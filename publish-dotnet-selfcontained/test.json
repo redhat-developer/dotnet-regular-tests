@@ -5,9 +5,6 @@
   "version": "8.0",
   "versionSpecific": false,
   "type": "bash",
-  "cleanup": true,
-  "skipWhen": [
-    "portable", // skip during cross-bld-sdk/tarball validation
-  ],
+  "cleanup": true
 }
 
