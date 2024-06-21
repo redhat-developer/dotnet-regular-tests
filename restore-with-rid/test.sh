@@ -5,4 +5,4 @@ IFS=$'\n\t'
 set -x
 
 dotnet new console --no-restore
-dotnet restore -r "$(../runtime-id)"
+dotnet restore -r "$(../runtime-id --sdk)"
