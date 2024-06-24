@@ -29,6 +29,9 @@ jobs:
         dotnet_version:
           - "6.0"
           - "8.0"
+        exclude:
+          - container_image: registry.fedoraproject.org/fedora:rawhide
+            dotnet_version: "6.0"
         include:
           - container_image: registry.fedoraproject.org/fedora:40
             dotnet_version: "9.0"
