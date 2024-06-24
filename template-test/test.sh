@@ -30,7 +30,6 @@ dotnet9Templates=(
     global.json
     globaljson
     grpc
-    mstest-playwright
     mstest-class
     mstest
     mvc
@@ -39,7 +38,6 @@ dotnet9Templates=(
     nugetconfig
     nunit
     nunit-test
-    nunit-playwright
     packagesprops
     page
     proto
@@ -77,7 +75,6 @@ dotnet8Templates=(
     global.json
     grpc
     mstest
-    mstest-playwright
     mvc
     mvccontroller
     nugetconfig
@@ -310,6 +307,7 @@ if [[ "${#allAutoTemplates[@]}" -lt 10 ]]; then
     exit 1
 fi
 
+set +x
 filteredAutoTemplates=()
 for template in "${allAutoTemplates[@]}"; do
     ignore=0
@@ -322,6 +320,7 @@ for template in "${allAutoTemplates[@]}"; do
         filteredAutoTemplates+=("$template")
     fi
 done
+set -x
 
 template_names="dotnet${major_version}Templates[@]"
 allTemplates=( "${!template_names}" )
@@ -332,6 +331,7 @@ if [[ -z "$allTemplates" ]] ; then
     exit 1
 fi
 
+set +x
 for autoTemplate in "${filteredAutoTemplates[@]}"; do
     found=0
     for explicitTemplate in "${allTemplates[@]}"; do
@@ -348,6 +348,7 @@ for autoTemplate in "${filteredAutoTemplates[@]}"; do
 
     fi
 done
+set -x
 
 echo "Auto-detected templates:" "${allAutoTemplates[@]}"
 echo "Ignoring:" "${templateIgnoreList[@]}"
