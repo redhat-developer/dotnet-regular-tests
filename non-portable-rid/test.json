@@ -1,0 +1,12 @@
+{
+  "name": "non-portable-rid",
+  "enabled": true,
+  "requiresSdk": true,
+  "version": "6.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "skipWhen":[
+    "portable", // this test only tests non-portable SDKs
+  ]
+}

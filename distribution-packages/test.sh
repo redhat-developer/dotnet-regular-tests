@@ -7,7 +7,7 @@ set -x
 sdk_version="$(dotnet --version)"
 runtime_version="$(dotnet --list-runtimes | grep Microsoft.NETCore.App | awk '{ print $2 }')"
 aspnetcore_runtime_version="$(dotnet --list-runtimes | grep Microsoft.AspNetCore.App | awk '{ print $2 }')"
-runtime_id=$(../runtime-id)
+runtime_id=$(../runtime-id --sdk)
 # This might be the final/only netstandard version from now on
 netstandard_version=2.1
 
