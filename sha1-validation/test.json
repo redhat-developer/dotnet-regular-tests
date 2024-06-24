@@ -7,7 +7,7 @@
     "type": "bash",
     "cleanup": true,
     "skipWhen": [
-      "vmr-ci", // skip during cross-bld-sdk/tarball validation
+      "vmr-ci", // relies on RHEL/Fedora specific patches
     ],
     "ignoredRIDs":[
     ]

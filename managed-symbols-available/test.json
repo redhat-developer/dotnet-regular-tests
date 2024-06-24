@@ -8,7 +8,7 @@
   "cleanup": true,
   "skipWhen": [
     "vmr-ci,version=6", // unpacking symbols is a hassle
-    "no-symbols",  //skip during cross-bld-sdk/tarball validation
+    "no-symbols",  // standard VMR builds don't include symbols, it's an extra/manual step
   ],
   "ignoredRIDs":[
   ]

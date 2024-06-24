@@ -7,7 +7,7 @@
   "type": "bash",
   "cleanup": true,
   "skipWhen": [
-    "portable", // skip during cross-bld-sdk/tarball validation
+    "portable", // portable dlopen()s system openssl
   ],
   "ignoredRIDs":[
   ]
