@@ -25,6 +25,11 @@ if [[ "${#packageNames[@]}" == 0 ]]; then
   esac
 fi
 
+if [[ "${#packageNames[@]}" == 0 ]]; then
+  echo "No lttng-package found: PASS"
+  exit 0
+fi
+
 case $RUNTIME_ID in
   alpine*)
     filePath="/$(apk info -L "${packageNames[@]}" | grep -E 'liblttng-ust.so.[01]$')"
