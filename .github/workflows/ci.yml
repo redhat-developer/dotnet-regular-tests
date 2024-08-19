@@ -53,6 +53,7 @@ jobs:
             if [[ ${{ matrix.dotnet_version }} == 9.* ]]; then
               dnf install 'dnf-command(copr)' -y
               dnf copr enable @dotnet-sig/dotnet-preview -y
+              dnf install -y dotnet-sdk-aot-${{ matrix.dotnet_version }}
             fi
             dnf install -y dotnet-sdk-${{ matrix.dotnet_version }}
             if [[ ! ${{ matrix.dotnet_version }} == *6* ]]; then
