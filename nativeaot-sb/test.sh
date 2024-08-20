@@ -6,6 +6,10 @@ set -x
 
 RID_ARG="/p:RuntimeIdentifier=$(../runtime-id --sdk)"
 
+# Depending on the code used by the program, different native libraries are needed.
+# We compile different programs to test if those native libraries are found.
+# Some native libraries (like libunwind and rapidjson) are always needed. Consequently, each program check those.
+
 for DEPENDENCY in NO_DEPS DEP_CRYPTO DEP_ZLIB DEP_BROTLI
 do
     echo "Testing NativeAOT with $DEPENDENCY"
