@@ -1,0 +1,12 @@
+{
+  "name": "nativeaot-sb",
+  "enabled": true,
+  "requiresSdk": true,
+  "version": "9.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "skipWhen": [
+    "runtime=mono" // nativeaot is not available with mono
+  ]
+}
