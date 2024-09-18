@@ -21,6 +21,7 @@ jobs:
           - docker.io/library/alpine:latest
           - docker.io/library/alpine:edge
           - quay.io/centos/centos:stream9
+          - quay.io/centos/centos:stream10-development
           - registry.fedoraproject.org/fedora:39
           - registry.fedoraproject.org/fedora:40
           - registry.fedoraproject.org/fedora:rawhide
@@ -32,8 +33,14 @@ jobs:
         exclude:
           - container_image: registry.fedoraproject.org/fedora:rawhide
             dotnet_version: "6.0"
+          - container_image: quay.io/centos/centos:stream10-development
+            dotnet_version: "6.0"
         include:
           - container_image: registry.fedoraproject.org/fedora:40
+            dotnet_version: "9.0"
+          - container_image: registry.fedoraproject.org/fedora:rawhide
+            dotnet_version: "9.0"
+          - container_image: quay.io/centos/centos:stream10-development
             dotnet_version: "9.0"
 
     container:
@@ -45,23 +52,32 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install .NET ${{ matrix.dotnet_version }}
+        # .NET 9 is a preview and requires 'copr' for installation.
+        # .NET 9 introduced the 'dotnet-sdk-aot' package
+        # .NET 8 introduced the 'dbg' packages
+        # '/etc/os-release' will also match the grep fedora for Fedora derived systems, such as CentOS.
         timeout-minutes: 10
         run: |
+
           set -euo pipefail
           cat /etc/os-release
-          if grep fedora /etc/os-release ; then
-            if [[ ${{ matrix.dotnet_version }} == 9.* ]]; then
-              dnf install 'dnf-command(copr)' -y
+          if [[ ${{ matrix.dotnet_version }} == 9.* ]]; then
+            dnf install 'dnf-command(copr)' -y
+            if grep centos /etc/os-release; then
+              dnf copr enable @dotnet-sig/dotnet-preview centos-stream-10-x86_64 -y
+            else
               dnf copr enable @dotnet-sig/dotnet-preview -y
-              dnf install -y dotnet-sdk-aot-${{ matrix.dotnet_version }}
             fi
+            dnf install -y dotnet-sdk-aot-${{ matrix.dotnet_version }}
+          fi
+          if grep fedora /etc/os-release; then
             dnf install -y dotnet-sdk-${{ matrix.dotnet_version }}
-            if [[ ! ${{ matrix.dotnet_version }} == *6* ]]; then
-              dnf install -y \
-                dotnet-sdk-dbg-${{ matrix.dotnet_version }} \
-                dotnet-runtime-dbg-${{ matrix.dotnet_version }} \
-                aspnetcore-runtime-dbg-${{ matrix.dotnet_version }}
-            fi
+              if [[ ! ${{ matrix.dotnet_version }} == *6* ]]; then
+                dnf install -y \
+                  dotnet-sdk-dbg-${{ matrix.dotnet_version }} \
+                  dotnet-runtime-dbg-${{ matrix.dotnet_version }} \
+                  aspnetcore-runtime-dbg-${{ matrix.dotnet_version }}
+              fi
           elif grep alpine /etc/os-release; then
             if grep edge /etc/os-release; then
               echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
