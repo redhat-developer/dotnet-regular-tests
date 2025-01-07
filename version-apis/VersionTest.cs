@@ -8,7 +8,7 @@ namespace DotNetCoreVersionApis
 {
     public class VersionTest
     {
-        public static readonly int MAX_DOTNET_MAJOR_VERSION = 9;
+        public static readonly int MAX_DOTNET_MAJOR_VERSION = 10;
 
         [Fact]
         public void EnvironmentVersion()
