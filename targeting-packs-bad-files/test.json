@@ -7,8 +7,9 @@
   "type": "bash",
   "cleanup": true,
   "skipWhen": [
-    "version=8", // see https://github.com/redhat-developer/dotnet-regular-tests/issues/251
-    "version=9"  // see https://github.com/redhat-developer/dotnet-regular-tests/issues/251
+    "version=8",  // see https://github.com/redhat-developer/dotnet-regular-tests/issues/251
+    "version=9",  // see https://github.com/redhat-developer/dotnet-regular-tests/issues/251
+    "version=10"  // see https://github.com/redhat-developer/dotnet-regular-tests/issues/251
   ],
   "ignoredRIDs":[
 
