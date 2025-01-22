@@ -16,8 +16,8 @@ sleep 2
 rm -rf WebTest
 mkdir -p WebTest
 pushd WebTest
-dotnet new web >/dev/null 2>&1 || true
-dotnet publish
+dotnet new web --no-restore >/dev/null 2>&1 || true
+dotnet publish /p:UsingMicrosoftNETSdkRazor=false /p:ScopedCssEnabled=false
 popd
 sleep 2
 sudo --non-interactive pkill tcpdump

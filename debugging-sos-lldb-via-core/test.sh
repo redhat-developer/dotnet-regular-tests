@@ -58,9 +58,9 @@ rm -rf TestDir
 mkdir TestDir
 cd TestDir
 
-dotnet new web
+dotnet new web --no-restore
 sed -i -e 's|.UseStartup|.UseUrls("http://localhost:5000").UseStartup|' Program.cs
-dotnet build "${no_server[@]}"
+dotnet build "${no_server[@]}" /p:UsingMicrosoftNETSdkRazor=false /p:ScopedCssEnabled=false
 
 dotnet bin/Debug/net*/TestDir.dll &
 run_pid=$!

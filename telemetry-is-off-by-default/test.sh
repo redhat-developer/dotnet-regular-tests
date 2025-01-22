@@ -12,7 +12,7 @@ set -euo pipefail
 IFS=$'\n\t'
 set -x
 
-no_server=("/nodeReuse:false" "/p:UseSharedCompilation=false" "/p:UseRazorBuildServer=false")
+no_server=("/nodeReuse:false" "/p:UseSharedCompilation=false" "/p:UseRazorBuildServer=false" "/p:UsingMicrosoftNETSdkRazor=false" "/p:ScopedCssEnabled=false")
 
 IFS='.-' read -ra VERSION_SPLIT <<< "$1"
 DOTNET_MAJOR="${VERSION_SPLIT[0]}"

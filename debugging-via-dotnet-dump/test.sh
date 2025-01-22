@@ -94,7 +94,7 @@ dotnet tool install -g dotnet-dump
 framework_dir=$(../dotnet-directory --framework "${sdk_version}")
 test -f "${framework_dir}/createdump"
 
-no_server=("/nodeReuse:false" "/p:UseSharedCompilation=false" "/p:UseRazorBuildServer=false")
+no_server=("/nodeReuse:false" "/p:UseSharedCompilation=false" "/p:UseRazorBuildServer=false" "/p:UsingMicrosoftNETSdkRazor=false" "/p:ScopedCssEnabled=false")
 
 heading "Running test application"
 
@@ -102,7 +102,7 @@ rm -rf TestDir
 mkdir TestDir
 cd TestDir
 
-dotnet new web
+dotnet new web --no-restore
 sed -i -e 's|.UseStartup|.UseUrls("http://localhost:5000").UseStartup|' Program.cs
 dotnet build "${no_server[@]}"
 
