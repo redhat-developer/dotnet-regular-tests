@@ -9,12 +9,12 @@ IFS='.-' read -ra VERSION_SPLIT <<< "$1"
 
 version=${VERSION_SPLIT[0]}.${VERSION_SPLIT[1]}
 
-dotnet new web --force
+dotnet new web --no-restore --force
 
 sed -i -e 's|.UseStartup|.UseUrls("http://localhost:5000").UseStartup|' Program.cs
 
 # Do not kick off compiler servers that hang around after a build
-dotnet build -p:UseRazorBuildServer=false -p:UseSharedCompilation=false /m:1
+dotnet build -p:UseRazorBuildServer=false -p:UseSharedCompilation=false /p:UsingMicrosoftNETSdkRazor=false /p:ScopedCssEnabled=false /m:1
 
 dotnet run --no-build --no-restore &
 sleep 5
