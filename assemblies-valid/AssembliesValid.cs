@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace AssembliesValid
 {
@@ -40,6 +41,13 @@ namespace AssembliesValid
             new Regex("/packs/"),
         };
 
+        private readonly ITestOutputHelper _output;
+
+        public AssembliesValid(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+
         [Fact]
         public void ValidateAssemblies()
         {
@@ -47,15 +55,15 @@ namespace AssembliesValid
             int exitCode = RunProcessAndGetOutput(new string[] { "bash", "-c", "command -v dotnet" }, out dotnetPath);
             if (exitCode != 0)
             {
-                Console.Error.WriteLine("'dotnet' command not found");
-                Console.Error.WriteLine("PATH: " + Environment.GetEnvironmentVariable("PATH"));
+                _output.WriteLine("'dotnet' command not found");
+                _output.WriteLine("PATH: " + Environment.GetEnvironmentVariable("PATH"));
                 Assert.True(false);
             }
             dotnetPath = dotnetPath.Trim();
             exitCode = RunProcessAndGetOutput(new string[] { "readlink", "-f", dotnetPath }, out dotnetPath);
             if (exitCode != 0)
             {
-                Console.Error.WriteLine($"Unable to run readlink -f {dotnetPath}");
+                _output.WriteLine($"Unable to run readlink -f {dotnetPath}");
                 Assert.True(false);
             }
             dotnetPath = dotnetPath.Trim();
@@ -63,7 +71,7 @@ namespace AssembliesValid
             string searchRoot = new FileInfo(dotnetPath).DirectoryName;
             var searchRootDirectory = new System.IO.DirectoryInfo(searchRoot);
 
-            Console.WriteLine($"Searching for dotnet binaries in {searchRoot}");
+            _output.WriteLine($"Searching for dotnet binaries in {searchRoot}");
 
             var architecture = RuntimeInformation.OSArchitecture;
             var machine = GetCurrentMachine(architecture);
@@ -106,11 +114,11 @@ namespace AssembliesValid
 
                         if (valid)
                         {
-                            Console.WriteLine($"{assembly}: OK");
+                            _output.WriteLine($"{assembly}: OK");
                         }
                         else
                         {
-                            Console.WriteLine($"error: {assembly} hasMethods: {hasMethods}, hasAot: {hasAot}, inReleaseMode: {inReleaseMode}");
+                            _output.WriteLine($"error: {assembly} hasMethods: {hasMethods}, hasAot: {hasAot}, inReleaseMode: {inReleaseMode}");
                             allOkay = false;
                         }
                     }
