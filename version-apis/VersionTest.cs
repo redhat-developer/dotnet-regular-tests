@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace DotNetCoreVersionApis
 {
@@ -10,11 +11,18 @@ namespace DotNetCoreVersionApis
     {
         public static readonly int MAX_DOTNET_MAJOR_VERSION = 10;
 
+        private readonly ITestOutputHelper _output;
+
+        public VersionTest(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+
         [Fact]
         public void EnvironmentVersion()
         {
             var version = Environment.Version;
-            Console.WriteLine($"Environment.Version: {version}");
+            _output.WriteLine($"Environment.Version: {version}");
             Assert.InRange(version.Major, 3, MAX_DOTNET_MAJOR_VERSION);
         }
 
@@ -22,7 +30,7 @@ namespace DotNetCoreVersionApis
         public void RuntimeInformationFrameworkDescription()
         {
             var description = RuntimeInformation.FrameworkDescription;
-            Console.WriteLine($"RuntimeInformation.FrameworkDescription: {description}");
+            _output.WriteLine($"RuntimeInformation.FrameworkDescription: {description}");
             Assert.StartsWith(".NET", description);
         }
 
@@ -31,11 +39,11 @@ namespace DotNetCoreVersionApis
         [InlineData("corefx", typeof(Uri))]
         public void CommitHashesAreAvailable(string repo, Type type)
         {
-            Console.WriteLine($"Testing commit hashes for {repo}");
+            _output.WriteLine($"Testing commit hashes for {repo}");
 
             var attributes = (AssemblyInformationalVersionAttribute[])type.Assembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute),false);
             var versionAttribute = attributes[0];
-            Console.WriteLine($"AssemblyInformationVersionAttribute: {versionAttribute.InformationalVersion}");
+            _output.WriteLine($"AssemblyInformationVersionAttribute: {versionAttribute.InformationalVersion}");
 
             string[] versionParts = versionAttribute.InformationalVersion.Split("+");
             Assert.Equal(2, versionParts.Length);
