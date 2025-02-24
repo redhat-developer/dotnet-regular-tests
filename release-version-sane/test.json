@@ -7,6 +7,7 @@
   "type": "xunit",
   "cleanup": true,
   "skipWhen": [
+    "github-ci", // Making our CI fail because distro .NET versions are out of date doesn't sound nice
     "vmr-ci" // see https://github.com/redhat-developer/dotnet-regular-tests/issues/282
   ]
 }

@@ -7,6 +7,7 @@
   "type": "bash",
   "cleanup": true,
   "skipWhen": [
+    "github-ci", // github CI doesn't support this.
     "vmr-ci,os=rhel.7" // test doesn't work when it needs sudo on rhel7 because DOTNET_ROOT isn't passed through.
   ],
   "ignoredRIDs":[

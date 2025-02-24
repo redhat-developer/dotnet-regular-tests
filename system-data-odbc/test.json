@@ -8,5 +8,9 @@
   "cleanup": true,
   "ignoredRIDs":[
     "rhel7"
+  ],
+  "skipWhen": [
+    "ubi8-repos", // UBI8 repos don't contain postgressql server
+    "ubi9-repos" // UBI9 repos don't contain postgressql server
   ]
 }
