@@ -94,28 +94,18 @@ jobs:
         run: |
           set -euo pipefail
 
-          ### This is very questionable, but making our CI fail because distro
-          ### .NET versions are out of date doesn't sound nice.
-          rm -rf release-version-sane
+          trait_flags=()
 
-          ### HACK: Filter tests that can't pass in Containers
-          rm -rf debugging-sos-lldb* createdump-aspnet cgroup-limit
-
-          ### HACK: RID parsing is broken on alpine:edge, so these tests fail
-          if [[ ${{ matrix.container_image }} == *'alpine:edge'* ]] ; then
-              rm -rf system-data-odbc
-          fi
-
-          ### HACK: UBI 8 is missing bash-completion, postgres, and strace packages for tests
           if [[ ${{ matrix.container_image }} == *ubi8* ]] ; then
-              rm -rf bash-completion system-data-odbc telemetry-is-off-by-default
-          fi
-          ### HACK: UBI 9 is missing postsgres and strace package for tests
-          if [[ ${{ matrix.container_image }} == *ubi9* ]] ; then
-              rm -rf system-data-odbc telemetry-is-off-by-default 
+              trait_flags+=( --trait ubi8-repos )
           fi
 
-          dotnet turkey/Turkey.dll -v --timeout 600
+          if [[ ${{ matrix.container_image }} == *ubi9* ]] ; then
+              trait_flags+=( --trait ubi9-repos )
+          fi
+
+          dotnet turkey/Turkey.dll -v --timeout 600 --trait github-ci "${trait_flags[@]}"
+        shell: bash
 
       - name: Show Logs
         if: ${{ always() }}
