@@ -1,0 +1,53 @@
+summary: Run dotnet-regular-tests
+execute:
+    how: tmt
+    duration: 30m
+    script: |
+        set -euo pipefail
+        cat /etc/os-release
+        if grep fedora /etc/os-release; then
+          dnf install -y dotnet-sdk-${{ matrix.dotnet_version }}
+          dnf install -y \
+            dotnet-sdk-dbg-${{ matrix.dotnet_version }} \
+            dotnet-runtime-dbg-${{ matrix.dotnet_version }} \
+            aspnetcore-runtime-dbg-${{ matrix.dotnet_version }}
+          if [[ ${{ matrix.dotnet_version }} == 9.* ]]; then
+          dnf install -y dotnet-sdk-aot-${{ matrix.dotnet_version }}
+          fi
+        elif grep alpine /etc/os-release; then
+          if grep edge /etc/os-release; then
+            echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+          fi
+          apk add dotnet-sdk-${{ matrix.dotnet_version }} dotnet-doc
+          apk add \
+            dotnet-sdk-dbg-${{ matrix.dotnet_version }} \
+            dotnet-runtime-dbg-${{ matrix.dotnet_version }} \
+            aspnetcore-runtime-dbg-${{ matrix.dotnet_version }}
+          if [[ ${{ matrix.dotnet_version }} == 9.* ]]; then
+            apk add dotnet-sdk-aot-${{ matrix.dotnet_version }}
+          fi
+        fi
+
+        if grep fedora /etc/os-release ; then
+          dnf install -y python3 wget $(grep '^Dependencies(dnf): ' README.md | cut -d: -f2-) --skip-broken
+        elif grep alpine /etc/os-release; then
+          apk add python3 wget curl $(grep '^Dependencies(apk): ' README.md | cut -d: -f2-)
+          echo -e '[PostgreSQL]\nDescription=PostgreSQL Unicode\nDriver=/usr/lib/psqlodbcw.so\nUsageCount=1' > /etc/odbcinst.ini
+        fi
+
+        wget --no-verbose https://github.com/redhat-developer/dotnet-bunny/releases/latest/download/turkey.tar.gz
+        tar xf turkey.tar.gz
+
+        trait_flags=()
+
+        if [[ ${{ matrix.compose }} == *ubi8* ]] ; then
+          trait_flags+=( --trait ubi8-repos )
+        fi
+
+        if [[ ${{ matrix.compose }} == *ubi9* ]] ; then
+          trait_flags+=( --trait ubi9-repos )
+        fi
+
+        dotnet turkey/Turkey.dll -v --timeout 600 --trait github-ci "${trait_flags[@]}"
+
+        find -iname '*.log' -exec echo {} \; -exec cat {} \;

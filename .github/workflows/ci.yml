@@ -1,114 +1,134 @@
-name: Confirm tests run successfully
-
-on:
+on: 
   push:
     branches:
       - main
   pull_request:
 
 jobs:
-  build:
-    name: Verify tests pass
+  testing-farm:
+    name: Verify tests pass (tf)
 
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+      statuses: write
 
     timeout-minutes: 30
 
     strategy:
       fail-fast: false
       matrix:
-        container_image:
-          - docker.io/library/alpine:latest
-          - docker.io/library/alpine:edge
-          - quay.io/centos/centos:stream9
-          - quay.io/centos/centos:stream10
-          - registry.fedoraproject.org/fedora:40
-          - registry.fedoraproject.org/fedora:41
-          - registry.fedoraproject.org/fedora:rawhide
-          - registry.access.redhat.com/ubi8
-          - registry.access.redhat.com/ubi9
+        compose:
+          - CentOS-Stream-9
+          - CentOS-Stream-10
+          - Fedora-40
+          - Fedora-41
         dotnet_version:
           - "8.0"
           - "9.0"
-        exclude:
-          - container_image: docker.io/library/alpine:latest
-            dotnet_version: "9.0"
-          - container_image: docker.io/library/alpine:edge
-            dotnet_version: "9.0"
-
-    container:
-      image: ${{ matrix.container_image }}
-      options: --security-opt seccomp=unconfined
+        arch:
+          - x86_64
 
     steps:
+      - name: Get User Permission
+        id: checkAccess
+        uses: actions-cool/check-user-permission@v2
+        with:
+          require: write
+          username: ${{ github.triggering_actor }}
+      
+      - name: Check User Permission
+        if: steps.checkAccess.outputs.require-result == 'false'
+        run: |
+           echo "${{ github.triggering_actor }} does not have permissions on this repo."
+           exit 1
+
       - uses: actions/checkout@v4
 
-      - name: Install .NET ${{ matrix.dotnet_version }}
-        # .NET 9 introduced the 'dotnet-sdk-aot' package
-        # .NET 8 introduced the 'dbg' packages
-        # '/etc/os-release' will also match the grep fedora for Fedora derived systems, such as CentOS.
-        timeout-minutes: 10
-        run: |
-          set -euo pipefail
-          cat /etc/os-release
-          if grep fedora /etc/os-release; then
-            dnf install -y dotnet-sdk-${{ matrix.dotnet_version }}
-            dnf install -y \
-              dotnet-sdk-dbg-${{ matrix.dotnet_version }} \
-              dotnet-runtime-dbg-${{ matrix.dotnet_version }} \
-              aspnetcore-runtime-dbg-${{ matrix.dotnet_version }}
-            if [[ ${{ matrix.dotnet_version }} == 9.* ]]; then
-              dnf install -y dotnet-sdk-aot-${{ matrix.dotnet_version }}
-            fi
-          elif grep alpine /etc/os-release; then
-            if grep edge /etc/os-release; then
-              echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
-            fi
-            apk add dotnet-sdk-${{ matrix.dotnet_version }} dotnet-doc
-            apk add \
-              dotnet-sdk-dbg-${{ matrix.dotnet_version }} \
-              dotnet-runtime-dbg-${{ matrix.dotnet_version }} \
-              aspnetcore-runtime-dbg-${{ matrix.dotnet_version }}
-            if [[ ${{ matrix.dotnet_version }} == 9.* ]]; then
-              apk add dotnet-sdk-aot-${{ matrix.dotnet_version }}
-            fi
-          fi
+      - name: Schedule tests on Testing Farm
+        uses: sclorg/testing-farm-as-github-action@v3.1.2
+        with:
+          api_key: ${{ secrets.TF_API_KEY }}
+          tmt_plan_regex: "ci"
+          compose: ${{ matrix.compose }}
+          variables: ${{ matrix.dotnet_version }}
+    
+  # alpine:
+  #   name: Verify tests pass (alpine)
 
-      - name: Install Test dependencies
-        timeout-minutes: 5
-        run: |
-          if grep fedora /etc/os-release ; then
-            dnf install -y python3 wget $(grep '^Dependencies(dnf): ' README.md | cut -d: -f2-) --skip-broken
-          elif grep alpine /etc/os-release; then
-            apk add python3 wget curl $(grep '^Dependencies(apk): ' README.md | cut -d: -f2-)
-            echo -e '[PostgreSQL]\nDescription=PostgreSQL Unicode\nDriver=/usr/lib/psqlodbcw.so\nUsageCount=1' > /etc/odbcinst.ini
-          fi
+  #   runs-on: ubuntu-latest
 
-      - name: Download test runner
-        run: |
-          set -euo pipefail
-          wget --no-verbose https://github.com/redhat-developer/dotnet-bunny/releases/latest/download/turkey.tar.gz
-          tar xf turkey.tar.gz
+  #   timeout-minutes: 30
 
-      - name: Run tests
-        run: |
-          set -euo pipefail
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       container_image:
+  #         - docker.io/library/alpine:latest
+  #         - docker.io/library/alpine:edge
+  #       dotnet_version:
+  #         - "8.0"
+  #         - "9.0"
 
-          trait_flags=()
+  #   container:
+  #     image: ${{ matrix.container_image }}
+  #     options: --security-opt seccomp=unconfined
 
-          if [[ ${{ matrix.container_image }} == *ubi8* ]] ; then
-              trait_flags+=( --trait ubi8-repos )
-          fi
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-          if [[ ${{ matrix.container_image }} == *ubi9* ]] ; then
-              trait_flags+=( --trait ubi9-repos )
-          fi
+  #     - name: Install .NET ${{ matrix.dotnet_version }}
+  #       timeout-minutes: 10
 
-          dotnet turkey/Turkey.dll -v --timeout 600 --trait github-ci "${trait_flags[@]}"
-        shell: bash
+  #       run: |
+  #         set -euo pipefail
+  #         cat /etc/os-release
 
-      - name: Show Logs
-        if: ${{ always() }}
-        run: |
-          set -euo pipefail
-          find -iname '*.log' -exec echo {} \; -exec cat {} \;
+  #         if grep edge /etc/os-release; then
+  #           echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+  #         fi
+  #         apk add dotnet-sdk-${{ matrix.dotnet_version }} dotnet-doc
+  #         apk add \
+  #           dotnet-sdk-dbg-${{ matrix.dotnet_version }} \
+  #           dotnet-runtime-dbg-${{ matrix.dotnet_version }} \
+  #           aspnetcore-runtime-dbg-${{ matrix.dotnet_version }}
+  #         if [[ ${{ matrix.dotnet_version }} == 9.* ]]; then
+  #           apk add dotnet-sdk-aot-${{ matrix.dotnet_version }}
+  #         fi
+      
+  #     - name: Install Test dependencies
+  #       timeout-minutes: 5
+  #       run: |
+  #         apk add python3 wget curl $(grep '^Dependencies(apk): ' README.md | cut -d: -f2-)
+  #         echo -e '[PostgreSQL]\nDescription=PostgreSQL Unicode\nDriver=/usr/lib/psqlodbcw.so\nUsageCount=1' > /etc/odbcinst.ini
+
+  #     - name: Download test runner
+  #       run: |
+  #         set -euo pipefail
+  #         wget --no-verbose https://github.com/redhat-developer/dotnet-bunny/releases/latest/download/turkey.tar.gz
+  #         tar xf turkey.tar.gz    
+
+  #     - name: Run tests
+  #       run: |
+  #         set -euo pipefail
+
+  #         trait_flags=()
+
+  #         if [[ ${{ matrix.container_image }} == *ubi8* ]] ; then
+  #             trait_flags+=( --trait ubi8-repos )
+  #         fi
+
+  #         if [[ ${{ matrix.container_image }} == *ubi9* ]] ; then
+  #             trait_flags+=( --trait ubi9-repos )
+  #         fi
+
+  #         dotnet turkey/Turkey.dll -v --timeout 600 --trait github-ci "${trait_flags[@]}"
+  #       shell: bash
+
+  #     - name: Show Logs
+  #       if: ${{ always() }}
+  #       run: |
+  #         set -euo pipefail
+  #         find -iname '*.log' -exec echo {} \; -exec cat {} \;
