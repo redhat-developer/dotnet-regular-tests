@@ -32,16 +32,6 @@ jobs:
           - "8.0"
           - "9.0"
           - "10.0"
-        exclude:
-          - container_image: docker.io/library/alpine:latest
-            dotnet_version: "9.0"
-          - container_image: docker.io/library/alpine:edge
-            dotnet_version: "9.0"
-          - container_image: docker.io/library/alpine:latest
-            dotnet_version: "10.0"
-          - container_image: docker.io/library/alpine:edge
-            dotnet_version: "10.0"
-
 
     container:
       image: ${{ matrix.container_image }}
