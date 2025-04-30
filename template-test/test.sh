@@ -15,6 +15,52 @@ major_version="${VERSION_SPLIT[0]}"
 # If additional templates are found via `dotnet new --list`, this test
 # will fail unless they are added here.
 
+dotnet10Templates=(
+    apicontroller
+    blazor
+    blazorwasm
+    buildprops
+    buildtargets
+    classlib
+    console
+    editorconfig
+    .editorconfig
+    gitattributes
+    .gitattributes
+    gitignore
+    .gitignore
+    global.json
+    globaljson
+    grpc
+    mstest-class
+    mstest
+    mvc
+    mvccontroller
+    nuget.config
+    nugetconfig
+    nunit
+    nunit-test
+    packagesprops
+    page
+    proto
+    razor
+    razorclasslib
+    razorcomponent
+    sln
+    solution
+    tool-manifest
+    view
+    viewimports
+    viewstart
+    web
+    webapi
+    webapiaot
+    webapp
+    webconfig
+    worker
+    xunit
+)
+
 dotnet9Templates=(
     apicontroller
     blazor
@@ -254,6 +300,8 @@ worker build
 xunit test"
 
 template9Actions=\
+"nunit-test project,new"
+template10Actions=\
 "nunit-test project,new"
 
 # Templates that can be ignored. They may be present in the dotnet new
