@@ -7,6 +7,6 @@
 	"type": "bash",
 	"cleanup": false,
 	"skipWhen": [
-		"version=6,arch=s390x", // https://github.com/redhat-developer/dotnet-regular-tests/issues/325
+		"version=10", // https://github.com/redhat-developer/dotnet-regular-tests/issues/380
 	]
 }
