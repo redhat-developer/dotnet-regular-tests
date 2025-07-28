@@ -13,6 +13,11 @@ esac
 
 failed=0
 for page in $helpPages; do
+    # In .NET 10, the command is shown as 'solution'. sln is a working alias,
+    # like older versions of .NET.  However, the man page is name 'sln'.
+    if [[ "$page" == solution ]]; then
+        page=sln
+    fi
     if echo "$manPages" | grep "dotnet-$page"; then
         true
     else
