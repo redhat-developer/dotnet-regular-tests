@@ -9,7 +9,7 @@ from enum import Enum
 import pathlib
 import subprocess
 import sys
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 description: str = '''
 Verify that .NET Core packages comply with the official packaging
@@ -22,24 +22,53 @@ class SymbolsPresence(Enum):
     NOT_ALLOWED_EXCEPT_LEGACY = 2
     ONLY_SYMBOLS_ALLOWED = 3
 
+class ConditionalDependency:
+    def __init__(self,
+                 name: str,
+                 min_version: Optional[str] = None,
+                 max_version: Optional[str] = None):
+        self.name = name
+        self.min_version = min_version
+        self.max_version = max_version
+
 class PackageRequirement:
 
     def __init__(self, name: str, version: str,
-                 dependencies: List[str],
+                 dependencies: List[Union[str, ConditionalDependency]],
                  contains: List[str],
                  symbols: SymbolsPresence,
                  another_version: bool = False,
-                 minimum_version_for_requirement: str = '1.0'):
+                 min_version_for_requirement: str = '1.0',
+                 max_version_for_requirement: str = '10000000.0'):
         self.name = name
         self.version = version
-        self.dependencies = dependencies
+        self.__dependencies = dependencies
         self.contains = contains
         self.symbols = symbols
         self.another_version = another_version
-        self.minimum_version_for_requirement = minimum_version_for_requirement
+        self.min_version_for_requirement = min_version_for_requirement
+        self.max_version_for_requirement = max_version_for_requirement
+
+    def dependencies(self, major_dot_minor) -> List[str]:
+        result: List[str] = []
+        for dependency in self.__dependencies:
+            if isinstance(dependency, str):
+                result.append(dependency)
+            if isinstance(dependency, ConditionalDependency):
+                include = True
+                if dependency.min_version and float(major_dot_minor) < float(dependency.min_version):
+                    include = False
+                if dependency.max_version and float(major_dot_minor) > float(dependency.max_version):
+                    include = False
+                if include:
+                    result.append(dependency.name)
+
+        return result
+
 
     def applies_to_dotnet_major_minor(self, major_dot_minor: str) -> bool:
-        return float(self.minimum_version_for_requirement) <= float(major_dot_minor)
+        return (float(self.min_version_for_requirement) <= float(major_dot_minor) and
+                float(self.max_version_for_requirement) >= float(major_dot_minor))
 
 # This is a machine-readable version of the guidelines at
 # https://docs.microsoft.com/en-us/dotnet/core/build/distribution-packaging
@@ -70,7 +99,7 @@ PACKAGE_REQUIREMENTS = [
             'dotnet-apphost-pack-{major}.{minor}',
             'dotnet-targeting-pack-{major}.{minor}',
             'dotnet-templates-{major}.{minor}',
-            'netstandard-targeting-pack-{netstandard_major}.{netstandard_minor}',
+            ConditionalDependency(name='netstandard-targeting-pack-{netstandard_major}.{netstandard_minor}', max_version='9.0'),
         ],
         contains=['/sdk/', '/sdk/{major}.{minor}'],
         symbols=SymbolsPresence.NOT_ALLOWED_EXCEPT_LEGACY,
@@ -83,7 +112,7 @@ PACKAGE_REQUIREMENTS = [
         ],
         contains=['/sdk/', '/sdk/{major}.{minor}'],
         symbols=SymbolsPresence.ONLY_SYMBOLS_ALLOWED,
-        minimum_version_for_requirement='8.0',
+        min_version_for_requirement='8.0',
     ),
     PackageRequirement(
         name='aspnetcore-runtime-{major}.{minor}',
@@ -102,7 +131,7 @@ PACKAGE_REQUIREMENTS = [
         ],
         contains=['/shared/', '/shared/Microsoft.AspNetCore.App/{major}.{minor}'],
         symbols=SymbolsPresence.ONLY_SYMBOLS_ALLOWED,
-        minimum_version_for_requirement='8.0',
+        min_version_for_requirement='8.0',
     ),
     PackageRequirement(
         name='dotnet-runtime-{major}.{minor}',
@@ -121,7 +150,7 @@ PACKAGE_REQUIREMENTS = [
         ],
         contains=['/shared/', '/shared/Microsoft.NETCore.App/{major}.{minor}'],
         symbols=SymbolsPresence.ONLY_SYMBOLS_ALLOWED,
-        minimum_version_for_requirement='8.0',
+        min_version_for_requirement='8.0',
     ),
     PackageRequirement(
         name='dotnet-hostfxr-{major}.{minor}',
@@ -175,6 +204,7 @@ PACKAGE_REQUIREMENTS = [
         dependencies=[],
         contains=['/packs/NETStandard.Library.Ref/{netstandard_major}.{netstandard_minor}'],
         symbols=SymbolsPresence.NOT_ALLOWED,
+        max_version_for_requirement='9.0',
     ),
     PackageRequirement(
         name='dotnet-templates-{major}.{minor}',
@@ -360,6 +390,12 @@ def check_packages(package_source: PackageSource, package_prefix: str, runtime_i
     for requirement in PACKAGE_REQUIREMENTS:
 
         if not requirement.applies_to_dotnet_major_minor(major_minor):
+            package_name = package_prefix + requirement.name.format(**format_dict)
+            package = package_source.find_package(package_name)
+            if package is not None:
+                print(f'✗ {package_name}')
+                print(f'  error: package {package_name} found')
+                okay = False
             continue
 
         package_name = package_prefix + requirement.name.format(**format_dict)
@@ -379,7 +415,7 @@ def check_packages(package_source: PackageSource, package_prefix: str, runtime_i
         another_version = requirement.another_version;
         issues += check_package_version(package_source, package_name, expected_version, another_version)
 
-        resolved_deps = [package_prefix + dep.format(**format_dict) for dep in requirement.dependencies]
+        resolved_deps = [package_prefix + dep.format(**format_dict) for dep in requirement.dependencies(major_minor)]
         issues += check_package_dependencies(package_source, package_name, runtime_id, known_packages, resolved_deps)
 
         contains = [path.format(**format_dict) for path in requirement.contains]
