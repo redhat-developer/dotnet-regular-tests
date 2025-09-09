@@ -7,6 +7,5 @@
 	"type": "bash",
 	"cleanup": false,
 	"skipWhen": [
-		"version=10", // https://github.com/redhat-developer/dotnet-regular-tests/issues/380
 	]
 }
