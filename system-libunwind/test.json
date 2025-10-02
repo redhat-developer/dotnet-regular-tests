@@ -7,7 +7,7 @@
   "type": "bash",
   "cleanup": true,
   "skipWhen": [
-    "os=fedora,version=8", // see https://github.com/redhat-developer/dotnet-regular-tests/issues/254
+    "os=fedora",           // using bundled libunwind
     "vmr-ci",              // using system libunwind is configured in the rpm build
     "runtime=mono",        // mono does not use libunwind
   ],
