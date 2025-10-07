@@ -10,7 +10,6 @@
     "non-packaged",
   ],
   "ignoredRIDs":[
-    "rhel7",
     "linux-musl"
   ]
 }
