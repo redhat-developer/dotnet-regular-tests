@@ -312,6 +312,7 @@ templateIgnoreList=(
     mstest-playwright
     nunit-playwright
     winforms
+    winformscontrollib
     winformslib
     wpf
     wpfcustomcontrollib
