@@ -1,0 +1,13 @@
+{
+  "name": "dnx-works",
+  "enabled": true,
+  "requiresSdk": true,
+  "version": "10.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "skipWhen": [
+  ],
+  "ignoredRIDs":[
+  ]
+}
