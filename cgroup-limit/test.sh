@@ -9,7 +9,12 @@ cat /proc/self/mountinfo
 
 cat /proc/self/cgroup
 
-if [[ "$(stat -f -c "%T" /sys/fs/cgroup)" == "cgroup2fs" ]] && [[ $(dotnet --version) == "3."* ]]; then
+CGROUPV2=false
+if [[ "$(stat -f -c "%T" /sys/fs/cgroup)" == "cgroup2fs" ]] ; then
+    CGROUPV2=true
+fi
+
+if [[ $CGROUPV2 == true ]] && [[ $(dotnet --version) == "3."* ]]; then
     echo "cgroup v2 is not fully supported on .NET Core 3.x. Skipping."
     exit 0
 fi
@@ -48,7 +53,12 @@ if [ "$UID" != "0" ]; then
   fi
 fi
 
-mapfile -t DOTNET_LIMITS < <($SYSTEMD_RUN  -q --scope -p CPUQuota=100% -p MemoryLimit=100M bin/Release/net*/cgroup-limit)
+memory_args="-p MemoryLimit=100M"
+if [[ $CGROUPV2 == true ]]; then
+    memory_args="-p MemoryMax=100M"
+fi
+
+mapfile -t DOTNET_LIMITS < <($SYSTEMD_RUN  -q --scope -p CPUQuota=100% $memory_args bin/Release/net*/cgroup-limit)
 
 if [ "${DOTNET_LIMITS[0]}" == "Limits:" ] &&      # Application ran.
    [ "${DOTNET_LIMITS[1]}" == "1" ] &&            # Available processors is 1.
