@@ -680,16 +680,8 @@ grep -E '^ +[0-9]+ timers$' dump.out
 heading "traverseheap"
 if [[ "$(uname -m)" != "aarch64" ]]; then
     dump-analyze 'help traverseheap' > dump.out
-    # Disable exit on error for traverseheap. Reported as https://github.com/dotnet/diagnostics/issues/3842
-    if grep -F -- '-verify' dump.out; then
-        set +e
-        dump-analyze 'traverseheap -xml -verify full-heap' > dump.out
-        set -e
-    else
-        set +e
-        dump-analyze 'traverseheap -xml full-heap' > dump.out
-        set -e
-    fi
+    cat dump.out
+    dump-analyze 'traverseheap -xml full-heap' > dump.out
     cat dump.out
     head full-heap
     tail full-heap
