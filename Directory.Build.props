@@ -7,7 +7,7 @@
     <SystemDataOdbcVersion>8.0.0</SystemDataOdbcVersion>
     <MicrosoftNetTestSdkVersion>17.13.0</MicrosoftNetTestSdkVersion>
     <XunitVersion>2.9.3</XunitVersion>
-    <XunitV3Version>2.0.0</XunitV3Version>
-    <XunitRunnerVisualStudioVersion>3.0.2</XunitRunnerVisualStudioVersion>
+    <XunitV3Version>3.2.0</XunitV3Version>
+    <XunitRunnerVisualStudioVersion>3.1.5</XunitRunnerVisualStudioVersion>
   </PropertyGroup>
 </Project>
