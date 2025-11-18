@@ -1,0 +1,14 @@
+{
+  "name": "kerberos-auth",
+  "enabled": true,
+  "requiresSdk": true,
+  "version": "8.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "skipWhen": [
+     "ubi8-repos", // ubi repos don't contain kerberos utils
+     "ubi9-repos", // ubi repos don't contain kerberos utils
+     "ubi10-repos" // ubi repos don't contain kerberos utils
+  ]
+}
