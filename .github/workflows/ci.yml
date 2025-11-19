@@ -22,24 +22,25 @@ jobs:
           - docker.io/library/alpine:edge
           - quay.io/centos/centos:stream9
           - quay.io/centos/centos:stream10
-          - registry.fedoraproject.org/fedora:41
           - registry.fedoraproject.org/fedora:42
+          - registry.fedoraproject.org/fedora:43
           - registry.fedoraproject.org/fedora:rawhide
           - registry.access.redhat.com/ubi8
           - registry.access.redhat.com/ubi9
+          - registry.access.redhat.com/ubi10
         dotnet_version:
           - "8.0"
           - "9.0"
-        include:
-          - container_image: registry.fedoraproject.org/fedora:42
-            dotnet_version: "10.0"
-          - container_image: registry.fedoraproject.org/fedora:rawhide
-            dotnet_version: "10.0"
+          - "10.0"
         exclude:
           - container_image: docker.io/library/alpine:latest
             dotnet_version: "9.0"
           - container_image: docker.io/library/alpine:edge
             dotnet_version: "9.0"
+          - container_image: docker.io/library/alpine:latest
+            dotnet_version: "10.0"
+          - container_image: docker.io/library/alpine:edge
+            dotnet_version: "10.0"
 
 
     container:
@@ -58,7 +59,7 @@ jobs:
           set -euo pipefail
           cat /etc/os-release
           if grep fedora /etc/os-release; then
-            if [[ ${{ matrix.dotnet_version }} == 10.* ]]; then
+            if [[ ${{ matrix.dotnet_version }} == 11.* ]]; then
               dnf install 'dnf-command(copr)' -y
               if grep centos /etc/os-release; then
                 dnf copr enable @dotnet-sig/dotnet-preview centos-stream-10-x86_64 -y
@@ -111,12 +112,14 @@ jobs:
 
           trait_flags=()
 
-          if [[ ${{ matrix.container_image }} == *ubi8* ]] ; then
+          if [[ ${{ matrix.container_image }} == *ubi8 ]] ; then
               trait_flags+=( --trait ubi8-repos )
           fi
-
-          if [[ ${{ matrix.container_image }} == *ubi9* ]] ; then
+          if [[ ${{ matrix.container_image }} == *ubi9 ]] ; then
               trait_flags+=( --trait ubi9-repos )
+          fi
+          if [[ ${{ matrix.container_image }} == *ubi10 ]] ; then
+              trait_flags+=( --trait ubi10-repos )
           fi
 
           dotnet turkey/Turkey.dll -v --timeout 600 --trait github-ci "${trait_flags[@]}"

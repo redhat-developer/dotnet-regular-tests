@@ -7,6 +7,8 @@
   "cleanup": true,
   "skipWhen": [
     "vmr-ci", // tools PATH not configured (tar.gz build)
+    "os=fedora.34", // Fedora packages stopped updating PATH with 44
+    "os=fedora.35"
   ],
   "ignoredRIDs": [
   ]
