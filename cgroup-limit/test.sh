@@ -33,7 +33,7 @@ if [ "$UID" != "0" ]; then
 fi
 
 # Pass DOTNET_ROOT to support testing against a dotnet tarball.
-SYSTEMD_RUN="$SYSTEMD_RUN -E DOTNET_ROOT=$DOTNET_ROOT"
+SYSTEMD_RUN="$SYSTEMD_RUN -E DOTNET_ROOT=${DOTNET_ROOT:-}"
 # Unset DOTNET_PROCESSOR_COUNT so .NET won't return its value instead of the cgroup CPU limit.
 SYSTEMD_RUN="$SYSTEMD_RUN -E DOTNET_PROCESSOR_COUNT="
 
