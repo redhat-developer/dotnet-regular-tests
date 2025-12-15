@@ -5,6 +5,9 @@
   "version": "8.0",
   "versionSpecific": false,
   "type": "bash",
-  "cleanup": true
+  "cleanup": true,
+  "skipWhen": [
+    "os=alpine,version=9",// see https://github.com/redhat-developer/dotnet-regular-tests/issues/405
+  ]
 }
 
