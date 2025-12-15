@@ -49,6 +49,7 @@ if ! command -v lldb ; then
     echo "lldb is not installed"
     exit 1
 fi
+{ rpm -qa | grep lldb; } || { apk list -i | grep lldb; } || true
 
 no_server=("/nodeReuse:false" "/p:UseSharedCompilation=false" "/p:UseRazorBuildServer=false")
 
