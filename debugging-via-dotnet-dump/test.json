@@ -8,7 +8,6 @@
   "cleanup": true,
   "timeoutMultiplier": 2,
   "ignoredRIDs": [
-     "linux-arm" // dotnet-dump relies on features not implemented on arm
   ],
   "skipWhen": [
     "runtime=mono" // dotnet-dump relies on coreclr features
