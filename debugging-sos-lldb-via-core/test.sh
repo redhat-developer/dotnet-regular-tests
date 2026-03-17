@@ -42,6 +42,12 @@ dotnet tool install -g dotnet-dump
 
 dotnet sos install
 
+# work around lldb deadlock in v21.1.8 (https://github.com/redhat-developer/dotnet-regular-tests/issues/392#issuecomment-4068491555).
+if lldb --version | grep -q "21.1.8"; then
+    LINE='settings set target.parallel-module-load false'
+    grep -qF "$LINE" ~/.lldbinit || echo "$LINE" >> ~/.lldbinit
+fi
+
 framework_dir=$(../dotnet-directory --framework "${sdk_version}")
 test -f "${framework_dir}/createdump"
 
