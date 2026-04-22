@@ -1,3 +1,6 @@
+// This test verifies that OpenSSL TLS uses PQC key exchange by default.
+// It performs a standard TLS handshake and then checks that a PQC group was negotiated.
+
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
