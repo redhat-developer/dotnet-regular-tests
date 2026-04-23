@@ -1,0 +1,16 @@
+{
+  "name": "tls-uses-pqc",
+  "enabled": true,
+  "requiresSdk": true,
+  "version": "10.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "ignoredRIDs":[
+    "rhel.8", // no PQC key exchange support
+    "rhel.9", // no PQC key exchange support
+    "centos.8", // no PQC key exchange support
+    "centos.9", // no PQC key exchange support
+    "fedora.42" // no PQC key exchange support
+  ]
+}
