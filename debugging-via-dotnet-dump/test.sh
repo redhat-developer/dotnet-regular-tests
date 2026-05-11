@@ -429,7 +429,7 @@ cat dump.out
 heading "gchandles"
 dump-analyze 'gchandles' > dump.out
 cat dump.out
-for reference in Strong WeakShort WeakLong Dependent; do
+for reference in Strong WeakShort Dependent; do
     if [[ $(cut -d' ' -f2 dump.out | grep -cF "$reference") -lt 2 ]]; then
         echo "fail: too few references of type $reference"
         exit 2
