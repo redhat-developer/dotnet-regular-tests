@@ -15,6 +15,56 @@ major_version="${VERSION_SPLIT[0]}"
 # If additional templates are found via `dotnet new --list`, this test
 # will fail unless they are added here.
 
+dotnet11Templates=(
+    apicontroller
+    blazor
+    blazorwasm
+    blazorwebworker
+    buildprops
+    buildtargets
+    classlib
+    console
+    editorconfig
+    .editorconfig
+    gitattributes
+    .gitattributes
+    gitignore
+    .gitignore
+    global.json
+    globaljson
+    grpc
+    mcpserver
+    mstest-class
+    mstest
+    mvc
+    mvccontroller
+    nuget.config
+    nugetconfig
+    nunit
+    nunit-test
+    packagesprops
+    page
+    proto
+    razor
+    razorclasslib
+    razorcomponent
+    sln
+    slnf
+    solution
+    solutionfilter
+    tool-manifest
+    view
+    viewimports
+    viewstart
+    web
+    webapi
+    webapiaot
+    webapp
+    webconfig
+    worker
+    xunit
+)
+
 dotnet10Templates=(
     apicontroller
     blazor
@@ -271,6 +321,8 @@ blazorserver build
 blazorserver-empty build
 blazorwasm build
 blazorwasm-empty build
+blazorwebworker build
+blazor-wasm-servicedefaults build
 buildprops new
 buildtargets new
 classlib build
@@ -281,6 +333,7 @@ gitignore new
 .gitignore new
 globaljson new
 global.json new
+mcpserver build
 mstest test
 mstest-class project,new
 mvc build
@@ -292,6 +345,8 @@ razorclasslib build
 react build
 reactredux build
 sln new
+slnf new
+solutionfilter new
 view new
 web build
 webapi build
@@ -303,14 +358,20 @@ template9Actions=\
 "nunit-test project,new"
 template10Actions=\
 "nunit-test project,new"
+template11Actions=\
+"nunit-test project,new"
 
 # Templates that can be ignored. They may be present in the dotnet new
 # --list output but are safe to ignore. We we don't want to test these
 # because they are known to not work on the platforms we care about.
 templateIgnoreList=(
+    # FIXME: enable when Microsoft.Extensions.ServiceDiscovery >= 10.6.0-preview.1.26210.2 is available
+    blazor-wasm-servicedefaults
+
     # playwright needs powershell and needs to be interactively used to install browser integration pieces
     mstest-playwright
     nunit-playwright
+
     winforms
     winformscontrollib
     winformslib

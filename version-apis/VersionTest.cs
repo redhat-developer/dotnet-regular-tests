@@ -9,7 +9,7 @@ namespace DotNetCoreVersionApis
 {
     public class VersionTest
     {
-        public static readonly int MAX_DOTNET_MAJOR_VERSION = 10;
+        public static readonly int MAX_DOTNET_MAJOR_VERSION = 11;
 
         private readonly ITestOutputHelper _output;
 
