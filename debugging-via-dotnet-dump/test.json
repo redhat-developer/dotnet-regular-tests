@@ -11,7 +11,8 @@
      "linux-arm" // dotnet-dump relies on features not implemented on arm
   ],
   "skipWhen": [
-    "runtime=mono" // dotnet-dump relies on coreclr features
+    "runtime=mono", // dotnet-dump relies on coreclr features
+    "version=11" // https://github.com/redhat-developer/dotnet-regular-tests/issues/416
   ]
 }
 

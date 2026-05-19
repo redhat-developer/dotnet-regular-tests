@@ -32,6 +32,17 @@ jobs:
           - "8.0"
           - "9.0"
           - "10.0"
+        # Preview .NET versions are available via the @dotnet-sig/dotnet-preview copr repo.
+        # Each year, add include entries for the new preview version (fedora:latest + rawhide)
+        # with use_preview_copr: true. When a version ships officially, move dotnet_version
+        # into the main list above and remove its include entries (and this block if empty).
+        include:
+          - container_image: registry.fedoraproject.org/fedora:44
+            dotnet_version: "11.0"
+            use_preview_copr: true
+          - container_image: registry.fedoraproject.org/fedora:rawhide
+            dotnet_version: "11.0"
+            use_preview_copr: true
 
     container:
       image: ${{ matrix.container_image }}
@@ -49,7 +60,7 @@ jobs:
           set -euo pipefail
           cat /etc/os-release
           if grep fedora /etc/os-release; then
-            if [[ ${{ matrix.dotnet_version }} == 11.* ]]; then
+            if [[ "${{ matrix.use_preview_copr }}" == "true" ]]; then
               dnf install 'dnf-command(copr)' -y
               if grep centos /etc/os-release; then
                 dnf copr enable @dotnet-sig/dotnet-preview centos-stream-10-x86_64 -y
@@ -85,9 +96,9 @@ jobs:
         timeout-minutes: 5
         run: |
           if grep fedora /etc/os-release ; then
-            dnf install -y python3 wget $(grep '^Dependencies(dnf): ' README.md | cut -d: -f2-) --skip-broken
+            dnf install -y $(grep '^Dependencies(dnf): ' README.md | cut -d: -f2-) --skip-broken
           elif grep alpine /etc/os-release; then
-            apk add python3 wget curl $(grep '^Dependencies(apk): ' README.md | cut -d: -f2-)
+            apk add $(grep '^Dependencies(apk): ' README.md | cut -d: -f2-)
             echo -e '[PostgreSQL]\nDescription=PostgreSQL Unicode\nDriver=/usr/lib/psqlodbcw.so\nUsageCount=1' > /etc/odbcinst.ini
           fi
 
