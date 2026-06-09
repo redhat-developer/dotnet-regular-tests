@@ -1,0 +1,10 @@
+{
+  "name": "bundled-tools-can-execute",
+  "enabled": true,
+  "requiresSdk": true,
+  "version": "8.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "ignoredRIDs": []
+}
