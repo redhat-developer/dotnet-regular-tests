@@ -7,8 +7,8 @@
   "type": "bash",
   "cleanup": true,
   "skipWhen": [
-    "vmr-ci,version=6", // unpacking symbols is a hassle
     "no-symbols",  // standard VMR builds don't include symbols, it's an extra/manual step
+    "version=10", // https://github.com/dotnet/source-build/issues/5531
   ],
   "ignoredRIDs":[
   ]
