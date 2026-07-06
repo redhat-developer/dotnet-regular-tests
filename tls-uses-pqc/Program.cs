@@ -9,6 +9,8 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
+SetOpenSSLImportResolver();
+
 // Create a self-signed certificate.
 using var key = ECDsa.Create();
 var certReq = new CertificateRequest("CN=localhost", key, HashAlgorithmName.SHA256);
@@ -55,6 +57,24 @@ Console.WriteLine($"FAIL: Expected PQC key exchange group containing 'MLKEM', go
 return 1;
 
 // Use OpenSSL interop to get the negotiated key exchange group (SslStream doesn't expose this information).
+static void SetOpenSSLImportResolver()
+{
+    // Use the latest OpenSSL version on the system.
+    NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), (name, assembly, searchPath) =>
+    {
+        if (name == "libssl")
+        {
+            if (NativeLibrary.TryLoad("libssl.so.4", assembly, searchPath, out var h) ||
+                NativeLibrary.TryLoad("libssl.so.3", assembly, searchPath, out h))
+            {
+                return h;
+            }
+            throw new NotSupportedException($"Cannot resolve {name}.");
+        }
+        return IntPtr.Zero; // Use the default resolution logic.
+    });
+}
+
 static string? GetNegotiatedGroupName(SslStream sslStream)
 {
     var secCtxField = typeof(SslStream).GetField("_securityContext", BindingFlags.NonPublic | BindingFlags.Instance)!;
@@ -72,5 +92,5 @@ static string? GetNegotiatedGroupName(SslStream sslStream)
     }
 }
 
-[DllImport("libssl.so.3")]
+[DllImport("libssl")]
 static extern IntPtr SSL_get0_group_name(IntPtr ssl);
