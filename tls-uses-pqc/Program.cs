@@ -69,8 +69,9 @@ static void SetOpenSSLImportResolver()
             {
                 return h;
             }
+            throw new NotSupportedException($"Cannot resolve {name}.");
         }
-        return IntPtr.Zero;
+        return IntPtr.Zero; // Use the default resolution logic.
     });
 }
 
