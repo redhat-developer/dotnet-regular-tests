@@ -24,6 +24,11 @@ find ${dotnet_home} -type f -name '*.so' -print0 | while IFS= read -r -d '' file
         continue;
     fi
 
+    # libaspnetcoretools.so does not include the expected version string format. (https://github.com/dotnet/aspnetcore/issues/67637)
+    if [ "$(basename "${file}")" == libaspnetcoretools.so ]; then
+        continue;
+    fi
+
     echo "${file}"
     strings "${file}" | grep '@(#)' | grep -o '[a-f0-9]\{40\}'
 done
