@@ -372,6 +372,9 @@ templateIgnoreList=(
     mstest-playwright
     nunit-playwright
 
+    # vulnerable at the moment, which fails tests - https://github.com/advisories/GHSA-v5pm-xwqc-g5wc
+    mcpserver
+    
     winforms
     winformscontrollib
     winformslib
