@@ -82,6 +82,7 @@ dotnet10Templates=(
     global.json
     globaljson
     grpc
+    mcpserver
     mstest-class
     mstest
     mvc
