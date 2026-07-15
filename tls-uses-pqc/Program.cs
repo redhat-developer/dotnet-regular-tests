@@ -62,6 +62,8 @@ static void SetOpenSSLImportResolver()
     // Use the latest OpenSSL version on the system.
     NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), (name, assembly, searchPath) =>
     {
+        Console.WriteLine($"Resolving {name}...");
+
         if (name == "libssl")
         {
             if (NativeLibrary.TryLoad("libssl.so.4", assembly, searchPath, out var h) ||
@@ -69,8 +71,15 @@ static void SetOpenSSLImportResolver()
             {
                 return h;
             }
-            throw new NotSupportedException($"Cannot resolve {name}.");
+            Console.WriteLine($"error: Cannot resolve {name}.");
+            Console.WriteLine();
+            Console.WriteLine("Mapped files:");
+            Console.WriteLine(File.ReadAllText("/proc/self/maps"));
+
+            // On Mono, throwing an exception here gets swallowed, so do an application exit instead.
+            Environment.Exit(1);
         }
+
         return IntPtr.Zero; // Use the default resolution logic.
     });
 }
