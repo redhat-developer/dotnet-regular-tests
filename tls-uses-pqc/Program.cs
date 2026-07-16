@@ -75,6 +75,31 @@ static void SetOpenSSLImportResolver()
             Console.WriteLine();
             Console.WriteLine("Mapped files:");
             Console.WriteLine(File.ReadAllText("/proc/self/maps"));
+            Console.WriteLine();
+            Console.WriteLine("libssl files in /usr/lib*:");
+            try
+            {
+                foreach (var dir in Directory.GetDirectories("/usr", "lib*"))
+                {
+                    foreach (var file in Directory.GetFiles(dir, "libssl*"))
+                    {
+                        var info = new FileInfo(file);
+                        if (info.LinkTarget != null)
+                        {
+                            string suffix = info.Exists ? "" : " (broken)";
+                            Console.WriteLine($"  {file} -> {info.LinkTarget}{suffix}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"  {file}");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"  (enumeration failed: {ex.Message})");
+            }
 
             // On Mono, throwing an exception here gets swallowed, so do an application exit instead.
             Environment.Exit(1);
