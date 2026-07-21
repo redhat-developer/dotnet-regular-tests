@@ -59,22 +59,34 @@ return 1;
 // Use OpenSSL interop to get the negotiated key exchange group (SslStream doesn't expose this information).
 static void SetOpenSSLImportResolver()
 {
-    // Use the latest OpenSSL version on the system.
     NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), (name, assembly, searchPath) =>
     {
         Console.WriteLine($"Resolving {name}...");
 
         if (name == "libssl")
         {
-            if (NativeLibrary.TryLoad("libssl.so.4", assembly, searchPath, out var h) ||
-                NativeLibrary.TryLoad("libssl.so.3", assembly, searchPath, out h))
+            // The runtime can pick a libssl version based on the build
+            // configuration (portable vs non-portable) and/or version-priority
+            // and/or user-overrides. Instead of hardcoding or guessing, find
+            // the version of libssl.so already loaded into the current
+            // process. By the time this runs, we have already used TLS
+            // operations like SslStream(), so some version of libssl must be
+            // already loaded on *nix.
+            var procSelfMaps = File.ReadAllText("/proc/self/maps");
+            var libsslPath = procSelfMaps.Split(new string[]{ Environment.NewLine }, StringSplitOptions.None)
+                             .Select(line => line.Split(' ').LastOrDefault()?.Trim())
+                             .FirstOrDefault(path => !string.IsNullOrEmpty(path) && path.Contains("libssl.so"));
+
+            if (!string.IsNullOrEmpty(libsslPath) &&
+                NativeLibrary.TryLoad(libsslPath, assembly, searchPath, out var h))
             {
                 return h;
             }
+
             Console.WriteLine($"error: Cannot resolve {name}.");
             Console.WriteLine();
             Console.WriteLine("Mapped files:");
-            Console.WriteLine(File.ReadAllText("/proc/self/maps"));
+            Console.WriteLine(procSelfMaps);
             Console.WriteLine();
             Console.WriteLine("libssl files in /usr/lib*:");
             try
