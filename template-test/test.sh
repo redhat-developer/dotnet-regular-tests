@@ -19,6 +19,7 @@ dotnet11Templates=(
     apicontroller
     blazor
     blazorwasm
+    blazorwasm-servicedefaults
     blazorwebworker
     buildprops
     buildtargets
@@ -491,7 +492,13 @@ function testTemplate {
         echo "SKIP skipping webapiaot on ppc64/s390x/armv7"
         return
     fi
-
+    
+    if [[ ( $(uname -m) == "s390x" ||  $(uname -m) == "ppc64le" || $(uname -m) == "armv7" || $(uname -m) == "armv8l" ) && ( "${templateName}" == "mcpserver" ) ]]; then
+        # mcpserver relies on Microsoft.NETCore.App.Runtime, which will not even restore on mono (ppc64le/s390x) and arm, skip it
+        echo "SKIP skipping mcpserver on ppc64/s390x/armv7"
+        return
+    fi
+    
     if [[ ${action} = project,* ]] ; then
         dotnet new console 2>&1 | tee "${templateName}.log"
         action=$(echo "${action}" | sed -E "s|project,||")
