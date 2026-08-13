@@ -8,7 +8,8 @@
   "skipWhen": [
     "vmr-ci", // tools PATH not configured (tar.gz build)
     "os=fedora.44", // Fedora packages stopped updating PATH with 44
-    "os=fedora.45"
+    "os=fedora.45",
+    "os=fedora.46"
   ],
   "ignoredRIDs": [
   ]
