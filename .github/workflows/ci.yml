@@ -24,6 +24,7 @@ jobs:
           - quay.io/centos/centos:stream10
           - registry.fedoraproject.org/fedora:43
           - registry.fedoraproject.org/fedora:44
+          - registry.fedoraproject.org/fedora:45
           - registry.fedoraproject.org/fedora:rawhide
           - registry.access.redhat.com/ubi8
           - registry.access.redhat.com/ubi9
@@ -32,6 +33,15 @@ jobs:
           - "8.0"
           - "9.0"
           - "10.0"
+        exclude:
+          - container_image: registry.fedoraproject.org/fedora:45
+            dotnet_version: "8.0"
+          - container_image: registry.fedoraproject.org/fedora:rawhide
+            dotnet_version: "8.0"
+          - container_image: registry.fedoraproject.org/fedora:45
+            dotnet_version: "9.0"
+          - container_image: registry.fedoraproject.org/fedora:rawhide
+            dotnet_version: "9.0"
         # Preview .NET versions are available via the @dotnet-sig/dotnet-preview copr repo.
         # Each year, add include entries for the new preview version (fedora:latest + rawhide)
         # with use_preview_copr: true. When a version ships officially, move dotnet_version
