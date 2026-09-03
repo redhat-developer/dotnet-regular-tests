@@ -198,17 +198,12 @@ echo "[name2ee]"
 lldb-core 'name2ee *!System.String' > lldb.out
 cat lldb.out
 grep 'MethodTable: ' lldb.out
-grep 'EEClass: ' lldb.out
 grep 'Name: ' lldb.out
 string_module=$(grep 'Module: ' lldb.out | head -1 | awk '{print $2}')
 string_method_table=$(grep 'MethodTable:' lldb.out | awk '{print $2}')
-string_eeclass=$(grep 'EEClass:' lldb.out | head -1 | awk '{print $2}')
 
 lldb-core 'name2ee *!System.String.ToString' > lldb.out
 cat lldb.out
-grep 'TestDir.dll' lldb.out
-grep 'System.Runtime.dll' lldb.out
-grep 'Microsoft.AspNetCore.dll' lldb.out
 to_string_method_descriptor=$(grep 'MethodDesc:' lldb.out | head -1 | awk '{print $2}')
 
 # https://github.com/dotnet/diagnostics/issues/3757
@@ -217,11 +212,6 @@ to_string_method_descriptor=$(grep 'MethodDesc:' lldb.out | head -1 | awk '{prin
 # cat lldb.out
 # grep 'Name:            System.String' lldb.out
 # grep -F "File:            ${framework_dir}" lldb.out
-
-echo "[dumpclass]"
-lldb-core "dumpclass ${string_eeclass}" > lldb.out
-cat lldb.out
-grep 'Class Name:      System.String' lldb.out
 
 echo "[dumpmd]"
 lldb-core "dumpmd ${to_string_method_descriptor}" > lldb.out
