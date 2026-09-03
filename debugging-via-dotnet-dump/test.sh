@@ -227,8 +227,14 @@ fi
 heading "dumpclass"
 dump-analyze 'name2ee *!System.String' > dump.out
 cat dump.out
-string_method_table=$(grep 'MethodTable:' dump.out | { head -1; cat > /dev/null; }  | awk '{print $2}')
-dump-analyze "dumpclass ${string_method_table}" > dump.out
+# For .NET 8, dumpclass needs EEClass. For later versions we pass the
+# MethodTable address since EEClass is no longer in the output.
+if grep -q 'EEClass:' dump.out; then
+    dumpclass_arg=$(grep 'EEClass:' dump.out | { head -1; cat > /dev/null; }  | awk '{print $2}')
+else
+    dumpclass_arg=$(grep 'MethodTable:' dump.out | { head -1; cat > /dev/null; }  | awk '{print $2}')
+fi
+dump-analyze "dumpclass ${dumpclass_arg}" > dump.out
 cat dump.out
 grep 'Class Name:      System.String' dump.out
 
