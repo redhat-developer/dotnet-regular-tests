@@ -201,13 +201,12 @@ grep 'MethodTable: ' lldb.out
 grep 'Name: ' lldb.out
 string_module=$(grep 'Module: ' lldb.out | head -1 | awk '{print $2}')
 string_method_table=$(grep 'MethodTable:' lldb.out | head -1 | awk '{print $2}')
-# For .NET 8, dumpclass needs EEClass. For later versions we pass the
-# MethodTable address since EEClass is no longer in the output.
-if grep -q 'EEClass:' lldb.out; then
-    dumpclass_arg=$(grep 'EEClass:' lldb.out | head -1 | awk '{print $2}')
-else
-    dumpclass_arg=${string_method_table}
-fi
+lldb-core "dumpmt ${string_method_table}" > lldb.out
+cat lldb.out
+# On .NET 8, dumpclass needs the EEClass address (from dumpmt output).
+# On .NET 9+, EEClass is gone and dumpclass accepts the MethodTable directly.
+dumpclass_arg=$(grep 'EEClass:' lldb.out | head -1 | awk '{print $2}' || true)
+dumpclass_arg=${dumpclass_arg:-${string_method_table}}
 
 lldb-core 'name2ee *!System.String.ToString' > lldb.out
 cat lldb.out
