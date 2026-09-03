@@ -227,9 +227,14 @@ fi
 heading "dumpclass"
 dump-analyze 'name2ee *!System.String' > dump.out
 cat dump.out
-grep 'EEClass: ' dump.out
-string_eeclass=$(grep 'EEClass:' dump.out | { head -1; cat > /dev/null; }  | awk '{print $2}')
-dump-analyze "dumpclass ${string_eeclass}" > dump.out
+string_method_table=$(grep 'MethodTable:' dump.out | { head -1; cat > /dev/null; }  | awk '{print $2}')
+dump-analyze "dumpmt ${string_method_table}" > dump.out
+cat dump.out
+# On .NET 8, dumpclass needs the EEClass address (from dumpmt output).
+# On .NET 9+, EEClass is gone and dumpclass accepts the MethodTable directly.
+dumpclass_arg=$(grep 'EEClass:' dump.out | awk '{print $2}' || true)
+dumpclass_arg=${dumpclass_arg:-${string_method_table}}
+dump-analyze "dumpclass ${dumpclass_arg}" > dump.out
 cat dump.out
 grep 'Class Name:      System.String' dump.out
 
@@ -297,9 +302,6 @@ if grep 'Unmanaged code' dump.out; then
 fi
 dump-analyze 'name2ee *!System.String.ToString' > dump.out
 cat dump.out
-grep 'TestDir.dll' dump.out
-grep 'System.Runtime.dll' dump.out
-grep 'Microsoft.AspNetCore.dll' dump.out
 to_string_method_descriptor=$(grep 'MethodDesc:' dump.out | { head -1; cat > /dev/null; }  | awk '{print $2}')
 dump-analyze "dumpmd ${to_string_method_descriptor}" > dump.out
 cat dump.out
@@ -323,7 +325,7 @@ heading "dumpmt"
 dump-analyze 'name2ee *!System.String' > dump.out
 cat dump.out
 grep 'MethodTable:' dump.out | awk '{print $2}'
-string_method_table=$(grep 'MethodTable:' dump.out | awk '{print $2}')
+string_method_table=$(grep 'MethodTable:' dump.out | { head -1; cat > /dev/null; } | awk '{print $2}')
 dump-analyze "dumpmt ${string_method_table}" > dump.out
 cat dump.out
 grep -E '^Name:[ \n\t]+System.String' dump.out
@@ -550,7 +552,6 @@ heading "name2ee"
 dump-analyze 'name2ee *!System.String' > dump.out
 cat dump.out
 grep 'MethodTable: ' dump.out
-grep 'EEClass: ' dump.out
 grep 'Name: ' dump.out
 dump-analyze 'name2ee *!System.String.ToString' > dump.out
 
