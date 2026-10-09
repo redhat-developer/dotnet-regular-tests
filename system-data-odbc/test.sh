@@ -8,7 +8,8 @@ set -x
 if [[ $(id -u) == "0" ]]; then
     id testrunner || useradd testrunner || adduser testrunner --disabled-password
     chown -R testrunner:testrunner "$(pwd)"
-    su testrunner -c "$(readlink -f "$0")" "$@"
+    # root's XDG_RUNTIME_DIR may cause permission errors for the testrunner user
+    env XDG_RUNTIME_DIR= su testrunner -c "$(readlink -f "$0")" "$@"
     exit
 fi
 
