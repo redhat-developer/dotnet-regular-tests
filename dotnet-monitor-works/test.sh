@@ -4,8 +4,14 @@ set -euo pipefail
 IFS=$'\n\t'
 set -x
 
-IFS='.-' read -ra VERSION_SPLIT <<< "$1" 
-dotnet tool update -g dotnet-monitor --version "${VERSION_SPLIT[0]}.*-*"
+IFS='.-' read -ra VERSION_SPLIT <<< "$1"
+# Try to install the latest version that matches the major version number.
+if ! dotnet tool update -g dotnet-monitor --version "${VERSION_SPLIT[0]}.*-*"; then
+    # Fall back to latest version when there's no matching major (e.g. .NET 11 uses dotnet-monitor 10.x).
+    echo "No dotnet-monitor ${VERSION_SPLIT[0]}.x found, falling back to latest version."
+    dotnet tool update -g dotnet-monitor --prerelease
+    export DOTNET_ROLL_FORWARD_TO_PRERELEASE=1
+fi
 
 export PATH="$HOME/.dotnet/tools:$PATH"
 
