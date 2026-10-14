@@ -23,7 +23,7 @@ for tool in "${!tools[@]}"; do
   # Ignore the exit code because 'dotnet user-secrets' has a non-zero exit for '--help'.
   output=$(dotnet "${tool}" --help 2>&1) || true
 
-  if echo "${output}" | grep -q "${expected}"; then
+  if grep -q "${expected}" <<< "${output}"; then
     echo "PASS: dotnet ${tool} --help"
   else
     echo "FAIL: dotnet ${tool} --help did not contain '${expected}'"
