@@ -1,14 +1,12 @@
 {
-  "name": "system-openssl",
+  "name": "required-system-libraries",
   "enabled": true,
   "requiresSdk": false,
-  "version": "2.1",
+  "version": "11.0",
   "versionSpecific": false,
   "type": "bash",
   "cleanup": true,
   "skipWhen": [
-    "portable", // portable dlopen()s system openssl
-  ],
-  "ignoredRIDs":[
+    "portable"     // portable builds dlopen OpenSSL
   ]
 }

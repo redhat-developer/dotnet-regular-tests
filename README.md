@@ -12,5 +12,5 @@ $ git clone https://github.com/redhat-developer/dotnet-bunny && cd dotnet-bunny 
 
 ### Dependencies
 
-Dependencies(apk): babeltrace bash bash-completion binutils coreutils curl file findutils g++ jq libstdc++-dev lldb lttng-ust lttng-tools npm postgresql psqlodbc python3 sed strace unixodbc wget zlib-dev
-Dependencies(dnf): awk babeltrace bash-completion bc curl findutils gcc-c++ jq libstdc++-devel lttng-ust lttng-tools npm postgresql-odbc postgresql-server python3 strace unixODBC /usr/bin/file /usr/bin/free /usr/bin/lldb /usr/bin/readelf /usr/bin/su which wget zlib-devel
+Dependencies(apk): babeltrace bash bash-completion binutils coreutils curl file findutils git g++ jq libstdc++-dev lldb lttng-ust lttng-tools npm postgresql psqlodbc python3 sed strace unixodbc wget zlib-dev
+Dependencies(dnf): awk babeltrace bash-completion bc curl findutils gcc-c++ git-core jq libstdc++-devel lttng-ust lttng-tools npm postgresql-odbc postgresql-server python3 strace unixODBC /usr/bin/file /usr/bin/free /usr/bin/lldb /usr/bin/readelf /usr/bin/su which wget zlib-devel
