@@ -1,0 +1,15 @@
+{
+  "name": "system-or-bundled-libraries",
+  "enabled": true,
+  "requiresSdk": true,
+  "version": "11.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "skipWhen": [
+    "os=alpine",        // uses RPM specific packages
+    "vmr-ci"            // uses packages
+  ],
+  "ignoredRIDs":[
+  ]
+}

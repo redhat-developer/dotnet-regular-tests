@@ -47,12 +47,16 @@ jobs:
         # with use_preview_copr: true. When a version ships officially, move dotnet_version
         # into the main list above and remove its include entries (and this block if empty).
         include:
+          - container_image: registry.fedoraproject.org/fedora:43
+            dotnet_version: "11.0"
           - container_image: registry.fedoraproject.org/fedora:44
             dotnet_version: "11.0"
-            use_preview_copr: true
+          - container_image: registry.fedoraproject.org/fedora:45
+            dotnet_version: "11.0"
           - container_image: registry.fedoraproject.org/fedora:rawhide
             dotnet_version: "11.0"
-            use_preview_copr: true
+          - container_image: registry.access.redhat.com/ubi8
+            dotnet_version: "11.0"
 
     container:
       image: ${{ matrix.container_image }}
