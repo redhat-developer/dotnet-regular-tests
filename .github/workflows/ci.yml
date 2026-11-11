@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
 name: Confirm tests run successfully
 
 on:
@@ -30,33 +32,23 @@ jobs:
           - registry.access.redhat.com/ubi9
           - registry.access.redhat.com/ubi10
         dotnet_version:
-          - "8.0"
-          - "9.0"
           - "10.0"
+          - "11.0"
         exclude:
-          - container_image: registry.fedoraproject.org/fedora:45
-            dotnet_version: "8.0"
-          - container_image: registry.fedoraproject.org/fedora:rawhide
-            dotnet_version: "8.0"
-          - container_image: registry.fedoraproject.org/fedora:45
-            dotnet_version: "9.0"
-          - container_image: registry.fedoraproject.org/fedora:rawhide
-            dotnet_version: "9.0"
+          # .NET 11 is not packaged in Alpine 3.24 (alpine:latest) yet; drop this
+          # once latest ships it.
+          - container_image: docker.io/library/alpine:latest
+            dotnet_version: "11.0"
+          # Alpine edge's .NET 11 dbg/aot packages depend on a non-existent
+          # 'dotnet11-sdk' package (the 11.0 SDK is shipped as 'dotnet10-sdk' that
+          # only provides 'dotnet-sdk-11.0'). Drop this once that packaging is fixed.
+          - container_image: docker.io/library/alpine:edge
+            dotnet_version: "11.0"
         # Preview .NET versions are available via the @dotnet-sig/dotnet-preview copr repo.
         # Each year, add include entries for the new preview version (fedora:latest + rawhide)
         # with use_preview_copr: true. When a version ships officially, move dotnet_version
         # into the main list above and remove its include entries (and this block if empty).
-        include:
-          - container_image: registry.fedoraproject.org/fedora:43
-            dotnet_version: "11.0"
-          - container_image: registry.fedoraproject.org/fedora:44
-            dotnet_version: "11.0"
-          - container_image: registry.fedoraproject.org/fedora:45
-            dotnet_version: "11.0"
-          - container_image: registry.fedoraproject.org/fedora:rawhide
-            dotnet_version: "11.0"
-          - container_image: registry.access.redhat.com/ubi8
-            dotnet_version: "11.0"
+        #include:
 
     container:
       image: ${{ matrix.container_image }}
@@ -66,8 +58,6 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install .NET ${{ matrix.dotnet_version }}
-        # .NET 9 introduced the 'dotnet-sdk-aot' package
-        # .NET 8 introduced the 'dbg' packages
         # '/etc/os-release' will also match the grep fedora for Fedora derived systems, such as CentOS.
         timeout-minutes: 10
         run: |
@@ -85,11 +75,9 @@ jobs:
             dnf install -y dotnet-sdk-${{ matrix.dotnet_version }}
             dnf install -y \
               dotnet-sdk-dbg-${{ matrix.dotnet_version }} \
+              dotnet-sdk-aot-${{ matrix.dotnet_version }} \
               dotnet-runtime-dbg-${{ matrix.dotnet_version }} \
               aspnetcore-runtime-dbg-${{ matrix.dotnet_version }}
-            if [[ ${{ matrix.dotnet_version }} != 8.* ]]; then
-              dnf install -y dotnet-sdk-aot-${{ matrix.dotnet_version }}
-            fi
           elif grep alpine /etc/os-release; then
             if grep edge /etc/os-release; then
               echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
@@ -98,11 +86,9 @@ jobs:
             apk add dotnet-sdk-${{ matrix.dotnet_version }} dotnet-doc
             apk add \
               dotnet-sdk-dbg-${{ matrix.dotnet_version }} \
+              dotnet-sdk-aot-${{ matrix.dotnet_version }} \
               dotnet-runtime-dbg-${{ matrix.dotnet_version }} \
               aspnetcore-runtime-dbg-${{ matrix.dotnet_version }}
-            if [[ ${{ matrix.dotnet_version }} != 8.* ]]; then
-              apk add dotnet-sdk-aot-${{ matrix.dotnet_version }}
-            fi
           fi
           dotnet --info
 
@@ -121,6 +107,15 @@ jobs:
           set -euo pipefail
           wget --no-verbose https://github.com/redhat-developer/dotnet-bunny/releases/latest/download/turkey.tar.gz
           tar xf turkey.tar.gz
+
+      - name: Configure .NET ${{ matrix.dotnet_version }} environment
+        run: |
+          set -euo pipefail
+          # .NET 11 requires the MSBuild server to be disabled in CI.
+          # https://github.com/dotnet/runtime/issues/137182
+          if [[ ${{ matrix.dotnet_version }} == 11.* ]]; then
+            echo 'DOTNET_CLI_USE_MSBUILD_SERVER=false' >> "${GITHUB_ENV}"
+          fi
 
       - name: Run tests
         run: |
