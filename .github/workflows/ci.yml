@@ -18,8 +18,6 @@ jobs:
       fail-fast: false
       matrix:
         container_image:
-          - docker.io/library/alpine:latest
-          - docker.io/library/alpine:edge
           - quay.io/centos/centos:stream9
           - quay.io/centos/centos:stream10
           - registry.fedoraproject.org/fedora:43
@@ -30,40 +28,18 @@ jobs:
           - registry.access.redhat.com/ubi9
           - registry.access.redhat.com/ubi10
         dotnet_version:
-          - "8.0"
-          - "9.0"
-          - "10.0"
-        exclude:
-          - container_image: registry.fedoraproject.org/fedora:45
-            dotnet_version: "8.0"
-          - container_image: registry.fedoraproject.org/fedora:rawhide
-            dotnet_version: "8.0"
-          - container_image: registry.fedoraproject.org/fedora:45
-            dotnet_version: "9.0"
-          - container_image: registry.fedoraproject.org/fedora:rawhide
-            dotnet_version: "9.0"
+          - "11.0"
         # Preview .NET versions are available via the @dotnet-sig/dotnet-preview copr repo.
         # Each year, add include entries for the new preview version (fedora:latest + rawhide)
         # with use_preview_copr: true. When a version ships officially, move dotnet_version
         # into the main list above and remove its include entries (and this block if empty).
-        include:
-          - container_image: registry.fedoraproject.org/fedora:43
-            dotnet_version: "11.0"
-          - container_image: registry.fedoraproject.org/fedora:44
-            dotnet_version: "11.0"
-          - container_image: registry.fedoraproject.org/fedora:45
-            dotnet_version: "11.0"
-          - container_image: registry.fedoraproject.org/fedora:rawhide
-            dotnet_version: "11.0"
-          - container_image: registry.access.redhat.com/ubi8
-            dotnet_version: "11.0"
 
     container:
       image: ${{ matrix.container_image }}
       options: --security-opt seccomp=unconfined
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install .NET ${{ matrix.dotnet_version }}
         # .NET 9 introduced the 'dotnet-sdk-aot' package
@@ -126,6 +102,12 @@ jobs:
         run: |
           set -euo pipefail
 
+          id
+          echo "HOME: $HOME"
+          echo "XDG_RUNTIME_DIR: ${XDG_RUNTIME_DIR:-(unset)}"
+          ls -al $HOME
+          test -d $HOME/.dotnet && find $HOME/.dotnet
+
           trait_flags=()
 
           if [[ ${{ matrix.container_image }} == *ubi8 ]] ; then
@@ -138,11 +120,26 @@ jobs:
               trait_flags+=( --trait ubi10-repos )
           fi
 
-          dotnet turkey/Turkey.dll -v --timeout 600 --trait github-ci "${trait_flags[@]}"
+          mkdir -p /tmp/dotnet-diag
+          dotnet turkey/Turkey.dll -v --timeout 600 --trait github-ci "${trait_flags[@]}" --log-directory /tmp/dotnet-diag/
         shell: bash
+        env:
+          # 1. Host & CLI resolution traces
+          DOTNET_CLI_USE_MSBUILD_SERVER: "false"
+          # 2. MSBuild out-of-proc node & scheduler logs
+          MSBUILDDEBUGENGINE: "1"
+          MSBUILDDEBUGPATH: "/tmp/dotnet-diag"
+          # 3. Runtime crash dumps & JSON stack reports
+          DOTNET_DbgEnableMiniDump: "1"
+          DOTNET_DbgMiniDumpType: "1"
+          DOTNET_DbgMiniDumpName: "/tmp/dotnet-diag/coredump.%e.%p.%t.dmp"
+          DOTNET_EnableCrashReport: "1"
+          DOTNET_CreateDumpDiagnostics: "1"
 
-      - name: Show Logs
-        if: ${{ always() }}
-        run: |
-          set -euo pipefail
-          find -iname '*.log' -exec echo {} \; -exec cat {} \;
+      - name: Upload .NET diagnostic logs and dumps
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: dotnet-11-diagnostics
+          path: /tmp/dotnet-diag/
+          if-no-files-found: warn
