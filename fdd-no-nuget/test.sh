@@ -16,7 +16,7 @@ cat <<EOF >nuget.config
 </configuration>
 EOF
 
-dotnet publish
+dotnet -d publish
 
 if [ $? -eq 1 ]; then
   echo "FAIL: unable to publish FFD without nuget.org access"
