@@ -9,14 +9,20 @@ echo "Found .NET at $dotnet_dir"
 
 errors=0
 
+# Allow known files in the SDK layout. Flag other files.
+#
 # The SharedFramework SDK intentionally generates each runtime pack's framework
 # .deps.json and .runtimeconfig.json at runtimes/<rid>/lib/<tfm>.
 # See https://github.com/dotnet/arcade/pull/5714
-# Allow only those known files in that layout; other JSON files in packs are unexpected.
+#
+# Mono-based SDKs include a RuntimeComponentManifest.json at
+# Microsoft.NETCore.App.Runtime.<rid>/<version>/runtimes/<rid>/build/RuntimeComponentManifest.json.
+# See https://github.com/dotnet/runtime/issues/137848
 bad_json_files=()
 while IFS= read -r -d '' json_file; do
     relative_path=${json_file#"$dotnet_dir/packs/"}
     if [[ ! $relative_path =~ ^Microsoft\.NETCore\.App\.Runtime(\.NativeAOT)?\.[^/]+/[^/]+/runtimes/[^/]+/lib/net[^/]+/Microsoft\.NETCore\.App\.(deps|runtimeconfig)\.json$ &&
+          ! $relative_path =~ ^Microsoft\.NETCore\.App\.Runtime\.[^/]+/[^/]+/runtimes/[^/]+/build/RuntimeComponentManifest\.json$ &&
           ! $relative_path =~ ^Microsoft\.AspNetCore\.App\.Runtime\.[^/]+/[^/]+/runtimes/[^/]+/lib/net[^/]+/Microsoft\.AspNetCore\.App\.(deps|runtimeconfig)\.json$ ]]; then
         bad_json_files+=("$json_file")
     fi
