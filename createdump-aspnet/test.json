@@ -8,7 +8,13 @@
   "cleanup": true,
   "skipWhen": [
     "github-ci", // github CI can't ptrace(2)
-    "runtime=mono" // 'createdump' is not included with mono
+    "runtime=mono", // 'createdump' is not included with mono
+    // 12 and later ship with a createdump that doesn't accept a target pid
+    // argument. Runtime-initiated crash dumps are covered by
+    // ../runtime-crash-dumps instead.
+    // FIXME: Delete this test when 11 reaches EOL.
+    "version=12",
+    "version=13"
   ],
   "ignoredRIDs":[
   ]
