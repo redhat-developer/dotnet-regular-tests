@@ -1,0 +1,14 @@
+{
+  "name": "runtime-crash-dumps",
+  "enabled": true,
+  "requiresSdk": true,
+  "version": "12.0",
+  "versionSpecific": false,
+  "type": "bash",
+  "cleanup": true,
+  "skipWhen": [
+    "runtime=mono" // mono does not support runtime crash dumps
+  ],
+  "ignoredRIDs":[
+  ]
+}
