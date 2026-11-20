@@ -9,6 +9,15 @@ IFS='.-' read -ra VERSION_SPLIT <<< "$1"
 
 version=${VERSION_SPLIT[0]}.${VERSION_SPLIT[1]}
 
+# FIXME: delete this test when .NET 11 reaches EOL.
+# Starting with .NET 12, createdump no longer accepts a target PID argument
+# (https://github.com/dotnet/runtime/pull/133330). Runtime-initiated crash
+# dumps are covered by ../runtime-crash-dumps instead.
+if (( 10#${VERSION_SPLIT[0]} >= 12 )); then
+    echo "PASS: not applicable, createdump takes no PID argument in .NET 12+"
+    exit 0
+fi
+
 dotnet new web --no-restore --force
 
 sed -i -e 's|.UseStartup|.UseUrls("http://localhost:5000").UseStartup|' Program.cs
