@@ -82,13 +82,23 @@ check_dependency libSystem.IO.Compression.Native.so libz
 
 # zstd
 # Zstandard support was added in .NET 11. Compare major versions so that
-# preview versions and future releases are covered too.
+# preview versions and future releases are covered too. The system version of
+# zstd on RHEL 8 is not usable by .NET, so it uses the bundled copy
+# intentionally.
 major_version=${1%%[!0-9]*}
 if [[ -z "$major_version" ]]; then
     echo "FAIL: cannot determine major version from $1"
     failed=1
 elif (( 10#$major_version >= 11 )); then
-    check_dependency libSystem.IO.Compression.Native.so libzstd
+    runtime_id="$(../runtime-id)"
+    case "$runtime_id" in
+        rhel.8-*|centos.8-*)
+            echo "SKIP: a usable zstd is not available on $runtime_id"
+            ;;
+        *)
+            check_dependency libSystem.IO.Compression.Native.so libzstd
+            ;;
+    esac
 fi
 
 exit "$failed"
